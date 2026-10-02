@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta name="google-site-verification-preview" content="temporary-github-pages-preview">
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>РемГазСервис — Газификация, котельные, СУГ и инженерный сервис</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue-primary: #004D99;
+  --blue-deep: #082142;
+  --blue-dark: #05152B;
+  --blue-hover: #00366B;
+  --blue-glow: rgba(0, 77, 153, 0.22);
+  --blue-subtle: #EDF4FC;
+  --blue-line: #CCE0F5;
+  --flame-orange: #FF6600;
+  --flame-amber: #FFA000;
+  --flame-glow: rgba(255, 102, 0, 0.25);
+  --white: #FFFFFF;
+  --frost-bg: #F4F7FB;
+  --ink: #0A192F;
+  --ink-soft: #2D3E54;
+  --muted: #5C708A;
+  --line-light: #DCE5F0;
+  --shadow-sm: 0 2px 8px rgba(8, 33, 66, 0.04);
+  --shadow-md: 0 10px 30px rgba(8, 33, 66, 0.08);
+  --shadow-lg: 0 20px 50px rgba(8, 33, 66, 0.12);
+  --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --max-width: 1400px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--frost-bg);
+  color: var(--ink);
+  font-family: var(--font-main);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page Frame */
+.page-wrapper {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  background: var(--white);
+  border-left: 1px solid var(--line-light);
+  border-right: 1px solid var(--line-light);
+  min-height: 100vh;
+  box-shadow: 0 0 50px rgba(9, 35, 71, 0.06);
+  position: relative;
+}
+
+/* Top utility strip */
+.top-utility {
+  background: var(--blue-dark);
+  color: #B2C7DE;
+  padding: 9px 4vw;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #142E52;
+}
+.utility-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.utility-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #38BDF8;
+}
+.utility-dot::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #38BDF8;
+  box-shadow: 0 0 10px #38BDF8;
+}
+
+/* Header */
+.top-header {
+  height: 86px;
+  border-bottom: 2px solid var(--blue-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4vw;
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(16px);
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+}
+.brand-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.brand-logo-img {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.2s ease;
+}
+.brand-identity:hover .brand-logo-img {
+  transform: scale(1.02);
+}
+.brand-text-col {
+  border-left: 1px solid var(--blue-line);
+  padding-left: 14px;
+}
+.brand-title {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blue-deep);
+  line-height: 1.1;
+}
+.brand-sub {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 3px;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+.nav-menu a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: all 0.2s;
+  padding-bottom: 4px;
+}
+.nav-menu a:hover {
+  color: var(--blue-primary);
+  border-bottom: 2px solid var(--blue-primary);
+}
+
+.header-action {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.header-phone {
+  text-align: right;
+}
+.header-phone a {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--blue-deep);
+  text-decoration: none;
+  display: block;
+}
+.header-phone small {
+  font-size: 11px;
+  color: var(--muted);
+}
+.btn-head {
+  background: var(--blue-primary);
+  color: var(--white);
+  padding: 11px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px var(--blue-glow);
+}
+.btn-head:hover {
+  background: var(--blue-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 77, 153, 0.3);
+}
+
+/* Mobile Nav Drawer */
+.mobile-nav-toggle {
+  display: none;
+  background: var(--blue-subtle);
+  border: 1px solid var(--blue-line);
+  color: var(--blue-deep);
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+  font-size: 20px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.mobile-drawer {
+  display: none;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  background: var(--blue-dark);
+  color: white;
+  padding: 24px;
+  z-index: 99;
+  border-bottom: 2px solid var(--blue-primary);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  animation: slideDown 0.25s ease;
+}
+.mobile-drawer.open { display: block; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.mobile-drawer ul { list-style: none; }
+.mobile-drawer ul li { margin-bottom: 16px; }
+.mobile-drawer ul li a {
+  color: #E2E8F0;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  display: block;
+}
+.mobile-drawer-contact {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #1E293B;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Hero Section */
+.hero-editorial {
+  padding: 85px 4vw 75px;
+  border-bottom: 1px solid var(--line-light);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #FFFFFF 0%, #EFF6FC 100%);
+  position: relative;
+  overflow: hidden;
+}
+.hero-editorial::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 77, 153, 0.09) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+.hero-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--blue-primary);
+  background: var(--blue-subtle);
+  border: 1px solid var(--blue-line);
+  padding: 7px 16px;
+  border-radius: 4px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-kicker::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--flame-orange);
+  box-shadow: 0 0 8px var(--flame-orange);
+}
+.hero-heading {
+  font-size: clamp(34px, 3.8rem, 74px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: normal;
+  max-width: 1080px;
+  color: var(--blue-dark);
+  margin-bottom: 26px;
+  overflow-wrap: break-word;
+}
+.hero-heading .typing-cursor {
+  color: var(--blue-primary);
+  border-right: 3px solid var(--flame-orange);
+  padding-right: 4px;
+  animation: blink 0.85s infinite;
+}
+@keyframes blink { 50% { border-color: transparent; } }
+
+.hero-actions-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 44px;
+  flex-wrap: wrap;
+}
+.btn-primary-lead {
+  background: var(--blue-primary);
+  color: white;
+  padding: 16px 34px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 20px var(--blue-glow);
+  transition: all 0.25s;
+}
+.btn-primary-lead:hover {
+  background: var(--blue-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 77, 153, 0.32);
+}
+.btn-outline-lead {
+  background: var(--white);
+  border: 1px solid var(--blue-line);
+  color: var(--blue-deep);
+  padding: 16px 30px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.btn-outline-lead:hover {
+  background: var(--blue-subtle);
+  border-color: var(--blue-primary);
+}
+
+.hero-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+  padding-top: 36px;
+  border-top: 1px solid var(--blue-line);
+  flex-wrap: wrap;
+}
+.hero-philosophy {
+  max-width: 520px;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+.hero-metrics {
+  display: flex;
+  gap: 36px;
+}
+.h-metric {
+  border-left: 3px solid var(--blue-primary);
+  padding-left: 14px;
+}
+.h-metric strong {
+  display: block;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  font-family: var(--font-mono);
+  color: var(--blue-deep);
+}
+.h-metric span {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 6px;
+  display: block;
+  font-weight: 600;
+}
+
+/* Section Common */
+.editorial-section {
+  padding: 100px 4vw;
+  border-bottom: 1px solid var(--line-light);
+}
+.sec-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--blue-primary);
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.sec-title {
+  font-size: clamp(28px, 2.5rem, 50px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: normal;
+  margin-bottom: 18px;
+  color: var(--blue-deep);
+  max-width: 860px;
+  overflow-wrap: break-word;
+}
+.sec-desc {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 680px;
+  margin-bottom: 50px;
+}
+
+/* Object Matrix Grid (8 Objects with Icons) */
+.object-matrix {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 2px solid var(--blue-deep);
+  border-left: 1px solid var(--blue-line);
+  margin-bottom: 30px;
+}
+.matrix-cell {
+  background: var(--white);
+  border-right: 1px solid var(--blue-line);
+  border-bottom: 1px solid var(--blue-line);
+  padding: 28px 22px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  min-height: 195px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.matrix-cell:hover {
+  background: var(--blue-subtle);
+  border-color: var(--blue-primary);
+}
+.matrix-cell.active {
+  background: var(--blue-deep);
+  color: var(--white);
+  border-color: var(--blue-deep);
+  box-shadow: 0 10px 30px rgba(9, 35, 71, 0.2);
+}
+.cell-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.cell-index {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--blue-primary);
+  font-weight: 700;
+}
+.matrix-cell.active .cell-index {
+  color: #38BDF8;
+}
+.cell-icon {
+  font-size: 20px;
+  opacity: 0.85;
+}
+.cell-name {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--blue-deep);
+}
+.matrix-cell.active .cell-name {
+  color: var(--white);
+}
+.cell-sub {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.matrix-cell.active .cell-sub {
+  color: #B4CCE6;
+}
+.cell-arrow {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  font-size: 16px;
+  font-family: var(--font-mono);
+  color: var(--blue-primary);
+  transition: transform 0.2s;
+}
+.matrix-cell.active .cell-arrow {
+  color: var(--flame-orange);
+  transform: translate(3px, -3px);
+}
+
+/* Detail Drawer (Active Selection) */
+.detail-view {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F5F9FD 100%);
+  border: 1px solid var(--blue-line);
+  border-left: 5px solid var(--blue-primary);
+  border-radius: 8px;
+  padding: 44px;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 44px;
+  box-shadow: var(--shadow-md);
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.dv-title {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--blue-deep);
+  letter-spacing: normal;
+  margin-bottom: 14px;
+}
+.dv-desc {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin-bottom: 24px;
+}
+.dv-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.dv-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--blue-line);
+  background: var(--blue-subtle);
+  padding: 6px 12px;
+  color: var(--blue-primary);
+  border-radius: 4px;
+}
+.dv-meta-list {
+  border-top: 1px solid var(--blue-line);
+  padding-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.dv-meta-item small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.dv-meta-item strong {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--blue-deep);
+  font-family: var(--font-mono);
+}
+.dv-visual-wrap {
+  border: 1px solid var(--blue-line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #E2EAF2;
+  position: relative;
+  min-height: 320px;
+}
+.dv-visual-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.dv-visual-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(8, 33, 66, 0.92) 100%);
+  padding: 20px;
+  color: white;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+/* Process Steps */
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-top: 2px solid var(--blue-deep);
+  border-left: 1px solid var(--blue-line);
+}
+.process-step {
+  border-right: 1px solid var(--blue-line);
+  border-bottom: 1px solid var(--blue-line);
+  padding: 30px 22px;
+  background: var(--white);
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s;
+}
+.process-step:hover {
+  background: var(--blue-subtle);
+}
+.step-index {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--blue-primary);
+  font-weight: 700;
+}
+.step-heading {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--blue-deep);
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+.step-text {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.process-note {
+  margin-top: 30px;
+  padding: 20px 26px;
+  border-left: 4px solid var(--blue-primary);
+  background: var(--blue-subtle);
+  border-top: 1px solid var(--blue-line);
+  border-right: 1px solid var(--blue-line);
+  border-bottom: 1px solid var(--blue-line);
+  font-size: 14px;
+  color: var(--blue-deep);
+  max-width: 820px;
+  border-radius: 6px;
+}
+
+/* Portfolio Projects */
+.case-triad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+.case-box {
+  background: var(--white);
+  border: 1px solid var(--blue-line);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.25s;
+}
+.case-box:hover {
+  border-color: var(--blue-primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+.case-img-wrap {
+  height: 230px;
+  border-bottom: 1px solid var(--blue-line);
+  overflow: hidden;
+  position: relative;
+}
+.case-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+.case-box:hover .case-img-wrap img {
+  transform: scale(1.04);
+}
+.case-body {
+  padding: 26px;
+}
+.case-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--blue-primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.case-body h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--blue-deep);
+  margin-bottom: 10px;
+}
+.case-body p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 20px;
+}
+.case-params {
+  padding-top: 14px;
+  border-top: 1px solid var(--line-light);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--blue-primary);
+  font-weight: 600;
+}
+
+/* Contact Section & Interactive Chips */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+}
+.contact-lead {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin-bottom: 30px;
+}
+.contact-numbers {
+  margin-bottom: 30px;
+}
+.big-phone {
+  font-size: 34px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--blue-primary);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 6px;
+}
+.contact-hours {
+  font-size: 13px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+.contact-spec-box {
+  background: var(--blue-subtle);
+  border: 1px solid var(--blue-line);
+  padding: 24px;
+  border-radius: 6px;
+}
+.contact-spec-box h5 {
+  font-size: 13px;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  color: var(--blue-deep);
+  margin-bottom: 8px;
+}
+
+/* Quick Object Type Pills on Form */
+.form-chips-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+  font-weight: 600;
+}
+.form-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.chip-btn {
+  background: var(--blue-subtle);
+  border: 1px solid var(--blue-line);
+  color: var(--blue-deep);
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chip-btn:hover, .chip-btn.active {
+  background: var(--blue-primary);
+  color: white;
+  border-color: var(--blue-primary);
+}
+
+.editorial-form {
+  border-top: 2px solid var(--blue-deep);
+}
+.form-row-line {
+  border-bottom: 1px solid var(--blue-line);
+  padding: 15px 0;
+}
+.form-row-line label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.form-transparent-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  font-family: var(--font-main);
+  color: var(--ink);
+  outline: none;
+}
+.form-transparent-input::placeholder {
+  color: #9AAEC4;
+}
+.submit-btn-line {
+  margin-top: 26px;
+  background: var(--blue-primary);
+  color: #FFFFFF;
+  border: none;
+  padding: 18px 34px;
+  font-size: 13px;
+  font-family: var(--font-main);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px var(--blue-glow);
+  width: 100%;
+}
+.submit-btn-line:hover {
+  background: var(--blue-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(0, 77, 153, 0.3);
+}
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 34px;
+}
+.service-card {
+  border: 1px solid var(--blue-line);
+  border-top: 3px solid var(--blue-primary);
+  border-radius: 8px;
+  padding: 24px;
+  background: var(--white);
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.service-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.service-card-featured { background: var(--blue-deep); border-color: var(--blue-deep); border-top-color: var(--flame-orange); color: var(--white); }
+.service-number { font-family: var(--font-mono); color: var(--flame-orange); font-size: 12px; font-weight: 700; margin-bottom: 24px; }
+.service-card h3 { color: var(--blue-deep); font-size: 18px; line-height: 1.25; margin-bottom: 12px; }
+.service-card-featured h3 { color: var(--white); }
+.service-card p { color: var(--muted); font-size: 13px; line-height: 1.55; }
+.service-card-featured p { color: #B4CCE6; }
+.service-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; padding-top: 20px; }
+.service-meta span { font-family: var(--font-mono); font-size: 10px; color: var(--blue-primary); background: var(--blue-subtle); padding: 6px 8px; border-radius: 4px; }
+.service-card-featured .service-meta span { color: #FFD0B8; background: rgba(255,102,0,.16); }
+.service-detail { display: grid; grid-template-columns: 1.15fr .85fr; gap: 32px; border-left: 4px solid var(--flame-orange); background: var(--blue-subtle); border-radius: 8px; padding: 28px; }
+.service-detail h3 { color: var(--blue-deep); font-size: 24px; margin-bottom: 10px; }
+.service-detail p { color: var(--ink-soft); font-size: 14px; line-height: 1.6; max-width: 650px; }
+.service-detail-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.service-detail-facts div { border-left: 1px solid var(--blue-line); padding-left: 12px; }
+.service-detail-facts small { display: block; color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+.service-detail-facts strong { color: var(--blue-deep); font-size: 14px; }
+
+/* Footer */
+.editorial-footer {
+  background: var(--blue-dark);
+  color: #FFFFFF;
+  padding: 60px 4vw 40px;
+  font-size: 13px;
+}
+.ef-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+.ef-brand {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.ef-brand-logo {
+  height: 48px;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.ef-brand strong {
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+  color: white;
+}
+.ef-brand p {
+  color: #8CA4C2;
+  max-width: 440px;
+  line-height: 1.5;
+  font-size: 12px;
+}
+.ef-links a {
+  color: #BACEE6;
+  text-decoration: none;
+  margin-right: 20px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.ef-links a:hover {
+  color: var(--flame-orange);
+}
+.ef-bottom {
+  border-top: 1px solid #162E4F;
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  color: #6C86A8;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* Floating Sticky Mobile Bottom Bar */
+.mobile-sticky-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(6, 24, 48, 0.95);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid #1E3A60;
+  padding: 10px 16px;
+  z-index: 999;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+}
+.mobile-sticky-btn-call {
+  flex: 1;
+  background: #10B981;
+  color: white;
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.mobile-sticky-btn-form {
+  flex: 1.2;
+  background: var(--blue-primary);
+  color: white;
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .object-matrix { grid-template-columns: 1fr 1fr; }
+  .process-grid { grid-template-columns: 1fr 1fr; }
+  .case-triad { grid-template-columns: 1fr; }
+  .detail-view { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+
+@media (max-width: 768px) {
+  body { padding-bottom: 60px; }
+  .top-utility { display: none; }
+  .nav-menu { display: none; }
+  .header-phone small { display: none; }
+  .btn-head { display: none; }
+  .mobile-nav-toggle { display: flex; }
+  
+  .top-header { height: 64px; padding: 0 16px; }
+  .brand-logo-img { height: 38px; }
+  .brand-title { font-size: 13px; }
+  .brand-sub { display: none; }
+  .brand-text-col { padding-left: 10px; }
+
+  .hero-editorial { padding: 40px 16px 45px; }
+  .hero-heading { font-size: 32px; line-height: 1.15; margin-bottom: 20px; }
+  .hero-actions-row { flex-direction: column; width: 100%; gap: 10px; margin-bottom: 30px; }
+  .btn-primary-lead, .btn-outline-lead { width: 100%; justify-content: center; text-align: center; }
+
+  /* 2x2 Clean Metrics Grid on Mobile */
+  .hero-footer-row { flex-direction: column; align-items: stretch; padding-top: 24px; gap: 24px; }
+  .hero-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .h-metric {
+    background: var(--blue-subtle);
+    border: 1px solid var(--blue-line);
+    border-left: 3px solid var(--blue-primary);
+    padding: 12px 14px;
+    border-radius: 6px;
+  }
+  .h-metric strong { font-size: 26px; }
+  .h-metric span { font-size: 10px; }
+
+  .editorial-section { padding: 60px 16px; }
+  .sec-title { font-size: 26px; }
+  
+  /* 2-column touch grid on mobile */
+  .object-matrix {
+    grid-template-columns: 1fr 1fr;
+    border-left: 1px solid var(--blue-line);
+  }
+  .matrix-cell {
+    padding: 16px 12px;
+    min-height: 140px;
+  }
+  .matrix-cell .cell-index { font-size: 10px; }
+  .matrix-cell .cell-name { font-size: 14px; }
+  .matrix-cell .cell-sub { font-size: 11px; }
+  .matrix-cell .cell-arrow { font-size: 14px; right: 10px; bottom: 10px; }
+  .service-grid { grid-template-columns: 1fr 1fr; }
+  .service-detail { grid-template-columns: 1fr; }
+
+  .detail-view { padding: 20px; border-radius: 8px; }
+  .dv-title { font-size: 22px; }
+  .dv-desc { font-size: 14px; }
+  .dv-visual-wrap { min-height: 200px; height: 200px; }
+  .dv-meta-list { grid-template-columns: 1fr 1fr; gap: 10px; }
+  
+  /* Process Timeline on Mobile */
+  .process-grid {
+    grid-template-columns: 1fr;
+    border: none;
+    display: flex;
+    gap: 12px;
+  }
+  .process-step {
+    border: 1px solid var(--blue-line);
+    border-left: 4px solid var(--blue-primary);
+    border-radius: 6px;
+    padding: 16px;
+    min-height: auto;
+  }
+  .step-heading { margin-top: 6px; font-size: 16px; }
+  .service-grid { grid-template-columns: 1fr; }
+  .service-card { min-height: 0; padding: 20px; }
+  .service-detail { padding: 20px; }
+  .service-detail-facts { grid-template-columns: 1fr 1fr; }
+
+  .case-body { padding: 18px; }
+  .case-img-wrap { height: 180px; }
+  .big-phone { font-size: 26px; }
+
+  .ef-row { flex-direction: column; gap: 20px; }
+  .ef-links { display: flex; flex-direction: column; gap: 10px; }
+  .ef-bottom { flex-direction: column; gap: 10px; }
+
+  .mobile-sticky-bar { display: flex; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- Top Utility Strip -->
+  <div class="top-utility">
+    <div class="utility-left">
+      <span>ГК «РемГазСервис» — работает с 2007 года</span>
+    </div>
+    <div class="utility-dot">Проектирование · монтаж · сервис · поставка СУГ</div>
+  </div>
+
+  <!-- Header -->
+  <header class="top-header">
+    <a href="#" class="brand-identity">
+      <img src="assets/logo_remgaz_transparent.png" alt="Логотип РемГазСервис" class="brand-logo-img">
+      <div class="brand-text-col">
+        <div class="brand-title">РемГазСервис</div>
+        <div class="brand-sub">Газификация · котельные · СУГ</div>
+      </div>
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="#objects">Объекты</a></li>
+      <li><a href="#services">Услуги</a></li>
+      <li><a href="#portfolio">Кейсы</a></li>
+      <li><a href="#contact">Контакты</a></li>
+    </ul>
+
+    <div class="header-action">
+      <div class="header-phone">
+        <a href="tel:+78123855353">8 (812) 385-53-53</a>
+        <small>Санкт-Петербург и СЗФО</small>
+      </div>
+      <a href="#contact" class="btn-head">Обсудить объект</a>
+      <button class="mobile-nav-toggle" onclick="toggleMobileNav()" aria-label="Меню навигации">☰</button>
+    </div>
+  </header>
+
+  <nav class="mobile-drawer" id="mobileDrawer" aria-label="Мобильная навигация">
+    <ul>
+      <li><a href="#objects" onclick="toggleMobileNav()">Объекты</a></li>
+      <li><a href="#services" onclick="toggleMobileNav()">Услуги</a></li>
+      <li><a href="#portfolio" onclick="toggleMobileNav()">Кейсы</a></li>
+      <li><a href="#contact" onclick="toggleMobileNav()">Контакты</a></li>
+    </ul>
+    <div class="mobile-drawer-contact">
+      <a href="tel:+78123855353">8 (812) 385-53-53</a>
+      <a href="mailto:info@remgaz.com">info@remgaz.com</a>
+    </div>
+  </nav>
+
+  <section class="hero-editorial">
+    <div>
+      <div class="hero-badge-wrap"><span class="hero-kicker">РемГазСервис · работает с 2007 года</span></div>
+      <h1 class="hero-heading">Газификация и тепло<br>для <span class="typing-cursor" id="typewriter">частных домов</span></h1>
+      <div class="hero-actions-row"><a href="#contact" class="btn-primary-lead">Обсудить задачу ↗</a><a href="#objects" class="btn-outline-lead">Выбрать объект</a></div>
+    </div>
+    <div class="hero-footer-row">
+      <div class="hero-philosophy">Проектируем и монтируем автономные системы газоснабжения, котельные и инженерные сети. Поставляем сжиженный газ и обслуживаем оборудование в Северо-Западном федеральном округе.</div><div class="hero-metrics"><div class="h-metric"><strong>с 2007</strong><span>работаем с объектами</span></div><div class="h-metric"><strong>1000+</strong><span>объектов</span></div><div class="h-metric"><strong>35</strong><span>специалистов</span></div><div class="h-metric"><strong>СЗФО</strong><span>география работы</span></div></div>
+    </div>
+  </section>
+
+  <!-- 01 / Object Categories -->
+  <section class="editorial-section" id="objects">
+    <div class="sec-kicker">01 / Объекты</div>
+    <h2 class="sec-title">Выберите объект — мы покажем подходящее направление</h2>
+    <p class="sec-desc">Выберите тип объекта. Ниже появится краткое описание и кнопка перехода к портфолио.</p>
+    <div class="object-matrix">
+      <div class="matrix-cell active" onclick="selectObject('house', this)"><div class="cell-top"><div class="cell-index">01</div><div class="cell-icon">🏡</div></div><div><div class="cell-name">Частные дома</div><div class="cell-sub">Автономная газификация и отопление</div></div><div class="cell-arrow">↗</div></div>
+      <div class="matrix-cell" onclick="selectObject('hotel', this)"><div class="cell-top"><div class="cell-index">02</div><div class="cell-icon">🏨</div></div><div><div class="cell-name">Базы отдыха и отели</div><div class="cell-sub">Котельные и газоснабжение</div></div><div class="cell-arrow">↗</div></div>
+      <div class="matrix-cell" onclick="selectObject('spa', this)"><div class="cell-top"><div class="cell-index">03</div><div class="cell-icon">♨️</div></div><div><div class="cell-name">SPA-комплексы</div><div class="cell-sub">Отопление и горячее водоснабжение</div></div><div class="cell-arrow">↗</div></div>
+      <div class="matrix-cell" onclick="selectObject('production', this)"><div class="cell-top"><div class="cell-index">04</div><div class="cell-icon">🏭</div></div><div><div class="cell-name">Предприятия</div><div class="cell-sub">Котельные и технологический газ</div></div><div class="cell-arrow">↗</div></div>
+      <div class="matrix-cell" onclick="selectObject('restaurant', this)"><div class="cell-top"><div class="cell-index">05</div><div class="cell-icon">🍽️</div></div><div><div class="cell-name">Рестораны</div><div class="cell-sub">СУГ для кухни и отопления</div></div><div class="cell-arrow">↗</div></div>
+      <div class="matrix-cell" onclick="selectObject('agro', this)"><div class="cell-top"><div class="cell-index">06</div><div class="cell-icon">🌱</div></div><div><div class="cell-name">Аграрные объекты</div><div class="cell-sub">Теплицы и инженерные системы</div></div><div class="cell-arrow">↗</div></div>
+      <div class="matrix-cell" onclick="selectObject('mkd', this)"><div class="cell-top"><div class="cell-index">07</div><div class="cell-icon">🏘️</div></div><div><div class="cell-name">Жилые дома и посёлки</div><div class="cell-sub">Групповая газификация</div></div><div class="cell-arrow">↗</div></div>
+      <div class="matrix-cell" onclick="selectObject('seasonal', this)"><div class="cell-top"><div class="cell-index">08</div><div class="cell-icon">❄️</div></div><div><div class="cell-name">Сезонные объекты</div><div class="cell-sub">Поставка газа и обслуживание</div></div><div class="cell-arrow">↗</div></div>
+    </div>
+
+    <div class="detail-view" id="detailDrawer">
+      <div>
+        <h3 class="dv-title" id="dvTitle">Частные дома</h3>
+        <p class="dv-desc" id="dvDesc">Автономная газификация и отопление частного дома с подбором оборудования под объект.</p>
+        <div class="dv-tags" id="dvTags"><span class="dv-tag">Автономная газификация</span><span class="dv-tag">Газовое отопление</span><span class="dv-tag">Поставка СУГ</span></div>
+        <div class="dv-meta-list">
+          <div class="dv-meta-item"><small>Задача</small><strong id="dvTime">По техническому заданию</strong></div>
+          <div class="dv-meta-item"><small>Решение</small><strong id="dvPower">Подбирается под объект</strong></div>
+          <div class="dv-meta-item"><small>Условия</small><strong id="dvWarranty">По договору</strong></div>
+          <div class="dv-meta-item"><small>Сервис</small><strong id="dvAutonomy">По договору</strong></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;"><a href="#contact" class="btn-primary-lead" style="padding: 12px 24px; font-size: 13px;" onclick="prefillForm(document.getElementById('dvTitle').innerText)">Обсудить этот объект ↗</a><a href="#portfolio" class="btn-outline-lead" style="padding: 12px 20px; font-size: 13px;" onclick="scrollToPortfolio()">Смотреть кейсы ↓</a></div>
+      </div>
+      <div class="dv-visual-wrap"><img src="assets/doc1_p4_img0_814.jpg" alt="Инженерный объект" class="dv-visual-img" id="dvImg"><div class="dv-visual-overlay"><span id="dvLocation">Северо-Западный федеральный округ</span></div></div>
+    </div>
+  </section>
+
+  <!-- 02 / Services -->
+  <section class="editorial-section" id="services">
+    <div class="sec-kicker">02 / Услуги</div>
+    <h2 class="sec-title">Газ, тепло и оборудование — в одной инженерной команде</h2>
+    <p class="sec-desc">Проектируем и монтируем инженерные системы, поставляем сжиженный газ и обслуживаем оборудование в СЗФО.</p>
+
+    <div class="service-grid">
+      <article class="service-card">
+        <div class="service-number">01</div>
+        <h3>Доставка сжиженного газа</h3>
+        <p>Для предприятий, баз отдыха, ресторанов и частных домов. Принимаем заявку, согласуем дату, доставляем газ специализированным транспортом и наполняем резервуар клиента.</p>
+        <div class="service-meta"><span>Заявка и согласование</span><span>Поставка СУГ</span></div>
+      </article>
+      <article class="service-card">
+        <div class="service-number">02</div>
+        <h3>Монтаж газовых котельных</h3>
+        <p>Подготовка технического задания, проектные работы, комплектация, монтаж, пусконаладка, исполнительная документация и сдача работ.</p>
+        <div class="service-meta"><span>По техническому заданию</span><span>По договору</span></div>
+      </article>
+      <article class="service-card">
+        <div class="service-number">03</div>
+        <h3>Сервисное обслуживание</h3>
+        <p>Плановое и аварийное техническое обслуживание газгольдеров, котельных, испарителей и участков газопроводов по договору.</p>
+        <div class="service-meta"><span>Плановое и аварийное</span><span>По договору</span></div>
+      </article>
+      <article class="service-card service-card-featured">
+        <div class="service-number">04</div>
+        <h3>Монтаж газгольдеров и испарительных установок</h3>
+        <p>Для предприятий, баз отдыха, ресторанов и частных жилых домов. Быстрое подключение с минимальными согласованиями.</p>
+        <div class="service-meta"><span>От 2 дней</span><span>Гарантия до 5 лет</span></div>
+      </article>
+    </div>
+
+    <div class="service-detail">
+      <div>
+        <div class="sec-kicker">Услуга 04 / Состав работ</div>
+        <h3>От технического задания до сдачи работ</h3>
+        <p>Техническое задание, проектные работы, согласование сметы и сроков, комплектация материалов, выполнение работ, пусконаладка, исполнительная документация и сдача работ.</p>
+      </div>
+      <div class="service-detail-facts">
+        <div><small>Стоимость</small><strong>По техническому заданию</strong></div>
+        <div><small>Срок</small><strong>От 2 дней</strong></div>
+        <div><small>Комплектация</small><strong>Все включено</strong></div>
+        <div><small>Гарантия</small><strong>До 5 лет</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 / Real Case Studies -->
+  <section class="editorial-section" id="portfolio">
+    <div class="sec-kicker">03 / Портфолио</div>
+    <h2 class="sec-title">Реализованные проекты и объекты на обслуживании</h2>
+    <p class="sec-desc">Подтверждённые примеры работ компании в Северо-Западном федеральном округе. Там, где фотография объекта не подтверждена, показываем только описание проекта.</p>
+
+    <div class="case-triad">
+      <article class="case-box">
+        <div class="case-img-wrap"><img src="assets/doc1_p12_img2_527.jpg" alt="Котельная загородного SPA-комплекса"></div>
+        <div class="case-body"><div class="case-kicker">Котельная · SPA-комплекс</div><h3>Котельная для SPA-комплекса</h3><p>Установлены газовые конденсационные котлы De Dietrich Naneo общей мощностью 68 кВт и бойлер Gekon 300 л. Объект работает на СУГ.</p><div class="case-params">7 дней · СУГ · 68 кВт</div></div>
+      </article>
+      <article class="case-box">
+        <div class="case-img-wrap"><img src="assets/doc1_p6_img0_704.jpg" alt="Реконструкция котельной частного дома"></div>
+        <div class="case-body"><div class="case-kicker">Котельная · Частный дом</div><h3>Реконструкция частной котельной</h3><p>Реконструкция котельной с установкой оборудования для работы на природном газе.</p><div class="case-params">10 дней · Природный газ · 68 кВт</div></div>
+      </article>
+      <article class="case-box">
+        <div class="case-img-wrap"><div style="height:100%;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--blue-subtle);color:var(--blue-primary);font-family:var(--font-mono);font-size:12px;">Фото объекта не предоставлено</div></div>
+        <div class="case-body"><div class="case-kicker">Газификация · База отдыха</div><h3>Газгольдеры и испарительная установка</h3><p>Собрали исходные данные и подготовили ТЗ, выполнили проектные расчёты, изготовили испарительную установку, смонтировали газгольдеры и подземные газопроводы, поставили газ и выполнили пусконаладку. Оборудование взято на обслуживание.</p><div class="case-params">Газ подан за 30 дней с даты подписания договора</div></div>
+      </article>
+      <article class="case-box">
+        <div class="case-img-wrap"><img src="assets/doc1_p10_img0_656.jpg" alt="Газовая котельная производственного комплекса"></div>
+        <div class="case-body"><div class="case-kicker">Сервис · Производственный комплекс</div><h3>Газовая котельная для комплекса 1500 м²</h3><p>На обслуживании газовая котельная 140 кВт, насосное оборудование и тепломеханическая часть котельной.</p><div class="case-params">140 кВт · Договорное обслуживание</div></div>
+      </article>
+      <article class="case-box">
+        <div class="case-img-wrap"><div style="height:100%;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--blue-subtle);color:var(--blue-primary);font-family:var(--font-mono);font-size:12px;">Фото объекта не предоставлено</div></div>
+        <div class="case-body"><div class="case-kicker">Сервис · Производство</div><h3>Обслуживание газоснабжения обжарочного производства</h3><p>На обслуживании газгольдер 10 м³, испарительная установка 100 кг/ч, а также участки подземного и внутреннего газопроводов.</p><div class="case-params">Газгольдер 10 м³ · 100 кг/ч</div></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 04 / Direct Consultation Form with Quick Chips -->
+  <section class="editorial-section" id="contact" style="border-bottom: none;">
+    <div class="sec-kicker">04 / Контакты</div>
+    <div class="contact-grid">
+      <div>
+        <h2 class="sec-title" style="margin-bottom: 20px;">Обсудим ваш объект с инженером</h2>
+        <p class="contact-lead">Расскажите, что нужно сделать: газифицировать объект, смонтировать котельную, организовать поставку СУГ или взять оборудование на обслуживание.</p>
+
+        <div class="contact-numbers">
+          <a href="tel:+78123855353" class="big-phone">8 (812) 385-53-53</a>
+          <div class="contact-hours">Понедельник — Пятница · 10:00 — 18:00 (МСК)</div>
+        </div>
+
+        <div class="contact-spec-box">
+          <h5>Контакты</h5>
+          <p style="font-size: 14px; color: var(--blue-deep); line-height: 1.8;">
+            Электронная почта: <a href="mailto:info@remgaz.com" style="color: var(--blue-primary); font-weight: 700;">info@remgaz.com</a><br>
+            ВКонтакте: <a href="https://vk.ru/remgaz_spb" target="_blank" rel="noopener" style="color: var(--blue-primary); font-weight: 700;">vk.ru/remgaz_spb</a><br>
+            Лицензия на эксплуатацию опасных производственных объектов
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <form class="editorial-form" onsubmit="prepareEmail(event)">
+          <span class="form-chips-label">Быстрый выбор типа объекта:</span>
+          <div class="form-chips-row">
+            <button type="button" class="chip-btn" onclick="setChip(this, 'Частный дом')">Частный дом</button>
+            <button type="button" class="chip-btn" onclick="setChip(this, 'Отель / база отдыха')">Отель / база отдыха</button>
+            <button type="button" class="chip-btn" onclick="setChip(this, 'SPA-комплекс')">SPA-комплекс</button>
+            <button type="button" class="chip-btn" onclick="setChip(this, 'Предприятие / склад')">Предприятие / склад</button>
+            <button type="button" class="chip-btn" onclick="setChip(this, 'Сервис котельной')">Сервис котельной</button>
+            <button type="button" class="chip-btn" onclick="setChip(this, 'Поставка СУГ')">Поставка СУГ</button>
+          </div>
+
+          <div class="form-row-line">
+            <label for="formName">Ваше имя</label>
+            <input type="text" id="formName" name="name" class="form-transparent-input" placeholder="Имя" required>
+          </div>
+
+          <div class="form-row-line">
+            <label for="formPhone">Номер телефона для связи</label>
+            <input type="tel" id="formPhone" name="phone" class="form-transparent-input" placeholder="+7 (___) ___-__-__" required>
+          </div>
+
+          <div class="form-row-line">
+            <label for="formObjectType">Тип объекта и параметры</label>
+            <input type="text" id="formObjectType" name="object" class="form-transparent-input" placeholder="Загородный дом / база отдыха / предприятие">
+          </div>
+
+          <div class="form-row-line">
+            <label for="formLocation">Локация объекта в СПб / СЗФО</label>
+            <input type="text" id="formLocation" name="location" class="form-transparent-input" placeholder="Район или населённый пункт">
+          </div>
+
+          <button type="submit" class="submit-btn-line">Открыть письмо с запросом ↗</button>
+          <p style="margin-top:12px;font-size:12px;color:var(--muted);line-height:1.5;">Кнопка откроет письмо в почтовой программе с заполненными данными.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Editorial Footer with Logo -->
+  <footer class="editorial-footer">
+    <div class="ef-row">
+      <div class="ef-brand">
+        <img src="assets/logo_remgaz_transparent.png" alt="Логотип РемГазСервис" class="ef-brand-logo">
+        <div>
+          <strong>ГРУППА КОМПАНИЙ «РЕМГАЗСЕРВИС»</strong>
+          <p>Проектирование, монтаж и обслуживание систем автономного газоснабжения, котельных и инженерных сетей в Северо-Западном федеральном округе.</p>
+        </div>
+      </div>
+
+      <div class="ef-links">
+        <a href="#objects">Направления</a>
+        <a href="#services">Услуги</a>
+        <a href="#portfolio">Кейсы</a>
+        <a href="#contact">Контакты</a>
+      </div>
+    </div>
+
+    <div class="ef-bottom">
+      <div>ГК «РемГазСервис» · Северо-Западный федеральный округ.</div>
+      <div>8 (812) 385-53-53 · info@remgaz.com</div>
+    </div>
+  </footer>
+
+  <!-- Floating Sticky Bottom Bar for Mobile -->
+  <div class="mobile-sticky-bar">
+    <a href="tel:+78123855353" class="mobile-sticky-btn-call">Позвонить</a>
+    <a href="#contact" class="mobile-sticky-btn-form">Оставить запрос</a>
+  </div>
+
+</div>
+
+
+<script>
+// Dynamic Typewriter
+const words = ["частных домов", "загородных отелей", "SPA-комплексов", "производственных цехов", "тепличных комплексов"];
+let wordIdx = 0;
+let charIdx = 0;
+let isDeleting = false;
+const el = document.getElementById("typewriter");
+
+function typeLoop() {
+  const currentWord = words[wordIdx];
+  if (isDeleting) {
+    el.textContent = currentWord.substring(0, charIdx - 1);
+    charIdx--;
+  } else {
+    el.textContent = currentWord.substring(0, charIdx + 1);
+    charIdx++;
+  }
+
+  let delay = isDeleting ? 45 : 90;
+
+  if (!isDeleting && charIdx === currentWord.length) {
+    delay = 1800;
+    isDeleting = true;
+  } else if (isDeleting && charIdx === 0) {
+    isDeleting = false;
+    wordIdx = (wordIdx + 1) % words.length;
+    delay = 400;
+  }
+
+  setTimeout(typeLoop, delay);
+}
+typeLoop();
+
+// Mobile Drawer Toggle
+function toggleMobileNav() {
+  const drawer = document.getElementById('mobileDrawer');
+  drawer.classList.toggle('open');
+}
+
+// Object Selector Data
+const objectData = {
+  house: {
+    title: "Частные дома",
+    desc: "Газификация и отопление частного дома с подбором решения под техническое задание.",
+    tags: ["Автономная газификация", "Газовое отопление", "Поставка СУГ", "Сервис по договору"],
+    time: "По техническому заданию",
+    power: "Подбирается под объект",
+    warranty: "По договору",
+    autonomy: "Плановое и аварийное обслуживание",
+    img: "assets/doc1_p4_img0_814.jpg",
+    loc: "Северо-Западный федеральный округ"
+  },
+  hotel: {
+    title: "Базы отдыха и отели",
+    desc: "Газоснабжение, котельные и инженерные системы для баз отдыха и отелей.",
+    tags: ["Газификация", "Котельные", "Поставка СУГ", "Сервис по договору"],
+    time: "По техническому заданию",
+    power: "Подбирается под объект",
+    warranty: "По договору",
+    autonomy: "Плановое и аварийное обслуживание",
+    img: "assets/doc1_p12_img2_527.jpg",
+    loc: "Северо-Западный федеральный округ"
+  },
+  spa: {
+    title: "SPA-комплексы",
+    desc: "Котельные, отопление и горячее водоснабжение для SPA-комплексов.",
+    tags: ["Отопление", "ГВС", "Газоснабжение", "Сервис по договору"],
+    time: "По техническому заданию",
+    power: "Подбирается под объект",
+    warranty: "По договору",
+    autonomy: "Плановое и аварийное обслуживание",
+    img: "assets/doc1_p12_img1_526.jpg",
+    loc: "Северо-Западный федеральный округ"
+  },
+  production: {
+    title: "Предприятия",
+    desc: "Проектирование, монтаж и обслуживание систем газоснабжения и котельных для предприятий.",
+    tags: ["Котельные", "Технологический газ", "Газопроводы", "Сервис по договору"],
+    time: "По техническому заданию",
+    power: "Подбирается под объект",
+    warranty: "По договору",
+    autonomy: "Плановое и аварийное обслуживание",
+    img: "assets/doc1_p10_img0_656.jpg",
+    loc: "Северо-Западный федеральный округ"
+  },
+  restaurant: {
+    title: "Рестораны",
+    desc: "Поставка СУГ для ресторанов, отопления и технологического оборудования кухни.",
+    tags: ["Поставка СУГ", "Технологическое оборудование", "Газоснабжение", "Сервис"],
+    time: "По техническому заданию",
+    power: "Подбирается под объект",
+    warranty: "По договору",
+    autonomy: "Поставка и обслуживание по договору",
+    img: "assets/doc1_p11_img0_535.png",
+    loc: "Северо-Западный федеральный округ"
+  },
+  agro: {
+    title: "Аграрные объекты",
+    desc: "Газоснабжение и инженерные решения для теплиц и аграрных объектов.",
+    tags: ["Теплицы", "Отопление", "Автоматизация", "Сервис"],
+    time: "По техническому заданию",
+    power: "Подбирается под объект",
+    warranty: "По договору",
+    autonomy: "Плановое и аварийное обслуживание",
+    img: "assets/doc1_p6_img0_704.jpg",
+    loc: "Северо-Западный федеральный округ"
+  },
+  mkd: {
+    title: "Жилые дома и посёлки",
+    desc: "Групповая газификация и теплоснабжение жилых объектов с подбором решения под задачу.",
+    tags: ["Групповая газификация", "Газовые сети", "Теплоснабжение", "Сервис"],
+    time: "По техническому заданию",
+    power: "Подбирается под объект",
+    warranty: "По договору",
+    autonomy: "Плановое и аварийное обслуживание",
+    img: "assets/doc1_p10_img0_656.jpg",
+    loc: "Северо-Западный федеральный округ"
+  },
+  seasonal: {
+    title: "Сезонные объекты",
+    desc: "Поставка СУГ и обслуживание объектов с сезонным режимом работы.",
+    tags: ["Поставка СУГ", "Сезонный график", "Газоснабжение", "Сервис"],
+    time: "По техническому заданию",
+    power: "Подбирается под объект",
+    warranty: "По договору",
+    autonomy: "Поставка и обслуживание по договору",
+    img: "assets/doc1_p18_img0_149.jpg",
+    loc: "Северо-Западный федеральный округ"
+  }
+};
+
+function selectObject(key, cell) {
+  document.querySelectorAll('.matrix-cell').forEach(c => c.classList.remove('active'));
+  cell.classList.add('active');
+  const d = objectData[key];
+  if (!d) return;
+
+  document.getElementById('dvTitle').innerText = d.title;
+  document.getElementById('dvDesc').innerText = d.desc;
+  document.getElementById('dvTime').innerText = d.time;
+  document.getElementById('dvPower').innerText = d.power;
+  document.getElementById('dvWarranty').innerText = d.warranty;
+  document.getElementById('dvAutonomy').innerText = d.autonomy;
+  document.getElementById('dvImg').src = d.img;
+  document.getElementById('dvLocation').innerText = d.loc;
+
+  const tagsContainer = document.getElementById('dvTags');
+  tagsContainer.innerHTML = '';
+  d.tags.forEach(t => {
+    const span = document.createElement('span');
+    span.className = 'dv-tag';
+    span.innerText = t;
+    tagsContainer.appendChild(span);
+  });
+}
+
+function prefillForm(name) {
+  const inp = document.getElementById('formObjectType');
+  if (inp) inp.value = name;
+}
+
+function scrollToPortfolio() {
+  const target = document.getElementById('portfolio');
+  if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function setChip(btn, text) {
+  document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const inp = document.getElementById('formObjectType');
+  if (inp) inp.value = text;
+}
+
+function prepareEmail(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const value = name => (form.elements[name] ? form.elements[name].value.trim() : '');
+  const body = [
+    `Имя: ${value('name')}`,
+    `Телефон: ${value('phone')}`,
+    `Тип объекта и параметры: ${value('object') || 'не указано'}`,
+    `Локация: ${value('location') || 'не указана'}`
+  ].join('\n');
+  window.location.href = `mailto:info@remgaz.com?subject=${encodeURIComponent('Запрос по объекту')}&body=${encodeURIComponent(body)}`;
+}
+</script>
+
+</body>
+</html>
