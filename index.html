@@ -1130,7 +1130,7 @@ body {
     <ul class="nav-menu">
       <li><a href="#objects">Объекты</a></li>
       <li><a href="#services">Услуги</a></li>
-      <li><a href="#portfolio">Кейсы</a></li>
+      <li><a href="portfolio.html">Портфолио</a></li>
       <li><a href="#contact">Контакты</a></li>
     </ul>
 
@@ -1148,7 +1148,7 @@ body {
     <ul>
       <li><a href="#objects" onclick="toggleMobileNav()">Объекты</a></li>
       <li><a href="#services" onclick="toggleMobileNav()">Услуги</a></li>
-      <li><a href="#portfolio" onclick="toggleMobileNav()">Кейсы</a></li>
+      <li><a href="portfolio.html">Портфолио</a></li>
       <li><a href="#contact" onclick="toggleMobileNav()">Контакты</a></li>
     </ul>
     <div class="mobile-drawer-contact">
@@ -1195,7 +1195,7 @@ body {
           <div class="dv-meta-item"><small>Условия</small><strong id="dvWarranty">По договору</strong></div>
           <div class="dv-meta-item"><small>Сервис</small><strong id="dvAutonomy">По договору</strong></div>
         </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;"><a href="#contact" class="btn-primary-lead" style="padding: 12px 24px; font-size: 13px;" onclick="prefillForm(document.getElementById('dvTitle').innerText)">Обсудить этот объект ↗</a><a href="#portfolio" class="btn-outline-lead" style="padding: 12px 20px; font-size: 13px;" onclick="scrollToPortfolio()">Смотреть кейсы ↓</a></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;"><a href="#contact" class="btn-primary-lead" style="padding: 12px 24px; font-size: 13px;" onclick="prefillForm(document.getElementById('dvTitle').innerText)">Обсудить этот объект ↗</a><a href="portfolio.html" class="btn-outline-lead" style="padding: 12px 20px; font-size: 13px;">Смотреть портфолио ↗</a></div>
       </div>
       <div class="dv-visual-wrap"><img src="assets/doc1_p4_img0_814.jpg" alt="Инженерный объект" class="dv-visual-img" id="dvImg"><div class="dv-visual-overlay"><span id="dvLocation">Северо-Западный федеральный округ</span></div></div>
     </div>
@@ -1252,8 +1252,8 @@ body {
   <!-- 03 / Real Case Studies -->
   <section class="editorial-section" id="portfolio">
     <div class="sec-kicker">03 / Портфолио</div>
-    <h2 class="sec-title">Реализованные проекты и объекты на обслуживании</h2>
-    <p class="sec-desc">Подтверждённые примеры работ компании в Северо-Западном федеральном округе. Там, где фотография объекта не подтверждена, показываем только описание проекта.</p>
+    <h2 class="sec-title">Наши проекты и объекты на обслуживании</h2>
+    <p class="sec-desc">Несколько примеров работ. Все опубликованные кейсы собраны на отдельной странице портфолио.</p>
 
     <div class="case-triad">
       <article class="case-box">
@@ -1268,15 +1268,8 @@ body {
         <div class="case-img-wrap"><div style="height:100%;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--blue-subtle);color:var(--blue-primary);font-family:var(--font-mono);font-size:12px;">Фото объекта не предоставлено</div></div>
         <div class="case-body"><div class="case-kicker">Газификация · База отдыха</div><h3>Газгольдеры и испарительная установка</h3><p>Собрали исходные данные и подготовили ТЗ, выполнили проектные расчёты, изготовили испарительную установку, смонтировали газгольдеры и подземные газопроводы, поставили газ и выполнили пусконаладку. Оборудование взято на обслуживание.</p><div class="case-params">Газ подан за 30 дней с даты подписания договора</div></div>
       </article>
-      <article class="case-box">
-        <div class="case-img-wrap"><img src="assets/doc1_p10_img0_656.jpg" alt="Газовая котельная производственного комплекса"></div>
-        <div class="case-body"><div class="case-kicker">Сервис · Производственный комплекс</div><h3>Газовая котельная для комплекса 1500 м²</h3><p>На обслуживании газовая котельная 140 кВт, насосное оборудование и тепломеханическая часть котельной.</p><div class="case-params">140 кВт · Договорное обслуживание</div></div>
-      </article>
-      <article class="case-box">
-        <div class="case-img-wrap"><div style="height:100%;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--blue-subtle);color:var(--blue-primary);font-family:var(--font-mono);font-size:12px;">Фото объекта не предоставлено</div></div>
-        <div class="case-body"><div class="case-kicker">Сервис · Производство</div><h3>Обслуживание газоснабжения обжарочного производства</h3><p>На обслуживании газгольдер 10 м³, испарительная установка 100 кг/ч, а также участки подземного и внутреннего газопроводов.</p><div class="case-params">Газгольдер 10 м³ · 100 кг/ч</div></div>
-      </article>
     </div>
+    <a class="btn-primary-lead" href="portfolio.html" style="margin-top: 32px;">Открыть всё портфолио ↗</a>
   </section>
 
   <!-- 04 / Direct Consultation Form with Quick Chips -->
@@ -1355,7 +1348,7 @@ body {
       <div class="ef-links">
         <a href="#objects">Направления</a>
         <a href="#services">Услуги</a>
-        <a href="#portfolio">Кейсы</a>
+        <a href="portfolio.html">Портфолио</a>
         <a href="#contact">Контакты</a>
       </div>
     </div>
@@ -1536,10 +1529,6 @@ function prefillForm(name) {
   if (inp) inp.value = name;
 }
 
-function scrollToPortfolio() {
-  const target = document.getElementById('portfolio');
-  if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
 
 function setChip(btn, text) {
   document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Проекты и объекты на обслуживании ГК «РемГазСервис»: газовые котельные и автономное газоснабжение.">
+<title>Портфолио — РемГазСервис</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --blue-primary:#004D99; --blue-deep:#082142; --blue-dark:#05152B; --blue-subtle:#EDF4FC; --blue-line:#CCE0F5; --white:#fff; --frost-bg:#F4F7FB; --ink:#0A192F; --ink-soft:#2D3E54; --muted:#5C708A; --line-light:#DCE5F0; --font-main:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif; --font-mono:'JetBrains Mono',monospace; }
+* { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body { background:var(--frost-bg); color:var(--ink); font-family:var(--font-main); line-height:1.55; -webkit-font-smoothing:antialiased; }
+.page-wrapper { max-width:1400px; min-height:100vh; margin:0 auto; background:var(--white); border-inline:1px solid var(--line-light); }
+.top-utility { background:var(--blue-dark); color:#B2C7DE; padding:9px 4vw; font:11px var(--font-mono); display:flex; justify-content:space-between; gap:15px; border-bottom:1px solid #142E52; }
+.utility-dot { color:#38BDF8; }
+.top-header { height:86px; padding:0 4vw; display:flex; align-items:center; justify-content:space-between; gap:20px; border-bottom:2px solid var(--blue-primary); background:rgba(255,255,255,.98); position:sticky; top:0; z-index:10; }
+.brand-identity { display:flex; align-items:center; gap:16px; text-decoration:none; color:var(--ink); }
+.brand-logo-img { height:52px; width:auto; display:block; }
+.brand-text-col { border-left:1px solid var(--blue-line); padding-left:14px; }
+.brand-title { color:var(--blue-deep); font-size:16px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; line-height:1.1; }
+.brand-sub { color:var(--muted); font:10px var(--font-mono); margin-top:3px; text-transform:uppercase; letter-spacing:.06em; }
+.nav-menu { display:flex; gap:32px; list-style:none; }
+.nav-menu a { color:var(--ink-soft); text-decoration:none; font-size:13px; font-weight:600; }
+.nav-menu a:hover, .nav-menu a[aria-current] { color:var(--blue-primary); }
+.header-action { display:flex; align-items:center; gap:20px; }
+.header-phone { text-align:right; }
+.header-phone a { color:var(--blue-deep); font:700 15px var(--font-mono); text-decoration:none; display:block; }
+.header-phone small { font-size:11px; color:var(--muted); }
+.btn-head, .btn-primary-lead { display:inline-flex; align-items:center; justify-content:center; background:var(--blue-primary); color:white; border-radius:6px; text-decoration:none; font-size:12px; font-weight:700; padding:12px 20px; }
+.btn-head:hover, .btn-primary-lead:hover { background:#00366B; }
+.intro { padding:86px 4vw 70px; background:linear-gradient(135deg,#fff,#EDF4FC); border-bottom:1px solid var(--line-light); }
+.sec-kicker { color:var(--blue-primary); font:700 12px var(--font-mono); margin-bottom:18px; text-transform:uppercase; letter-spacing:.1em; }
+h1 { font-size:64px; line-height:1.08; color:var(--blue-deep); overflow-wrap:break-word; max-width:900px; margin-bottom:22px; }
+.intro p { max-width:700px; color:var(--muted); font-size:17px; line-height:1.65; }
+.editorial-section { padding:76px 4vw; border-bottom:1px solid var(--line-light); }
+h2 { color:var(--blue-deep); font-size:38px; line-height:1.12; margin-bottom:18px; }
+.sec-desc { color:var(--muted); max-width:680px; margin-bottom:42px; line-height:1.65; }
+.case-triad { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:28px; }
+.case-box { min-width:0; background:var(--white); border:1px solid var(--blue-line); border-radius:8px; overflow:hidden; }
+.case-img-wrap { height:230px; border-bottom:1px solid var(--blue-line); overflow:hidden; }
+.case-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+.case-body { padding:26px; }
+.case-kicker { color:var(--blue-primary); font:700 11px var(--font-mono); text-transform:uppercase; margin-bottom:8px; }
+.case-body h3 { color:var(--blue-deep); font-size:20px; line-height:1.3; margin-bottom:10px; }
+.case-body p { color:var(--muted); font-size:14px; line-height:1.55; margin-bottom:20px; }
+.case-params { padding-top:14px; border-top:1px solid var(--line-light); font:600 12px/1.6 var(--font-mono); color:var(--blue-primary); }
+.case-box.no-photo { display:flex; align-items:center; background:var(--blue-subtle); }
+.case-box.no-photo .case-body { padding:32px; }
+.next { background:var(--blue-subtle); }
+.next p { color:var(--ink-soft); max-width:680px; margin-bottom:24px; }
+.editorial-footer { padding:52px 4vw 26px; background:var(--blue-dark); color:white; }
+.ef-row { display:flex; justify-content:space-between; gap:30px; flex-wrap:wrap; margin-bottom:42px; }
+.ef-brand { display:flex; gap:16px; align-items:center; }
+.ef-brand-logo { height:48px; padding:4px 8px; background:white; border-radius:6px; }
+.ef-brand strong { font-size:15px; letter-spacing:.08em; text-transform:uppercase; }
+.ef-brand p { max-width:440px; margin-top:4px; color:#8CA4C2; font-size:12px; }
+.ef-links a { color:#BACEE6; text-decoration:none; margin-right:20px; font-weight:600; font-size:13px; }
+.ef-bottom { display:flex; justify-content:space-between; gap:10px; padding-top:24px; border-top:1px solid #162E4F; color:#6C86A8; font:11px var(--font-mono); }
+:focus-visible { outline:2px solid currentColor; outline-offset:3px; }
+@media(max-width:1024px) { .case-triad { grid-template-columns:repeat(2,minmax(0,1fr)); } .nav-menu { gap:14px; } }
+@media(max-width:768px) { .top-utility,.header-phone,.btn-head { display:none; } .top-header { height:auto; min-height:64px; padding:12px 16px; flex-wrap:wrap; } .brand-logo-img { height:38px; } .brand-title { font-size:13px; } .brand-sub { display:none; } .nav-menu { flex-wrap:wrap; gap:12px; } .nav-menu a { font-size:12px; } .intro { padding:52px 16px; } h1 { font-size:36px; } .intro p { font-size:15px; } .editorial-section { padding:60px 16px; } h2 { font-size:26px; } .case-triad { grid-template-columns:1fr; } .case-img-wrap { height:180px; } .case-body { padding:18px; } .editorial-footer { padding:40px 16px 24px; } .ef-row,.ef-bottom { flex-direction:column; } .ef-links { display:flex; flex-wrap:wrap; gap:12px; } .ef-links a { margin:0; } }
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+  <div class="top-utility"><span>ГК «РемГазСервис» — работает с 2007 года</span><span class="utility-dot">Проектирование · монтаж · сервис · поставка СУГ</span></div>
+  <header class="top-header">
+    <a href="index.html" class="brand-identity"><img src="assets/logo_remgaz_transparent.png" alt="Логотип РемГазСервис" class="brand-logo-img"><span class="brand-text-col"><span class="brand-title">РемГазСервис</span><span class="brand-sub">Газификация · котельные · СУГ</span></span></a>
+    <nav aria-label="Основная навигация"><ul class="nav-menu"><li><a href="index.html#objects">Объекты</a></li><li><a href="index.html#services">Услуги</a></li><li><a href="portfolio.html" aria-current="page">Портфолио</a></li><li><a href="index.html#contact">Контакты</a></li></ul></nav>
+    <div class="header-action"><div class="header-phone"><a href="tel:+78123855353">8 (812) 385-53-53</a><small>Санкт-Петербург и СЗФО</small></div><a class="btn-head" href="index.html#contact">Обсудить объект</a></div>
+  </header>
+  <main>
+    <section class="intro"><div class="sec-kicker">РемГазСервис / Работы</div><h1>Портфолио</h1><p>Газификация, котельные и объекты на обслуживании. Для каждого кейса приводим выполненные работы и известные параметры. Без фотографии — только описание объекта.</p></section>
+    <section class="editorial-section" id="projects"><h2>Монтаж и реконструкция</h2><p class="sec-desc">Проекты газоснабжения и котельные для разных типов объектов.</p>
+      <div class="case-triad">
+        <article class="case-box"><div class="case-img-wrap"><img src="assets/doc1_p12_img2_527.jpg" alt="Котельная загородного SPA-комплекса" loading="lazy"></div><div class="case-body"><div class="case-kicker">Котельная · SPA-комплекс</div><h3>Котельная для SPA-комплекса</h3><p>Установлены газовые конденсационные котлы De Dietrich Naneo общей мощностью 68 кВт и бойлер Gekon 300 л. Объект работает на СУГ.</p><div class="case-params">7 дней · СУГ · 68 кВт</div></div></article>
+        <article class="case-box"><div class="case-img-wrap"><img src="assets/doc1_p6_img0_704.jpg" alt="Реконструкция котельной частного дома" loading="lazy"></div><div class="case-body"><div class="case-kicker">Котельная · Частный дом</div><h3>Реконструкция частной котельной</h3><p>Реконструкция котельной с установкой оборудования для работы на природном газе.</p><div class="case-params">10 дней · Природный газ · 68 кВт</div></div></article>
+        <article class="case-box no-photo"><div class="case-body"><div class="case-kicker">Газификация · База отдыха</div><h3>Газгольдеры и испарительная установка</h3><p>Собрали исходные данные и подготовили ТЗ, выполнили проектные расчёты, изготовили испарительную установку, смонтировали газгольдеры и подземные газопроводы, поставили газ и выполнили пусконаладку. Оборудование взято на обслуживание.</p><div class="case-params">Газ подан за 30 дней с даты подписания договора</div></div></article>
+      </div>
+    </section>
+    <section class="editorial-section" id="service"><h2>Объекты на обслуживании</h2><p class="sec-desc">Оборудование, за которое отвечает сервисная команда.</p>
+      <div class="case-triad">
+        <article class="case-box"><div class="case-img-wrap"><img src="assets/doc1_p10_img0_656.jpg" alt="Газовая котельная производственного комплекса" loading="lazy"></div><div class="case-body"><div class="case-kicker">Сервис · Производственный комплекс</div><h3>Газовая котельная для комплекса 1500 м²</h3><p>На обслуживании газовая котельная 140 кВт, насосное оборудование и тепломеханическая часть котельной.</p><div class="case-params">140 кВт · Договорное обслуживание</div></div></article>
+        <article class="case-box no-photo"><div class="case-body"><div class="case-kicker">Сервис · Производство</div><h3>Обслуживание газоснабжения обжарочного производства</h3><p>На обслуживании газгольдер 10 м³, испарительная установка 100 кг/ч, а также участки подземного и внутреннего газопроводов.</p><div class="case-params">Газгольдер 10 м³ · 100 кг/ч</div></div></article>
+      </div>
+    </section>
+    <section class="editorial-section next"><h2>Есть похожая задача?</h2><p>Расскажите, какой у вас объект и что нужно сделать. Обсудим исходные данные и возможный состав работ.</p><a class="btn-primary-lead" href="index.html#contact">Обсудить объект ↗</a></section>
+  </main>
+  <footer class="editorial-footer"><div class="ef-row"><div class="ef-brand"><img src="assets/logo_remgaz_transparent.png" alt="Логотип РемГазСервис" class="ef-brand-logo"><div><strong>ГРУППА КОМПАНИЙ «РЕМГАЗСЕРВИС»</strong><p>Проектирование, монтаж и обслуживание систем автономного газоснабжения, котельных и инженерных сетей в Северо-Западном федеральном округе.</p></div></div><div class="ef-links"><a href="index.html#objects">Направления</a><a href="index.html#services">Услуги</a><a href="portfolio.html">Портфолио</a><a href="index.html#contact">Контакты</a></div></div><div class="ef-bottom"><span>ГК «РемГазСервис» · Северо-Западный федеральный округ.</span><span>8 (812) 385-53-53 · info@remgaz.com</span></div></footer>
+</div>
+</body>
+</html>
