@@ -32,6 +32,17 @@ body { background:var(--frost-bg); color:var(--ink); font-family:var(--font-main
 .btn-head, .btn-primary-lead { display:inline-flex; align-items:center; justify-content:center; background:var(--blue-primary); color:white; border-radius:6px; text-decoration:none; font-size:12px; font-weight:700; padding:12px 20px; }
 .btn-head:hover, .btn-primary-lead:hover { background:#00366B; }
 .intro { padding:86px 4vw 70px; background:linear-gradient(135deg,#fff,#EDF4FC); border-bottom:1px solid var(--line-light); }
+.mobile-nav-toggle { display:none; width:42px; height:42px; align-items:center; justify-content:center; background:var(--blue-subtle); border:1px solid var(--blue-line); border-radius:6px; color:var(--blue-deep); font-size:20px; cursor:pointer; }
+.mobile-drawer { display:none; position:fixed; top:64px; left:0; right:0; padding:24px; background:var(--blue-dark); color:white; border-bottom:2px solid var(--blue-primary); z-index:99; }
+.mobile-drawer.open { display:block; }
+.mobile-drawer ul { list-style:none; }
+.mobile-drawer li { margin-bottom:16px; }
+.mobile-drawer a { color:#E2E8F0; text-decoration:none; font-size:16px; font-weight:600; display:block; }
+.mobile-drawer-contact { margin-top:24px; padding-top:20px; border-top:1px solid #1E293B; display:flex; flex-direction:column; gap:12px; }
+.mobile-sticky-bar { display:none; position:fixed; bottom:0; left:0; right:0; padding:10px 16px; gap:12px; background:rgba(6,24,48,.95); border-top:1px solid #1E3A60; z-index:999; }
+.mobile-sticky-bar a { flex:1; padding:12px; border-radius:6px; color:white; text-decoration:none; text-align:center; font-size:13px; font-weight:700; }
+.mobile-sticky-btn-call { background:#10B981; }
+.mobile-sticky-btn-form { background:var(--blue-primary); }
 .sec-kicker { color:var(--blue-primary); font:700 12px var(--font-mono); margin-bottom:18px; text-transform:uppercase; letter-spacing:.1em; }
 h1 { font-size:64px; line-height:1.08; color:var(--blue-deep); overflow-wrap:break-word; max-width:900px; margin-bottom:22px; }
 .intro p { max-width:700px; color:var(--muted); font-size:17px; line-height:1.65; }
@@ -61,7 +72,7 @@ h2 { color:var(--blue-deep); font-size:38px; line-height:1.12; margin-bottom:18p
 .ef-bottom { display:flex; justify-content:space-between; gap:10px; padding-top:24px; border-top:1px solid #162E4F; color:#6C86A8; font:11px var(--font-mono); }
 :focus-visible { outline:2px solid currentColor; outline-offset:3px; }
 @media(max-width:1024px) { .case-triad { grid-template-columns:repeat(2,minmax(0,1fr)); } .nav-menu { gap:14px; } }
-@media(max-width:768px) { .top-utility,.header-phone,.btn-head { display:none; } .top-header { height:auto; min-height:64px; padding:12px 16px; flex-wrap:wrap; } .brand-logo-img { height:38px; } .brand-title { font-size:13px; } .brand-sub { display:none; } .nav-menu { flex-wrap:wrap; gap:12px; } .nav-menu a { font-size:12px; } .intro { padding:52px 16px; } h1 { font-size:36px; } .intro p { font-size:15px; } .editorial-section { padding:60px 16px; } h2 { font-size:26px; } .case-triad { grid-template-columns:1fr; } .case-img-wrap { height:180px; } .case-body { padding:18px; } .editorial-footer { padding:40px 16px 24px; } .ef-row,.ef-bottom { flex-direction:column; } .ef-links { display:flex; flex-wrap:wrap; gap:12px; } .ef-links a { margin:0; } }
+@media(max-width:768px) { body { padding-bottom:60px; } .top-utility,.header-phone,.btn-head,.nav-menu { display:none; } .mobile-nav-toggle,.mobile-sticky-bar { display:flex; } .top-header { height:64px; padding:0 16px; } .brand-logo-img { height:38px; } .brand-title { font-size:13px; } .brand-sub { display:none; } .brand-text-col { padding-left:10px; } .intro { padding:52px 16px; } h1 { font-size:36px; } .intro p { font-size:15px; } .editorial-section { padding:60px 16px; } h2 { font-size:26px; } .case-triad { grid-template-columns:1fr; } .case-img-wrap { height:180px; } .case-body { padding:18px; } .editorial-footer { padding:40px 16px 24px; } .ef-row,.ef-bottom { flex-direction:column; } .ef-links { display:flex; flex-wrap:wrap; gap:12px; } .ef-links a { margin:0; } }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
 </style>
 </head>
@@ -71,8 +82,9 @@ h2 { color:var(--blue-deep); font-size:38px; line-height:1.12; margin-bottom:18p
   <header class="top-header">
     <a href="index.html" class="brand-identity"><img src="assets/logo_remgaz_transparent.png" alt="Логотип РемГазСервис" class="brand-logo-img"><span class="brand-text-col"><span class="brand-title">РемГазСервис</span><span class="brand-sub">Газификация · котельные · СУГ</span></span></a>
     <nav aria-label="Основная навигация"><ul class="nav-menu"><li><a href="index.html#objects">Объекты</a></li><li><a href="index.html#services">Услуги</a></li><li><a href="portfolio.html" aria-current="page">Портфолио</a></li><li><a href="index.html#contact">Контакты</a></li></ul></nav>
-    <div class="header-action"><div class="header-phone"><a href="tel:+78123855353">8 (812) 385-53-53</a><small>Санкт-Петербург и СЗФО</small></div><a class="btn-head" href="index.html#contact">Обсудить объект</a></div>
+    <div class="header-action"><div class="header-phone"><a href="tel:+78123855353">8 (812) 385-53-53</a><small>Санкт-Петербург и СЗФО</small></div><a class="btn-head" href="index.html#contact">Обсудить объект</a><button class="mobile-nav-toggle" type="button" onclick="toggleMobileNav()" aria-label="Меню навигации">☰</button></div>
   </header>
+  <nav class="mobile-drawer" id="mobileDrawer" aria-label="Мобильная навигация"><ul><li><a href="index.html#objects">Объекты</a></li><li><a href="index.html#services">Услуги</a></li><li><a href="portfolio.html" onclick="toggleMobileNav()">Портфолио</a></li><li><a href="index.html#contact">Контакты</a></li></ul><div class="mobile-drawer-contact"><a href="tel:+78123855353">8 (812) 385-53-53</a><a href="mailto:info@remgaz.com">info@remgaz.com</a></div></nav>
   <main>
     <section class="intro"><div class="sec-kicker">РемГазСервис / Работы</div><h1>Портфолио</h1><p>Газификация, котельные и объекты на обслуживании. Для каждого кейса приводим выполненные работы и известные параметры. Без фотографии — только описание объекта.</p></section>
     <section class="editorial-section" id="projects"><h2>Монтаж и реконструкция</h2><p class="sec-desc">Проекты газоснабжения и котельные для разных типов объектов.</p>
@@ -91,6 +103,8 @@ h2 { color:var(--blue-deep); font-size:38px; line-height:1.12; margin-bottom:18p
     <section class="editorial-section next"><h2>Есть похожая задача?</h2><p>Расскажите, какой у вас объект и что нужно сделать. Обсудим исходные данные и возможный состав работ.</p><a class="btn-primary-lead" href="index.html#contact">Обсудить объект ↗</a></section>
   </main>
   <footer class="editorial-footer"><div class="ef-row"><div class="ef-brand"><img src="assets/logo_remgaz_transparent.png" alt="Логотип РемГазСервис" class="ef-brand-logo"><div><strong>ГРУППА КОМПАНИЙ «РЕМГАЗСЕРВИС»</strong><p>Проектирование, монтаж и обслуживание систем автономного газоснабжения, котельных и инженерных сетей в Северо-Западном федеральном округе.</p></div></div><div class="ef-links"><a href="index.html#objects">Направления</a><a href="index.html#services">Услуги</a><a href="portfolio.html">Портфолио</a><a href="index.html#contact">Контакты</a></div></div><div class="ef-bottom"><span>ГК «РемГазСервис» · Северо-Западный федеральный округ.</span><span>8 (812) 385-53-53 · info@remgaz.com</span></div></footer>
+  <div class="mobile-sticky-bar"><a href="tel:+78123855353" class="mobile-sticky-btn-call">Позвонить</a><a href="index.html#contact" class="mobile-sticky-btn-form">Оставить запрос</a></div>
 </div>
+<script>function toggleMobileNav(){document.getElementById('mobileDrawer').classList.toggle('open')}</script>
 </body>
 </html>
