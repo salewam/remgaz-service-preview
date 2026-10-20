@@ -114,32 +114,13 @@ body {
 .brand-logo-img {
   height: 52px;
   width: auto;
+  max-width: 210px;
   object-fit: contain;
   display: block;
   transition: transform 0.2s ease;
 }
 .brand-identity:hover .brand-logo-img {
   transform: scale(1.02);
-}
-.brand-text-col {
-  border-left: 1px solid var(--blue-line);
-  padding-left: 14px;
-}
-.brand-title {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--blue-deep);
-  line-height: 1.1;
-}
-.brand-sub {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-top: 3px;
 }
 
 .nav-menu {
@@ -560,7 +541,7 @@ body {
   border-top: 1px solid var(--blue-line);
   padding-top: 20px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 16px;
   margin-bottom: 28px;
 }
@@ -575,7 +556,7 @@ body {
   font-size: 15px;
   font-weight: 700;
   color: var(--blue-deep);
-  font-family: var(--font-mono);
+  line-height: 1.4;
 }
 .dv-visual-wrap {
   border: 1px solid var(--blue-line);
@@ -903,22 +884,19 @@ body {
 }
 .ef-brand {
   display: flex;
-  gap: 16px;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 440px;
 }
 .ef-brand-logo {
-  height: 48px;
-  background: white;
-  padding: 4px 8px;
-  border-radius: 6px;
-}
-.ef-brand strong {
-  font-size: 15px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  width: 220px;
+  height: auto;
+  max-width: 100%;
   display: block;
-  margin-bottom: 4px;
-  color: white;
+  padding: 8px;
+  background: white;
+  border-radius: 6px;
 }
 .ef-brand p {
   color: #8CA4C2;
@@ -1024,10 +1002,7 @@ body {
   .mobile-nav-toggle { display: flex; }
   
   .top-header { height: 64px; padding: 0 16px; }
-  .brand-logo-img { height: 38px; }
-  .brand-title { font-size: 13px; }
-  .brand-sub { display: none; }
-  .brand-text-col { padding-left: 10px; }
+  .brand-logo-img { height: 38px; max-width: 160px; }
 
   .hero-editorial { padding: 40px 16px 45px; }
   .hero-heading { font-size: 32px; line-height: 1.15; margin-bottom: 20px; }
@@ -1074,7 +1049,6 @@ body {
   .dv-title { font-size: 22px; }
   .dv-desc { font-size: 14px; }
   .dv-visual-wrap { min-height: 200px; height: 200px; }
-  .dv-meta-list { grid-template-columns: 1fr 1fr; gap: 10px; }
   
   /* Process Timeline on Mobile */
   .process-grid {
@@ -1122,12 +1096,8 @@ body {
 
   <!-- Header -->
   <header class="top-header">
-    <a href="#" class="brand-identity">
-      <img src="assets/logo_remgaz_transparent.png" alt="Логотип РемГазСервис" class="brand-logo-img">
-      <div class="brand-text-col">
-        <div class="brand-title">РемГазСервис</div>
-        <div class="brand-sub">Газификация · котельные · СУГ</div>
-      </div>
+    <a href="#" class="brand-identity" aria-label="РемГазСервис — главная">
+      <img src="assets/remgaz-group-logo.png" alt="Группа компаний РемГазСервис" class="brand-logo-img" width="2907" height="821">
     </a>
 
     <ul class="nav-menu">
@@ -1175,7 +1145,7 @@ body {
   <section class="editorial-section" id="objects">
     <div class="sec-kicker">01 / Объекты</div>
     <h2 class="sec-title">Выберите объект — мы покажем подходящее направление</h2>
-    <p class="sec-desc">Выберите тип объекта. Ниже появится краткое описание и кнопка перехода к портфолио.</p>
+    <p class="sec-desc">Выберите тип объекта. Ниже появятся фотография и описание выполненных работ по похожему проекту.</p>
     <div class="object-matrix">
       <div class="matrix-cell active" onclick="selectObject('house', this)"><div class="cell-top"><div class="cell-index">01</div><div class="cell-icon">🏡</div></div><div><div class="cell-name">Частные дома</div><div class="cell-sub">Автономная газификация и отопление</div></div><div class="cell-arrow">↗</div></div>
       <div class="matrix-cell" onclick="selectObject('hotel', this)"><div class="cell-top"><div class="cell-index">02</div><div class="cell-icon">🏨</div></div><div><div class="cell-name">Базы отдыха и отели</div><div class="cell-sub">Котельные и газоснабжение</div></div><div class="cell-arrow">↗</div></div>
@@ -1189,18 +1159,16 @@ body {
 
     <div class="detail-view" id="detailDrawer">
       <div>
-        <h3 class="dv-title" id="dvTitle">Частные дома</h3>
-        <p class="dv-desc" id="dvDesc">Автономная газификация и отопление частного дома с подбором оборудования под объект.</p>
-        <div class="dv-tags" id="dvTags"><span class="dv-tag">Автономная газификация</span><span class="dv-tag">Газовое отопление</span><span class="dv-tag">Поставка СУГ</span></div>
+        <h3 class="dv-title" id="dvTitle">Котельная и тепловой пункт жилого комплекса</h3>
+        <p class="dv-desc" id="dvDesc">Отопление нескольких жилых зданий от сжиженного газа.</p>
+        <div class="dv-tags" id="dvTags"><span class="dv-tag">Подземные резервуары</span><span class="dv-tag">Теплотрасса Usystems</span><span class="dv-tag">Тепловой пункт</span></div>
         <div class="dv-meta-list">
-          <div class="dv-meta-item"><small>Задача</small><strong id="dvTime">По техническому заданию</strong></div>
-          <div class="dv-meta-item"><small>Решение</small><strong id="dvPower">Подбирается под объект</strong></div>
-          <div class="dv-meta-item"><small>Условия</small><strong id="dvWarranty">По договору</strong></div>
-          <div class="dv-meta-item"><small>Сервис</small><strong id="dvAutonomy">По договору</strong></div>
+          <div class="dv-meta-item"><small>Задача</small><strong id="dvTask">Подать тепло в несколько зданий и предусмотреть управление котельной с телефона.</strong></div>
+          <div class="dv-meta-item"><small>Что сделали</small><strong id="dvWork">Установили резервуары и котлы, проложили теплотрассу, собрали тепловой пункт и щит My Heat.</strong></div>
         </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;"><a href="#contact" class="btn-primary-lead" style="padding: 12px 24px; font-size: 13px;" onclick="prefillForm(document.getElementById('dvTitle').innerText)">Обсудить этот объект ↗</a><a href="portfolio.html" class="btn-outline-lead" style="padding: 12px 20px; font-size: 13px;">Смотреть портфолио ↗</a></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;"><a href="#contact" class="btn-primary-lead" style="padding: 12px 24px; font-size: 13px;" onclick="prefillForm(document.getElementById('dvTitle').innerText)">Обсудить похожий объект ↗</a><a href="portfolio.html#home" id="dvCaseLink" class="btn-outline-lead" style="padding: 12px 20px; font-size: 13px;">Смотреть фото и работы ↗</a></div>
       </div>
-      <div class="dv-visual-wrap"><img src="assets/doc1_p4_img0_814.jpg" alt="Инженерный объект" class="dv-visual-img" id="dvImg"><div class="dv-visual-overlay"><span id="dvLocation">Северо-Западный федеральный округ</span></div></div>
+      <div class="dv-visual-wrap"><img src="assets/portfolio/home-boiler-itp-04.webp" alt="Котельная и тепловой пункт жилого комплекса" class="dv-visual-img" id="dvImg"><div class="dv-visual-overlay"><span id="dvLocation">Ленинградская область · деревня Громово</span></div></div>
     </div>
   </section>
 
@@ -1341,9 +1309,8 @@ body {
   <footer class="editorial-footer">
     <div class="ef-row">
       <div class="ef-brand">
-        <img src="assets/logo_remgaz_transparent.png" alt="Логотип РемГазСервис" class="ef-brand-logo">
+        <img src="assets/remgaz-group-logo.png" alt="Группа компаний РемГазСервис" class="ef-brand-logo" width="2907" height="821">
         <div>
-          <strong>ГРУППА КОМПАНИЙ «РЕМГАЗСЕРВИС»</strong>
           <p>Проектирование, монтаж и обслуживание систем автономного газоснабжения, котельных и инженерных сетей в Северо-Западном федеральном округе.</p>
         </div>
       </div>
@@ -1410,119 +1377,114 @@ function toggleMobileNav() {
   drawer.classList.toggle('open');
 }
 
-// Object Selector Data
-const objectData = {
-  house: {
-    title: "Частные дома",
-    desc: "Газификация и отопление частного дома с подбором решения под техническое задание.",
-    tags: ["Автономная газификация", "Газовое отопление", "Поставка СУГ", "Сервис по договору"],
-    time: "По техническому заданию",
-    power: "Подбирается под объект",
-    warranty: "По договору",
-    autonomy: "Плановое и аварийное обслуживание",
-    img: "assets/doc1_p4_img0_814.jpg",
-    loc: "Северо-Западный федеральный округ"
-  },
-  hotel: {
-    title: "Базы отдыха и отели",
-    desc: "Газоснабжение, котельные и инженерные системы для баз отдыха и отелей.",
-    tags: ["Газификация", "Котельные", "Поставка СУГ", "Сервис по договору"],
-    time: "По техническому заданию",
-    power: "Подбирается под объект",
-    warranty: "По договору",
-    autonomy: "Плановое и аварийное обслуживание",
-    img: "assets/doc1_p12_img2_527.jpg",
-    loc: "Северо-Западный федеральный округ"
+// Real projects for the original eight object categories.
+const projectData = {
+  park: {
+    title: "Газоснабжение парк-отеля в Карелии",
+    desc: "Газ для ресторана, жилых домов и административной части парк-отеля.",
+    tags: ["Подземные резервуары", "Испарительная установка", "Поставка газа"],
+    task: "Обеспечить газом несколько зданий и организовать регулярные поставки СУГ.",
+    work: "Установили два подземных резервуара и испарительную установку, проложили газопроводы.",
+    img: "assets/portfolio/residential-gasification-01.webp",
+    loc: "Карелия · деревня Ляскеля",
+    anchor: "park-hotel"
   },
   spa: {
-    title: "SPA-комплексы",
-    desc: "Котельные, отопление и горячее водоснабжение для SPA-комплексов.",
-    tags: ["Отопление", "ГВС", "Газоснабжение", "Сервис по договору"],
-    time: "По техническому заданию",
-    power: "Подбирается под объект",
-    warranty: "По договору",
-    autonomy: "Плановое и аварийное обслуживание",
-    img: "assets/doc1_p12_img1_526.jpg",
-    loc: "Северо-Западный федеральный округ"
+    title: "Котельная для SPA-комплекса «Баня Кело»",
+    desc: "Отопление, горячая вода, подогрев бассейна и снеготаяние вокруг него.",
+    tags: ["De Dietrich AMC PRO", "Gekon XL", "My Heat"],
+    task: "Поддерживать разные температурные режимы и обеспечить комплекс горячей водой.",
+    work: "Собрали котельную и тепловой пункт; установили теплообменник для снеготаяния и щит управления.",
+    img: "assets/portfolio/spa-boiler-05.webp",
+    loc: "Ленинградская область · Новосаратовка",
+    anchor: "spa"
   },
   production: {
-    title: "Предприятия",
-    desc: "Проектирование, монтаж и обслуживание систем газоснабжения и котельных для предприятий.",
-    tags: ["Котельные", "Технологический газ", "Газопроводы", "Сервис по договору"],
-    time: "По техническому заданию",
-    power: "Подбирается под объект",
-    warranty: "По договору",
-    autonomy: "Плановое и аварийное обслуживание",
-    img: "assets/doc1_p10_img0_656.jpg",
-    loc: "Северо-Западный федеральный округ"
+    title: "Котельная производственного комплекса",
+    desc: "Отопление и нагрев приточной вентиляции производственного здания.",
+    tags: ["180 кВт", "Тепловой пункт", "My Heat"],
+    task: "Организовать радиаторное и воздушное отопление, нагрев вентиляции и удалённое управление.",
+    work: "Установили котельное оборудование, тепловой пункт с несколькими контурами и щит управления.",
+    img: "assets/portfolio/industrial-boiler-03.webp",
+    loc: "Санкт-Петербург · Волго-Донский проспект",
+    anchor: "production"
   },
-  restaurant: {
-    title: "Рестораны",
-    desc: "Поставка СУГ для ресторанов, отопления и технологического оборудования кухни.",
-    tags: ["Поставка СУГ", "Технологическое оборудование", "Газоснабжение", "Сервис"],
-    time: "По техническому заданию",
-    power: "Подбирается под объект",
-    warranty: "По договору",
-    autonomy: "Поставка и обслуживание по договору",
-    img: "assets/doc1_p11_img0_535.png",
-    loc: "Северо-Западный федеральный округ"
+  home: {
+    title: "Котельная и тепловой пункт жилого комплекса",
+    desc: "Отопление нескольких жилых зданий от сжиженного газа.",
+    tags: ["Подземные резервуары", "Теплотрасса Usystems", "Тепловой пункт"],
+    task: "Подать тепло в несколько зданий и предусмотреть управление котельной с телефона.",
+    work: "Установили резервуары и котлы, проложили теплотрассу, собрали тепловой пункт и щит My Heat.",
+    img: "assets/portfolio/home-boiler-itp-04.webp",
+    loc: "Ленинградская область · деревня Громово",
+    anchor: "home"
   },
-  agro: {
-    title: "Аграрные объекты",
-    desc: "Газоснабжение и инженерные решения для теплиц и аграрных объектов.",
-    tags: ["Теплицы", "Отопление", "Автоматизация", "Сервис"],
-    time: "По техническому заданию",
-    power: "Подбирается под объект",
-    warranty: "По договору",
-    autonomy: "Плановое и аварийное обслуживание",
-    img: "assets/doc1_p6_img0_704.jpg",
-    loc: "Северо-Западный федеральный округ"
+  hotel: {
+    title: "Система снеготаяния во дворе гостиницы",
+    desc: "Подогрев внутреннего двора гостиницы при реконструкции здания.",
+    tags: ["Внутренний двор 150 м²", "Трубопроводы с антифризом", "Автоматика"],
+    task: "Сделать так, чтобы на покрытии двора не задерживались снег и влага.",
+    work: "В плиту двора уложили трубы; поставили теплообменник и автоматику нагрева.",
+    img: "assets/portfolio/hotel-snowmelt-01.webp",
+    loc: "Санкт-Петербург · Дворцовая набережная",
+    anchor: "hotel"
   },
-  mkd: {
-    title: "Жилые дома и посёлки",
-    desc: "Групповая газификация и теплоснабжение жилых объектов с подбором решения под задачу.",
-    tags: ["Групповая газификация", "Газовые сети", "Теплоснабжение", "Сервис"],
-    time: "По техническому заданию",
-    power: "Подбирается под объект",
-    warranty: "По договору",
-    autonomy: "Плановое и аварийное обслуживание",
-    img: "assets/doc1_p10_img0_656.jpg",
-    loc: "Северо-Западный федеральный округ"
+  bar: {
+    title: "Тёплый пол для коктейль-бара",
+    desc: "Напольное отопление в цокольном помещении здания 1815 года постройки.",
+    tags: ["Тёплый пол", "Теплоизоляция", "Коллекторы"],
+    task: "Подготовить помещение под коктейль-бар и устроить напольное отопление.",
+    work: "Уложили теплоизоляцию и трубы, установили коллекторы; систему опрессовали.",
+    img: "assets/portfolio/cocktail-bar-floor-01.webp",
+    loc: "Санкт-Петербург · Дворцовая набережная",
+    anchor: "bar"
   },
-  seasonal: {
-    title: "Сезонные объекты",
-    desc: "Поставка СУГ и обслуживание объектов с сезонным режимом работы.",
-    tags: ["Поставка СУГ", "Сезонный график", "Газоснабжение", "Сервис"],
-    time: "По техническому заданию",
-    power: "Подбирается под объект",
-    warranty: "По договору",
-    autonomy: "Поставка и обслуживание по договору",
-    img: "assets/doc1_p18_img0_149.jpg",
-    loc: "Северо-Западный федеральный округ"
+  grain: {
+    title: "Поставка газа для зерносушильного комплекса",
+    desc: "Газоснабжение зерносушильного комплекса в Луге.",
+    tags: ["Сжиженный газ", "График поставок", "Резерв газа"],
+    task: "Рассчитать потребность комплекса в газе и согласовать график поставок.",
+    work: "Газ зарезервировали в хранилище; поставки идут по согласованному графику.",
+    img: "assets/portfolio/grain-dryer-05.webp",
+    loc: "Ленинградская область · Луга",
+    anchor: "grain"
   }
+};
+const objectData = {
+  house: projectData.home,
+  hotel: projectData.park,
+  spa: projectData.spa,
+  production: projectData.production,
+  restaurant: projectData.bar,
+  agro: projectData.grain,
+  mkd: projectData.home,
+  seasonal: projectData.hotel
 };
 
 function selectObject(key, cell) {
-  document.querySelectorAll('.matrix-cell').forEach(c => c.classList.remove('active'));
-  cell.classList.add('active');
   const d = objectData[key];
   if (!d) return;
+  document.querySelectorAll('.matrix-cell').forEach(c => {
+    c.classList.remove('active');
+  });
+  cell.classList.add('active');
 
-  document.getElementById('dvTitle').innerText = d.title;
-  document.getElementById('dvDesc').innerText = d.desc;
-  document.getElementById('dvTime').innerText = d.time;
-  document.getElementById('dvPower').innerText = d.power;
-  document.getElementById('dvWarranty').innerText = d.warranty;
-  document.getElementById('dvAutonomy').innerText = d.autonomy;
-  document.getElementById('dvImg').src = d.img;
-  document.getElementById('dvLocation').innerText = d.loc;
+  document.getElementById('dvTitle').textContent = d.title;
+  document.getElementById('dvDesc').textContent = d.desc;
+  document.getElementById('dvTask').textContent = d.task;
+  document.getElementById('dvWork').textContent = d.work;
+  const image = document.getElementById('dvImg');
+  image.src = d.img;
+  image.alt = d.title;
+  document.getElementById('dvLocation').textContent = d.loc;
+  document.getElementById('dvCaseLink').href = `portfolio.html#${d.anchor}`;
 
   const tagsContainer = document.getElementById('dvTags');
-  tagsContainer.innerHTML = '';
-  d.tags.forEach(t => {
+  tagsContainer.replaceChildren();
+  d.tags.forEach(tag => {
     const span = document.createElement('span');
     span.className = 'dv-tag';
-    span.innerText = t;
+    span.textContent = tag;
     tagsContainer.appendChild(span);
   });
 }
