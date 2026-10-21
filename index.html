@@ -1208,7 +1208,7 @@ body {
       <div>
         <h3 class="dv-title" id="dvTitle">Частные дома</h3>
         <p class="dv-project-name" id="dvProjectName">Объект: котельная и тепловой пункт частного дома в Громово</p>
-        <p class="dv-desc" id="dvDesc">Частный дом и другие здания комплекса получают тепло от котельной на сжиженном газе.</p>
+        <p class="dv-desc" id="dvDesc">Для частного дома и других жилых зданий смонтировали котельную на сжиженном газе и тепловой пункт.</p>
         <div class="dv-tags" id="dvTags"><span class="dv-tag">Подземные резервуары</span><span class="dv-tag">Теплотрасса Usystems</span><span class="dv-tag">Тепловой пункт</span></div>
         <div class="dv-meta-list">
           <div class="dv-meta-item"><small>Задача</small><strong id="dvTask">Подать тепло в несколько зданий и предусмотреть управление котельной с телефона.</strong></div>
@@ -1436,7 +1436,7 @@ function toggleMobileNav() {
 const projectData = {
   park: {
     title: "Парк-отель в Карелии: газоснабжение зданий",
-    desc: "Для парк-отеля в Ляскеля газифицировали ресторан, жилые дома и административную часть.",
+    desc: "Для парк-отеля в Ляскеля газифицировали ресторан и жилые дома.",
     tags: ["Подземные резервуары", "Испарительная установка", "Поставка газа"],
     task: "Обеспечить газом несколько зданий и организовать регулярные поставки СУГ.",
     work: "Установили два подземных резервуара для СУГ и изготовили испарительную установку. Проложили подземные и наружные газопроводы до зданий, сдали систему в эксплуатацию. Организовали поставку газа и обслуживание оборудования.",
@@ -1466,7 +1466,7 @@ const projectData = {
   },
   home: {
     title: "Частный жилой дом в Громово: котельная и тепловой пункт",
-    desc: "Частный дом и другие здания комплекса получают тепло от котельной на сжиженном газе.",
+    desc: "Для частного дома и других жилых зданий смонтировали котельную на сжиженном газе и тепловой пункт.",
     tags: ["Подземные резервуары", "Теплотрасса Usystems", "Тепловой пункт"],
     task: "Подать тепло в несколько зданий и предусмотреть управление котельной с телефона.",
     work: "Установили подземные резервуары и котлы De Dietrich AMC PRO, предусмотрели резервные электрокотлы Baxi Ampera. Проложили теплотрассу Usystems к дому, собрали тепловой пункт с отдельными контурами и щит My Heat. Заключили договор на обслуживание.",
@@ -1518,19 +1518,27 @@ const objectData = {
 
 let activeProject;
 let activePhotoIndex = 0;
+let imageRequestId = 0;
 let galleryVisible = false;
 
-function photoSrc(project, index, thumb = false) {
-  return `assets/portfolio/${project.photoPrefix}-${String(index + 1).padStart(2, '0')}${thumb ? '-thumb' : ''}.webp`;
+function photoSrc(project, index, variant = '') {
+  return `assets/portfolio/${project.photoPrefix}-${String(index + 1).padStart(2, '0')}${variant ? `-${variant}` : ''}.webp`;
 }
 
 function showPhoto(index) {
   activePhotoIndex = index;
-  const src = photoSrc(activeProject, index);
+  const project = activeProject;
+  const request = ++imageRequestId;
+  const full = photoSrc(project, index);
   const image = document.getElementById('dvImg');
-  image.src = galleryVisible ? src : photoSrc(activeProject, index, true);
-  image.alt = `${activeProject.title}, фото ${index + 1} из ${activeProject.photoCount}`;
-  document.getElementById('dvImageLink').href = src;
+  image.src = photoSrc(project, index, 'thumb');
+  if (galleryVisible) {
+    const next = new Image();
+    next.onload = () => { if (request === imageRequestId) image.src = next.src; };
+    next.src = photoSrc(project, index, 'view');
+  }
+  image.alt = `${project.title}, фото ${index + 1} из ${project.photoCount}`;
+  document.getElementById('dvImageLink').href = full;
   document.getElementById('dvGalleryCount').textContent = `Фото ${index + 1} из ${activeProject.photoCount}`;
   document.querySelectorAll('.dv-gallery-thumb').forEach((thumb, i) => {
     if (i === index) thumb.setAttribute('aria-current', 'true');
@@ -1552,8 +1560,8 @@ function renderGallery(project) {
     button.setAttribute('aria-label', `Фото ${i + 1} из ${project.photoCount}`);
     button.addEventListener('click', () => showPhoto(i));
     const image = document.createElement('img');
-    if (galleryVisible) image.src = photoSrc(project, i, true);
-    else image.dataset.src = photoSrc(project, i, true);
+    if (galleryVisible) image.src = photoSrc(project, i, 'thumb');
+    else image.dataset.src = photoSrc(project, i, 'thumb');
     image.alt = '';
     image.loading = 'lazy';
     image.decoding = 'async';
