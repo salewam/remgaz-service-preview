@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Проекты и объекты на обслуживании ГК «РемГазСервис»: газовые котельные и автономное газоснабжение.">
 <title>Портфолио — РемГазСервис</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/fonts.css">
 <style>
 :root { --blue-primary:#004D99; --blue-deep:#082142; --blue-dark:#05152B; --blue-subtle:#EDF4FC; --blue-line:#CCE0F5; --white:#fff; --frost-bg:#F4F7FB; --ink:#0A192F; --ink-soft:#2D3E54; --muted:#5C708A; --line-light:#DCE5F0; --font-main:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif; --font-mono:'JetBrains Mono',monospace; }
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -60,8 +58,11 @@ h2 { color:var(--blue-deep); font-size:38px; line-height:1.12; margin-bottom:18p
 .project-list { display:grid; gap:40px; }
 .portfolio-project { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr); grid-template-rows:auto 1fr; grid-template-areas:"gallery head" "gallery copy"; align-items:stretch; border:1px solid var(--blue-line); border-radius:8px; overflow:hidden; background:var(--white); scroll-margin-top:105px; }
 .project-gallery { grid-area:gallery; min-width:0; padding:16px; background:var(--blue-subtle); display:flex; flex-direction:column; gap:12px; }
-.gallery-stage { display:flex; align-items:center; justify-content:center; height:390px; background:#e4edf6; border-radius:5px; overflow:hidden; }
+.gallery-stage { position:relative; display:flex; align-items:center; justify-content:center; height:390px; background:#e4edf6; border-radius:5px; overflow:hidden; }
 .gallery-stage img { width:100%; height:100%; object-fit:contain; display:block; }
+.gallery-status { position:absolute; bottom:14px; left:14px; right:14px; width:max-content; max-width:calc(100% - 28px); padding:9px 12px; border-radius:4px; background:rgba(5,21,43,.9); color:#fff; font:600 12px/1.5 var(--font-main); pointer-events:none; }
+.gallery-status[hidden] { display:none; }
+.gallery-stage.is-empty .gallery-status { bottom:auto; left:50%; right:auto; transform:translateX(-50%); }
 .gallery-thumbs { display:flex; gap:8px; overflow-x:auto; padding:2px 2px 7px; scrollbar-width:thin; }
 .gallery-thumb { flex:0 0 76px; width:76px; height:60px; padding:0; border:2px solid transparent; border-radius:4px; background:#fff; cursor:pointer; overflow:hidden; }
 .gallery-thumb[aria-current="true"] { border-color:var(--blue-primary); }
@@ -97,7 +98,7 @@ h2 { color:var(--blue-deep); font-size:38px; line-height:1.12; margin-bottom:18p
 <div class="page-wrapper">
   <div class="top-utility"><span>ГК «РемГазСервис» — работает с 2007 года</span><span class="utility-dot">Проектирование · монтаж · сервис · поставка СУГ</span></div>
   <header class="top-header">
-    <a href="index.html" class="brand-identity" aria-label="Группа компаний «РемГазСервис» — на главную"><img src="assets/remgaz-group-logo.png" alt="Группа компаний «РемГазСервис»" class="brand-logo-img" width="2907" height="821"></a>
+    <a href="index.html" class="brand-identity" aria-label="Группа компаний «РемГазСервис» — на главную"><img src="assets/remgaz-group-logo-display.png" alt="Группа компаний «РемГазСервис»" class="brand-logo-img" width="600" height="169"></a>
     <nav aria-label="Основная навигация"><ul class="nav-menu"><li><a href="index.html#objects">Объекты</a></li><li><a href="index.html#services">Услуги</a></li><li><a href="portfolio.html" aria-current="page">Портфолио</a></li><li><a href="index.html#contact">Контакты</a></li></ul></nav>
     <div class="header-action"><div class="header-phone"><a href="tel:+78123855353">8 (812) 385-53-53</a><small>Санкт-Петербург и СЗФО</small></div><a class="btn-head" href="index.html#contact">Обсудить объект</a><button class="mobile-nav-toggle" type="button" onclick="toggleMobileNav()" aria-label="Меню навигации">☰</button></div>
   </header>
@@ -130,7 +131,7 @@ h2 { color:var(--blue-deep); font-size:38px; line-height:1.12; margin-bottom:18p
     </section>
     <section class="editorial-section next"><h2>Есть похожая задача?</h2><p>Расскажите, какой у вас объект и что нужно сделать. Обсудим исходные данные и возможный состав работ.</p><a class="btn-primary-lead" href="index.html#contact">Обсудить объект ↗</a></section>
   </main>
-  <footer class="editorial-footer"><div class="ef-row"><div class="ef-brand"><img src="assets/remgaz-group-logo.png" alt="Группа компаний «РемГазСервис»" class="ef-brand-logo" width="2907" height="821"><p>Проектирование, монтаж и обслуживание систем автономного газоснабжения, котельных и инженерных сетей в Северо-Западном федеральном округе.</p></div><div class="ef-links"><a href="index.html#objects">Направления</a><a href="index.html#services">Услуги</a><a href="portfolio.html">Портфолио</a><a href="index.html#contact">Контакты</a></div></div><div class="ef-bottom"><span>ГК «РемГазСервис» · Северо-Западный федеральный округ.</span><span>8 (812) 385-53-53 · info@remgaz.com</span></div></footer>
+  <footer class="editorial-footer"><div class="ef-row"><div class="ef-brand"><img src="assets/remgaz-group-logo-display.png" alt="Группа компаний «РемГазСервис»" class="ef-brand-logo" width="600" height="169"><p>Проектирование, монтаж и обслуживание систем автономного газоснабжения, котельных и инженерных сетей в Северо-Западном федеральном округе.</p></div><div class="ef-links"><a href="index.html#objects">Направления</a><a href="index.html#services">Услуги</a><a href="portfolio.html">Портфолио</a><a href="index.html#contact">Контакты</a></div></div><div class="ef-bottom"><span>ГК «РемГазСервис» · Северо-Западный федеральный округ.</span><span>8 (812) 385-53-53 · info@remgaz.com</span></div></footer>
   <div class="mobile-sticky-bar"><a href="tel:+78123855353" class="mobile-sticky-btn-call">Позвонить</a><a href="index.html#contact" class="mobile-sticky-btn-form">Оставить запрос</a></div>
 </div>
 <script>
@@ -143,7 +144,51 @@ document.querySelectorAll('.portfolio-project').forEach(project => {
   const name = project.querySelector('h3').textContent;
   const links = Array.from(thumbs.querySelectorAll('.gallery-thumb'));
   const active = thumbs.querySelector('[aria-current="true"]');
+  const status = document.createElement('span');
+  status.className = 'gallery-status';
+  status.setAttribute('role', 'status');
+  status.hidden = true;
+  stage.append(status);
+  let ready = image.complete && image.naturalWidth > 0;
+  let pending = false;
   let requestId = 0;
+  let timeout;
+  const prefetched = new Set();
+  const prefetches = [];
+  const showStatus = message => {
+    status.textContent = message;
+    status.hidden = !message;
+    stage.classList.toggle('is-empty', !ready);
+  };
+  if (!ready) {
+    if (image.complete) {
+      image.style.visibility = 'hidden';
+      showStatus('Не удалось загрузить фото. Откройте оригинал или выберите другое.');
+    } else showStatus('Загружаем фотографию…');
+  }
+  if (!ready && !image.complete) {
+    const watch = new IntersectionObserver((entries, observer) => {
+      if (!entries[0].isIntersecting) return;
+      observer.disconnect();
+      setTimeout(() => {
+        if (!ready && !pending && status.textContent === 'Загружаем фотографию…') {
+          showStatus('Фотография загружается дольше обычного. Откройте оригинал или выберите другое.');
+        }
+      }, 20000);
+    });
+    watch.observe(stage);
+  }
+  image.addEventListener('load', () => {
+    ready = true;
+    image.style.visibility = '';
+    if (!pending) showStatus('');
+    else stage.classList.remove('is-empty');
+  });
+  image.addEventListener('error', () => {
+    ready = false;
+    image.style.visibility = 'hidden';
+    if (!pending) showStatus('Не удалось загрузить фото. Откройте оригинал или выберите другое.');
+  });
   if (active) thumbs.scrollLeft = active.offsetLeft - thumbs.offsetLeft;
   thumbs.addEventListener('click', event => {
     const link = event.target.closest('.gallery-thumb');
@@ -151,23 +196,71 @@ document.querySelectorAll('.portfolio-project').forEach(project => {
     event.preventDefault();
     const number = links.indexOf(link) + 1;
     if (number < 1) return;
-    const request = ++requestId;
-    if (link === thumbs.querySelector('[aria-current="true"]')) return;
+    ++requestId;
+    clearTimeout(timeout);
+    pending = false;
+    if (link === thumbs.querySelector('[aria-current="true"]') && ready) {
+      showStatus('');
+      return;
+    }
+    const request = requestId;
+    pending = true;
+    showStatus(`Загружаем фотографию ${number} из ${links.length}…`);
     const next = new Image();
-    next.onload = () => {
+    const fail = () => {
       if (request !== requestId) return;
+      ++requestId;
+      pending = false;
+      clearTimeout(timeout);
+      showStatus(`Фото ${number} не загрузилось. Выберите другое или попробуйте ещё раз.`);
+    };
+    const commit = () => {
+      if (request !== requestId) return;
+      pending = false;
+      clearTimeout(timeout);
       image.src = next.src;
       image.alt = `${name}, фотография ${number}`;
+      image.style.visibility = '';
+      ready = true;
       stage.href = link.href;
       stage.setAttribute('aria-label', `${name}: открыть фотографию ${number} из ${links.length} крупнее`);
       thumbs.querySelector('[aria-current="true"]')?.removeAttribute('aria-current');
       link.setAttribute('aria-current', 'true');
       count.textContent = `Фото ${number} из ${links.length} · листайте миниатюры →`;
+      showStatus('');
     };
-    next.onerror = () => { if (request === requestId) count.textContent = 'Фотография не загрузилась. Попробуйте другую.'; };
+    next.onload = () => {
+      if (request !== requestId) return;
+      if (next.decode) next.decode().then(commit, fail);
+      else commit();
+    };
+    next.onerror = fail;
+    timeout = setTimeout(fail, 20000);
     next.src = link.href.replace(/\.webp$/, '-view.webp');
   });
+  thumbs.addEventListener('pointerover', event => {
+    const link = event.target.closest('.gallery-thumb');
+    if (!link || !thumbs.contains(link) || !ready || pending || prefetched.size >= 2) return;
+    const index = links.indexOf(link);
+    const current = links.indexOf(thumbs.querySelector('[aria-current="true"]'));
+    if (Math.abs(index - current) !== 1) return;
+    const src = link.href.replace(/\.webp$/, '-view.webp');
+    if (prefetched.has(src)) return;
+    prefetched.add(src);
+    const prefetch = new Image();
+    prefetches.push(prefetch);
+    prefetch.src = src;
+  });
 });
+function prioritizeTarget() {
+  const project = document.getElementById(location.hash.slice(1));
+  if (!project?.classList.contains('portfolio-project')) return;
+  const image = project.querySelector('.gallery-stage img');
+  image.loading = 'eager';
+  image.fetchPriority = 'high';
+}
+prioritizeTarget();
+window.addEventListener('hashchange', prioritizeTarget);
 </script>
 </body>
 </html>

@@ -6,9 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>РемГазСервис — Газификация, котельные, СУГ и инженерный сервис</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/fonts.css">
 <style>
 :root {
   --blue-primary: #004D99;
@@ -584,6 +582,22 @@ body {
   object-fit: contain;
   display: block;
 }
+.dv-visual-img[hidden] { display: none; }
+.dv-gallery-status:not([hidden]) {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 24px);
+  padding: 7px 12px;
+  border-radius: 4px;
+  background: rgba(8, 33, 66, .9);
+  color: var(--white);
+  font: 600 12px/1.4 var(--font-main);
+  text-align: center;
+  pointer-events: none;
+}
 .dv-visual-overlay {
   position: absolute;
   bottom: 0;
@@ -1144,7 +1158,7 @@ body {
   <!-- Header -->
   <header class="top-header">
     <a href="#" class="brand-identity" aria-label="РемГазСервис — главная">
-      <img src="assets/remgaz-group-logo.png" alt="Группа компаний РемГазСервис" class="brand-logo-img" width="2907" height="821">
+      <img src="assets/remgaz-group-logo-display.png" alt="Группа компаний РемГазСервис" class="brand-logo-img" width="600" height="169">
     </a>
 
     <ul class="nav-menu">
@@ -1218,9 +1232,10 @@ body {
       </div>
       <div class="dv-gallery" role="group" aria-label="Фотографии выбранного объекта">
         <div class="dv-visual-wrap">
-          <a class="dv-visual-link" id="dvImageLink" href="assets/portfolio/home-boiler-itp-04.webp" target="_blank" rel="noopener" aria-label="Открыть выбранную фотографию крупнее"><img src="assets/portfolio/home-boiler-itp-04-thumb.webp" alt="Котельная и тепловой пункт частного дома в Громово, фото 4 из 8" class="dv-visual-img" id="dvImg" loading="lazy" decoding="async" width="160" height="214"></a>
-          <button type="button" class="dv-gallery-arrow dv-gallery-prev" onclick="changePhoto(-1)" aria-label="Предыдущее фото">‹</button>
-          <button type="button" class="dv-gallery-arrow dv-gallery-next" onclick="changePhoto(1)" aria-label="Следующее фото">›</button>
+          <a class="dv-visual-link" id="dvImageLink" href="assets/portfolio/home-boiler-itp-04.webp" target="_blank" rel="noopener" aria-label="Открыть выбранную фотографию крупнее"><img src="assets/portfolio/home-boiler-itp-04-view.webp" alt="Частный жилой дом в Громово: котельная и тепловой пункт, фото 4 из 8" class="dv-visual-img" id="dvImg" loading="eager" fetchpriority="low" decoding="async" width="750" height="1000"></a>
+          <button type="button" class="dv-gallery-arrow dv-gallery-prev" onclick="changePhoto(-1)" onpointerenter="prefetchAdjacentPhoto(-1)" aria-label="Предыдущее фото">‹</button>
+          <button type="button" class="dv-gallery-arrow dv-gallery-next" onclick="changePhoto(1)" onpointerenter="prefetchAdjacentPhoto(1)" aria-label="Следующее фото">›</button>
+          <span class="dv-gallery-status" id="dvGalleryStatus" role="status" aria-live="polite" hidden></span>
           <div class="dv-visual-overlay"><span id="dvLocation">Ленинградская область · деревня Громово</span></div>
         </div>
         <div class="dv-gallery-footer"><div class="dv-gallery-thumbs" id="dvGalleryThumbs" role="group" aria-label="Выбор фотографии"></div><span class="dv-gallery-count" id="dvGalleryCount" aria-live="polite">Фото 4 из 8</span></div>
@@ -1364,7 +1379,7 @@ body {
   <footer class="editorial-footer">
     <div class="ef-row">
       <div class="ef-brand">
-        <img src="assets/remgaz-group-logo.png" alt="Группа компаний РемГазСервис" class="ef-brand-logo" width="2907" height="821">
+        <img src="assets/remgaz-group-logo-display.png" alt="Группа компаний РемГазСервис" class="ef-brand-logo" width="600" height="169">
         <div>
           <p>Проектирование, монтаж и обслуживание систем автономного газоснабжения, котельных и инженерных сетей в Северо-Западном федеральном округе.</p>
         </div>
@@ -1397,8 +1412,8 @@ body {
 // Dynamic Typewriter
 const words = ["частных домов", "загородных отелей", "SPA-комплексов", "производственных цехов", "тепличных комплексов"];
 let wordIdx = 0;
-let charIdx = 0;
-let isDeleting = false;
+let charIdx = words[0].length;
+let isDeleting = true;
 const el = document.getElementById("typewriter");
 
 function typeLoop() {
@@ -1424,7 +1439,7 @@ function typeLoop() {
 
   setTimeout(typeLoop, delay);
 }
-typeLoop();
+setTimeout(typeLoop, 2400);
 
 // Mobile Drawer Toggle
 function toggleMobileNav() {
@@ -1520,30 +1535,101 @@ let activeProject;
 let activePhotoIndex = 0;
 let imageRequestId = 0;
 let galleryVisible = false;
+let displayedProject;
+let displayedPhotoIndex;
+let prefetchedForPhoto = '';
+const prefetchedViews = new Map();
 
 function photoSrc(project, index, variant = '') {
   return `assets/portfolio/${project.photoPrefix}-${String(index + 1).padStart(2, '0')}${variant ? `-${variant}` : ''}.webp`;
+}
+
+function setGalleryStatus(message) {
+  const status = document.getElementById('dvGalleryStatus');
+  status.textContent = message;
+  status.hidden = !message;
+}
+
+function commitPhoto(project, index, src, message = '') {
+  const image = document.getElementById('dvImg');
+  image.hidden = false;
+  if (image.getAttribute('src') !== src) image.src = src;
+  image.alt = `${project.title}, фото ${index + 1} из ${project.photoCount}`;
+  document.getElementById('dvImageLink').href = photoSrc(project, index);
+  document.getElementById('dvLocation').textContent = project.loc;
+  document.getElementById('dvGalleryCount').textContent = `Фото ${index + 1} из ${project.photoCount}`;
+  document.querySelectorAll('.dv-gallery-thumb').forEach((thumb, i) => {
+    if (i === index) thumb.setAttribute('aria-current', 'true');
+    else thumb.removeAttribute('aria-current');
+  });
+  displayedProject = project;
+  displayedPhotoIndex = index;
+  prefetchedForPhoto = '';
+  prefetchedViews.clear();
+  setGalleryStatus(message);
+}
+
+function loadFallbackPhoto(project, index, request) {
+  setGalleryStatus('Загружается миниатюра…');
+  const thumb = new Image();
+  thumb.src = photoSrc(project, index, 'thumb');
+  thumb.decode().then(() => {
+    if (request === imageRequestId) commitPhoto(project, index, thumb.src, 'Крупное фото недоступно: показана миниатюра.');
+  }).catch(() => {
+    if (request === imageRequestId) setGalleryStatus('Не удалось загрузить фото. Попробуйте выбрать другое.');
+  });
 }
 
 function showPhoto(index) {
   activePhotoIndex = index;
   const project = activeProject;
   const request = ++imageRequestId;
-  const full = photoSrc(project, index);
+  const view = photoSrc(project, index, 'view');
   const image = document.getElementById('dvImg');
-  image.src = photoSrc(project, index, 'thumb');
-  if (galleryVisible) {
-    const next = new Image();
-    next.onload = () => { if (request === imageRequestId) image.src = next.src; };
-    next.src = photoSrc(project, index, 'view');
+  if (!displayedProject && image.getAttribute('src') === view) {
+    commitPhoto(project, index, view);
+    image.onerror = () => {
+      if (image.getAttribute('src') !== view || displayedProject !== project || activeProject !== project || activePhotoIndex !== index) return;
+      image.hidden = true;
+      loadFallbackPhoto(project, index, imageRequestId);
+    };
+    if (image.complete && !image.naturalWidth) image.onerror();
+    return;
   }
-  image.alt = `${project.title}, фото ${index + 1} из ${project.photoCount}`;
-  document.getElementById('dvImageLink').href = full;
-  document.getElementById('dvGalleryCount').textContent = `Фото ${index + 1} из ${activeProject.photoCount}`;
-  document.querySelectorAll('.dv-gallery-thumb').forEach((thumb, i) => {
-    if (i === index) thumb.setAttribute('aria-current', 'true');
-    else thumb.removeAttribute('aria-current');
+  if (displayedProject === project && displayedPhotoIndex === index && image.getAttribute('src') === view && !image.hidden) {
+    if (image.complete && !image.naturalWidth) {
+      image.hidden = true;
+      loadFallbackPhoto(project, index, request);
+    } else {
+      commitPhoto(project, index, view);
+    }
+    return;
+  }
+
+  setGalleryStatus('Загружается фото…');
+  const next = new Image();
+  next.decoding = 'async';
+  next.src = view;
+  next.decode().then(() => {
+    if (request === imageRequestId) commitPhoto(project, index, view);
+  }).catch(() => {
+    if (request === imageRequestId) loadFallbackPhoto(project, index, request);
   });
+}
+
+function prefetchAdjacentPhoto(step) {
+  if (!galleryVisible || !displayedProject || activeProject !== displayedProject) return;
+  const key = `${displayedProject.photoPrefix}-${displayedPhotoIndex}`;
+  if (prefetchedForPhoto !== key) {
+    prefetchedViews.clear();
+    prefetchedForPhoto = key;
+  }
+  const index = (displayedPhotoIndex + step + displayedProject.photoCount) % displayedProject.photoCount;
+  if (prefetchedViews.has(index) || prefetchedViews.size === 2) return;
+  const view = new Image();
+  view.fetchPriority = 'low';
+  view.src = photoSrc(displayedProject, index, 'view');
+  prefetchedViews.set(index, view);
 }
 
 function changePhoto(step) {
@@ -1588,7 +1674,6 @@ function selectObject(key, cell) {
   document.getElementById('dvTask').textContent = d.task;
   document.getElementById('dvWork').textContent = d.work;
   renderGallery(d);
-  document.getElementById('dvLocation').textContent = d.loc;
   document.getElementById('dvCaseLink').href = `portfolio.html#${d.anchor}`;
 
   const tagsContainer = document.getElementById('dvTags');
@@ -1616,7 +1701,6 @@ const galleryObserver = new IntersectionObserver(([entry]) => {
     image.src = image.dataset.src;
     delete image.dataset.src;
   });
-  showPhoto(activePhotoIndex);
   galleryObserver.disconnect();
 }, { rootMargin: '200px 0px' });
 galleryObserver.observe(document.querySelector('.dv-gallery'));
