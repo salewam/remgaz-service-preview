@@ -1539,6 +1539,36 @@ let displayedProject;
 let displayedPhotoIndex;
 let prefetchedForPhoto = '';
 const prefetchedViews = new Map();
+let hoverPhotoTimer;
+let hoveredPhotoThumb;
+const galleryThumbs = document.getElementById('dvGalleryThumbs');
+
+function cancelHoverPhoto() {
+  clearTimeout(hoverPhotoTimer);
+  hoverPhotoTimer = undefined;
+  hoveredPhotoThumb = undefined;
+}
+
+galleryThumbs.addEventListener('pointerover', event => {
+  if (event.pointerType !== 'mouse' || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const button = event.target.closest('.dv-gallery-thumb');
+  if (!button || !galleryThumbs.contains(button) || button === hoveredPhotoThumb) return;
+  cancelHoverPhoto();
+  hoveredPhotoThumb = button;
+  const index = Array.prototype.indexOf.call(galleryThumbs.children, button);
+  if (index === activePhotoIndex) return;
+  hoverPhotoTimer = setTimeout(() => {
+    hoverPhotoTimer = undefined;
+    if (hoveredPhotoThumb === button && button.isConnected && index !== activePhotoIndex) showPhoto(index);
+  }, 110);
+});
+
+galleryThumbs.addEventListener('pointerout', event => {
+  const button = event.target.closest('.dv-gallery-thumb');
+  if (button === hoveredPhotoThumb && !button.contains(event.relatedTarget)) cancelHoverPhoto();
+});
+galleryThumbs.addEventListener('pointerleave', cancelHoverPhoto);
+
 
 function photoSrc(project, index, variant = '') {
   return `assets/portfolio/${project.photoPrefix}-${String(index + 1).padStart(2, '0')}${variant ? `-${variant}` : ''}.webp`;
@@ -1633,10 +1663,12 @@ function prefetchAdjacentPhoto(step) {
 }
 
 function changePhoto(step) {
+  cancelHoverPhoto();
   showPhoto((activePhotoIndex + step + activeProject.photoCount) % activeProject.photoCount);
 }
 
 function renderGallery(project) {
+  cancelHoverPhoto();
   activeProject = project;
   const thumbs = document.createDocumentFragment();
   for (let i = 0; i < project.photoCount; i++) {
@@ -1644,7 +1676,10 @@ function renderGallery(project) {
     button.type = 'button';
     button.className = 'dv-gallery-thumb';
     button.setAttribute('aria-label', `Фото ${i + 1} из ${project.photoCount}`);
-    button.addEventListener('click', () => showPhoto(i));
+    button.addEventListener('click', () => {
+      cancelHoverPhoto();
+      showPhoto(i);
+    });
     const image = document.createElement('img');
     if (galleryVisible) image.src = photoSrc(project, i, 'thumb');
     else image.dataset.src = photoSrc(project, i, 'thumb');

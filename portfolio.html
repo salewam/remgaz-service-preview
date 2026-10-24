@@ -153,8 +153,7 @@ document.querySelectorAll('.portfolio-project').forEach(project => {
   let pending = false;
   let requestId = 0;
   let timeout;
-  const prefetched = new Set();
-  const prefetches = [];
+  let hoverTimer;
   const showStatus = message => {
     status.textContent = message;
     status.hidden = !message;
@@ -190,10 +189,7 @@ document.querySelectorAll('.portfolio-project').forEach(project => {
     if (!pending) showStatus('Не удалось загрузить фото. Откройте оригинал или выберите другое.');
   });
   if (active) thumbs.scrollLeft = active.offsetLeft - thumbs.offsetLeft;
-  thumbs.addEventListener('click', event => {
-    const link = event.target.closest('.gallery-thumb');
-    if (!link || !thumbs.contains(link)) return;
-    event.preventDefault();
+  const selectPhoto = link => {
     const number = links.indexOf(link) + 1;
     if (number < 1) return;
     ++requestId;
@@ -237,20 +233,26 @@ document.querySelectorAll('.portfolio-project').forEach(project => {
     next.onerror = fail;
     timeout = setTimeout(fail, 20000);
     next.src = link.href.replace(/\.webp$/, '-view.webp');
+  };
+  thumbs.addEventListener('click', event => {
+    const link = event.target.closest('.gallery-thumb');
+    if (!link || !thumbs.contains(link)) return;
+    event.preventDefault();
+    clearTimeout(hoverTimer);
+    selectPhoto(link);
   });
   thumbs.addEventListener('pointerover', event => {
+    if (event.pointerType !== 'mouse' || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     const link = event.target.closest('.gallery-thumb');
-    if (!link || !thumbs.contains(link) || !ready || pending || prefetched.size >= 2) return;
-    const index = links.indexOf(link);
-    const current = links.indexOf(thumbs.querySelector('[aria-current="true"]'));
-    if (Math.abs(index - current) !== 1) return;
-    const src = link.href.replace(/\.webp$/, '-view.webp');
-    if (prefetched.has(src)) return;
-    prefetched.add(src);
-    const prefetch = new Image();
-    prefetches.push(prefetch);
-    prefetch.src = src;
+    if (!link || !thumbs.contains(link) || link.contains(event.relatedTarget)) return;
+    clearTimeout(hoverTimer);
+    hoverTimer = setTimeout(() => selectPhoto(link), 110);
   });
+  thumbs.addEventListener('pointerout', event => {
+    const link = event.target.closest('.gallery-thumb');
+    if (link && thumbs.contains(link) && !link.contains(event.relatedTarget)) clearTimeout(hoverTimer);
+  });
+  thumbs.addEventListener('pointerleave', () => clearTimeout(hoverTimer));
 });
 function prioritizeTarget() {
   const project = document.getElementById(location.hash.slice(1));
