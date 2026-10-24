@@ -1214,8 +1214,7 @@ body {
       <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" onclick="selectObject('production', this)"><div class="cell-top"><div class="cell-index">04</div><div class="cell-icon">🏭</div></div><div><div class="cell-name">Предприятия</div><div class="cell-sub">Котельная и тепловой пункт</div></div><div class="cell-arrow">↗</div></div>
       <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" onclick="selectObject('restaurant', this)"><div class="cell-top"><div class="cell-index">05</div><div class="cell-icon">🍽️</div></div><div><div class="cell-name">Рестораны</div><div class="cell-sub">Тёплый пол для коктейль-бара</div></div><div class="cell-arrow">↗</div></div>
       <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" onclick="selectObject('agro', this)"><div class="cell-top"><div class="cell-index">06</div><div class="cell-icon">🌱</div></div><div><div class="cell-name">Аграрные объекты</div><div class="cell-sub">Газ для зерносушильного комплекса</div></div><div class="cell-arrow">↗</div></div>
-      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" onclick="selectObject('mkd', this)"><div class="cell-top"><div class="cell-index">07</div><div class="cell-icon">🏘️</div></div><div><div class="cell-name">Жилые дома и посёлки</div><div class="cell-sub">Теплоснабжение нескольких зданий</div></div><div class="cell-arrow">↗</div></div>
-      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" onclick="selectObject('seasonal', this)"><div class="cell-top"><div class="cell-index">08</div><div class="cell-icon">❄️</div></div><div><div class="cell-name">Сезонные объекты</div><div class="cell-sub">Снеготаяние во дворе гостиницы</div></div><div class="cell-arrow">↗</div></div>
+      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" onclick="selectObject('seasonal', this)"><div class="cell-top"><div class="cell-index">07</div><div class="cell-icon">❄️</div></div><div><div class="cell-name">Сезонные объекты</div><div class="cell-sub">Снеготаяние во дворе гостиницы</div></div><div class="cell-arrow">↗</div></div>
     </div>
 
     <div class="detail-view" id="detailDrawer">
@@ -1232,13 +1231,13 @@ body {
       </div>
       <div class="dv-gallery" role="group" aria-label="Фотографии выбранного объекта">
         <div class="dv-visual-wrap">
-          <a class="dv-visual-link" id="dvImageLink" href="assets/portfolio/home-boiler-itp-04.webp" target="_blank" rel="noopener" aria-label="Открыть выбранную фотографию крупнее"><img src="assets/portfolio/home-boiler-itp-04-view.webp" alt="Частный жилой дом в Громово: котельная и тепловой пункт, фото 4 из 8" class="dv-visual-img" id="dvImg" loading="eager" fetchpriority="low" decoding="async" width="750" height="1000"></a>
+          <a class="dv-visual-link" id="dvImageLink" href="assets/portfolio/home-boiler-itp-04.webp" data-lightbox data-lightbox-src="assets/portfolio/home-boiler-itp-04-lightbox.webp" target="_blank" rel="noopener" aria-label="Открыть выбранную фотографию крупнее"><img src="assets/portfolio/home-boiler-itp-04-view.webp" alt="Частный жилой дом в Громово: котельная и тепловой пункт, фото 4 из 6" class="dv-visual-img" id="dvImg" loading="eager" fetchpriority="low" decoding="async" width="750" height="1000"></a>
           <button type="button" class="dv-gallery-arrow dv-gallery-prev" onclick="changePhoto(-1)" onpointerenter="prefetchAdjacentPhoto(-1)" aria-label="Предыдущее фото">‹</button>
           <button type="button" class="dv-gallery-arrow dv-gallery-next" onclick="changePhoto(1)" onpointerenter="prefetchAdjacentPhoto(1)" aria-label="Следующее фото">›</button>
           <span class="dv-gallery-status" id="dvGalleryStatus" role="status" aria-live="polite" hidden></span>
           <div class="dv-visual-overlay"><span id="dvLocation">Ленинградская область · деревня Громово</span></div>
         </div>
-        <div class="dv-gallery-footer"><div class="dv-gallery-thumbs" id="dvGalleryThumbs" role="group" aria-label="Выбор фотографии"></div><span class="dv-gallery-count" id="dvGalleryCount" aria-live="polite">Фото 4 из 8</span></div>
+        <div class="dv-gallery-footer"><div class="dv-gallery-thumbs" id="dvGalleryThumbs" role="group" aria-label="Выбор фотографии"></div><span class="dv-gallery-count" id="dvGalleryCount" aria-live="polite">Фото 4 из 6</span></div>
       </div>
     </div>
   </section>
@@ -1298,15 +1297,15 @@ body {
 
     <div class="case-triad">
       <article class="case-box">
-        <div class="case-img-wrap"><a href="portfolio.html#park-hotel"><img src="assets/portfolio/residential-gasification-01-card.webp" alt="Работы по газоснабжению парк-отеля в Карелии" loading="lazy" decoding="async" width="800" height="600"></a></div>
+        <div class="case-img-wrap"><a href="assets/portfolio/residential-gasification-01.webp" data-lightbox data-lightbox-src="assets/portfolio/residential-gasification-01-lightbox.webp"><img src="assets/portfolio/residential-gasification-01-card.webp" alt="Работы по газоснабжению парк-отеля в Карелии" loading="lazy" decoding="async" width="800" height="600"></a></div>
         <div class="case-body"><div class="case-kicker">Карелия · парк-отель</div><h3><a href="portfolio.html#park-hotel">Газоснабжение парк-отеля</a></h3><p>Установили два подземных резервуара, испарительную установку и проложили газопроводы к ресторану и жилым домам.</p><div class="case-params">Испарительная установка · 100 кг/ч</div></div>
       </article>
       <article class="case-box">
-        <div class="case-img-wrap"><a href="portfolio.html#spa"><img src="assets/portfolio/spa-boiler-05-card.webp" alt="Котельная SPA-комплекса Баня Кело" loading="lazy" decoding="async" width="800" height="1067"></a></div>
+        <div class="case-img-wrap"><a href="assets/portfolio/spa-boiler-05.webp" data-lightbox data-lightbox-src="assets/portfolio/spa-boiler-05-lightbox.webp"><img src="assets/portfolio/spa-boiler-05-card.webp" alt="Котельная SPA-комплекса Баня Кело" loading="lazy" decoding="async" width="800" height="1067"></a></div>
         <div class="case-body"><div class="case-kicker">Новосаратовка · SPA-комплекс</div><h3><a href="portfolio.html#spa">Котельная для «Бани Кело»</a></h3><p>Установили оборудование De Dietrich AMC PRO и бойлер Gekon XL, собрали тепловой пункт и поставили теплообменник для снеготаяния.</p><div class="case-params">260 кВт · щит управления My Heat</div></div>
       </article>
       <article class="case-box">
-        <div class="case-img-wrap"><a href="portfolio.html#production"><img src="assets/portfolio/industrial-boiler-03-card.webp" alt="Котельная производственного комплекса в Санкт-Петербурге" loading="lazy" decoding="async" width="800" height="1067"></a></div>
+        <div class="case-img-wrap"><a href="assets/portfolio/industrial-boiler-03.webp" data-lightbox data-lightbox-src="assets/portfolio/industrial-boiler-03-lightbox.webp"><img src="assets/portfolio/industrial-boiler-03-card.webp" alt="Котельная производственного комплекса в Санкт-Петербурге" loading="lazy" decoding="async" width="800" height="1067"></a></div>
         <div class="case-body"><div class="case-kicker">Санкт-Петербург · производство</div><h3><a href="portfolio.html#production">Котельная производственного комплекса</a></h3><p>Смонтировали котельное оборудование и тепловой пункт с несколькими контурами; щит управления собрали на My Heat.</p><div class="case-params">180 кВт · договор обслуживания</div></div>
       </article>
     </div>
@@ -1447,7 +1446,7 @@ function toggleMobileNav() {
   drawer.classList.toggle('open');
 }
 
-// Real projects for the original eight object categories.
+// Real projects for the seven object categories.
 const projectData = {
   park: {
     title: "Парк-отель в Карелии: газоснабжение зданий",
@@ -1455,7 +1454,7 @@ const projectData = {
     tags: ["Подземные резервуары", "Испарительная установка", "Поставка газа"],
     task: "Обеспечить газом несколько зданий и организовать регулярные поставки СУГ.",
     work: "Установили два подземных резервуара для СУГ и изготовили испарительную установку. Проложили подземные и наружные газопроводы до зданий, сдали систему в эксплуатацию. Организовали поставку газа и обслуживание оборудования.",
-    photoPrefix: "residential-gasification", photoCount: 5, startPhoto: 1,
+    photoPrefix: "residential-gasification", photos: [1, 2, 3, 4, 5], startPhoto: 1,
     loc: "Карелия · деревня Ляскеля",
     anchor: "park-hotel"
   },
@@ -1465,7 +1464,7 @@ const projectData = {
     tags: ["De Dietrich AMC PRO", "Gekon XL", "My Heat"],
     task: "Поддерживать разные температурные режимы и обеспечить комплекс горячей водой.",
     work: "Установили котлы De Dietrich AMC PRO и бойлер Gekon XL, собрали тепловой пункт с несколькими контурами. Отделили контур снеготаяния теплообменником, собрали щит управления My Heat. Заключили договор на обслуживание котельной.",
-    photoPrefix: "spa-boiler", photoCount: 5, startPhoto: 5,
+    photoPrefix: "spa-boiler", photos: [1, 2, 3, 4, 5], startPhoto: 5,
     loc: "Ленинградская область · Новосаратовка",
     anchor: "spa"
   },
@@ -1475,7 +1474,7 @@ const projectData = {
     tags: ["180 кВт", "Тепловой пункт", "My Heat"],
     task: "Организовать радиаторное и воздушное отопление, нагрев вентиляции и удалённое управление.",
     work: "Смонтировали котельное оборудование De Dietrich AMC PRO мощностью 180 кВт и тепловой пункт с отдельными контурами отопления. Собрали щит удалённого управления на контроллере My Heat и заключили договор на сервисное обслуживание.",
-    photoPrefix: "industrial-boiler", photoCount: 5, startPhoto: 3,
+    photoPrefix: "industrial-boiler", photos: [1, 2, 3, 4, 5], startPhoto: 3,
     loc: "Санкт-Петербург · Волго-Донский проспект",
     anchor: "production"
   },
@@ -1485,7 +1484,7 @@ const projectData = {
     tags: ["Подземные резервуары", "Теплотрасса Usystems", "Тепловой пункт"],
     task: "Подать тепло в несколько зданий и предусмотреть управление котельной с телефона.",
     work: "Установили подземные резервуары и котлы De Dietrich AMC PRO, предусмотрели резервные электрокотлы Baxi Ampera. Проложили теплотрассу Usystems к дому, собрали тепловой пункт с отдельными контурами и щит My Heat. Заключили договор на обслуживание.",
-    photoPrefix: "home-boiler-itp", photoCount: 8, startPhoto: 4,
+    photoPrefix: "home-boiler-itp", photos: [1, 2, 3, 4, 5, 6], startPhoto: 4,
     loc: "Ленинградская область · деревня Громово",
     anchor: "home"
   },
@@ -1495,7 +1494,7 @@ const projectData = {
     tags: ["Внутренний двор 150 м²", "Трубопроводы с антифризом", "Автоматика"],
     task: "Сделать так, чтобы на покрытии двора не задерживались снег и влага.",
     work: "В бетонную плиту двора уложили трубопроводы с антифризом для нагрева покрытия. Теплообменник отделяет этот контур от отопления здания, автоматика управляет подогревом.",
-    photoPrefix: "hotel-snowmelt", photoCount: 6, startPhoto: 1,
+    photoPrefix: "hotel-snowmelt", photos: [4, 6, 3, 2], startPhoto: 1,
     loc: "Санкт-Петербург · Дворцовая набережная",
     anchor: "hotel"
   },
@@ -1505,7 +1504,7 @@ const projectData = {
     tags: ["Тёплый пол", "Теплоизоляция", "Коллекторы"],
     task: "Подготовить помещение под коктейль-бар и устроить напольное отопление.",
     work: "Подготовили основание, уложили теплоизоляционные плиты и трубы напольного отопления, установили коллекторы. Систему опрессовали и передали под заливку пола.",
-    photoPrefix: "cocktail-bar-floor", photoCount: 7, startPhoto: 1,
+    photoPrefix: "cocktail-bar-floor", photos: [4, 3, 5, 6, 7], startPhoto: 1,
     loc: "Санкт-Петербург · Дворцовая набережная",
     anchor: "bar"
   },
@@ -1515,7 +1514,7 @@ const projectData = {
     tags: ["Сжиженный газ", "График поставок", "Резерв газа"],
     task: "Рассчитать потребность комплекса в газе и согласовать график поставок.",
     work: "Рассчитали необходимый объём газа, согласовали график поставок и оплат. Зарезервировали газ в хранилище; поставки выполняются по согласованному графику.",
-    photoPrefix: "grain-dryer", photoCount: 5, startPhoto: 5,
+    photoPrefix: "grain-dryer", photos: [1, 2, 3], startPhoto: 1,
     loc: "Ленинградская область · Луга",
     anchor: "grain"
   }
@@ -1527,7 +1526,6 @@ const objectData = {
   production: projectData.production,
   restaurant: projectData.bar,
   agro: projectData.grain,
-  mkd: projectData.home,
   seasonal: projectData.hotel
 };
 
@@ -1571,7 +1569,7 @@ galleryThumbs.addEventListener('pointerleave', cancelHoverPhoto);
 
 
 function photoSrc(project, index, variant = '') {
-  return `assets/portfolio/${project.photoPrefix}-${String(index + 1).padStart(2, '0')}${variant ? `-${variant}` : ''}.webp`;
+  return `assets/portfolio/${project.photoPrefix}-${String(project.photos[index]).padStart(2, '0')}${variant ? `-${variant}` : ''}.webp`;
 }
 
 function setGalleryStatus(message) {
@@ -1584,10 +1582,12 @@ function commitPhoto(project, index, src, message = '') {
   const image = document.getElementById('dvImg');
   image.hidden = false;
   if (image.getAttribute('src') !== src) image.src = src;
-  image.alt = `${project.title}, фото ${index + 1} из ${project.photoCount}`;
-  document.getElementById('dvImageLink').href = photoSrc(project, index);
+  image.alt = `${project.title}, фото ${index + 1} из ${project.photos.length}`;
+  const imageLink = document.getElementById('dvImageLink');
+  imageLink.href = photoSrc(project, index);
+  imageLink.dataset.lightboxSrc = photoSrc(project, index, 'lightbox');
   document.getElementById('dvLocation').textContent = project.loc;
-  document.getElementById('dvGalleryCount').textContent = `Фото ${index + 1} из ${project.photoCount}`;
+  document.getElementById('dvGalleryCount').textContent = `Фото ${index + 1} из ${project.photos.length}`;
   document.querySelectorAll('.dv-gallery-thumb').forEach((thumb, i) => {
     if (i === index) thumb.setAttribute('aria-current', 'true');
     else thumb.removeAttribute('aria-current');
@@ -1654,7 +1654,7 @@ function prefetchAdjacentPhoto(step) {
     prefetchedViews.clear();
     prefetchedForPhoto = key;
   }
-  const index = (displayedPhotoIndex + step + displayedProject.photoCount) % displayedProject.photoCount;
+  const index = (displayedPhotoIndex + step + displayedProject.photos.length) % displayedProject.photos.length;
   if (prefetchedViews.has(index) || prefetchedViews.size === 2) return;
   const view = new Image();
   view.fetchPriority = 'low';
@@ -1664,18 +1664,18 @@ function prefetchAdjacentPhoto(step) {
 
 function changePhoto(step) {
   cancelHoverPhoto();
-  showPhoto((activePhotoIndex + step + activeProject.photoCount) % activeProject.photoCount);
+  showPhoto((activePhotoIndex + step + activeProject.photos.length) % activeProject.photos.length);
 }
 
 function renderGallery(project) {
   cancelHoverPhoto();
   activeProject = project;
   const thumbs = document.createDocumentFragment();
-  for (let i = 0; i < project.photoCount; i++) {
+  for (let i = 0; i < project.photos.length; i++) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'dv-gallery-thumb';
-    button.setAttribute('aria-label', `Фото ${i + 1} из ${project.photoCount}`);
+    button.setAttribute('aria-label', `Фото ${i + 1} из ${project.photos.length}`);
     button.addEventListener('click', () => {
       cancelHoverPhoto();
       showPhoto(i);
@@ -1766,6 +1766,7 @@ function prepareEmail(event) {
   window.location.href = `mailto:info@remgaz.com?subject=${encodeURIComponent('Запрос по объекту')}&body=${encodeURIComponent(body)}`;
 }
 </script>
+<script defer src="assets/lightbox.js"></script>
 
 </body>
 </html>
