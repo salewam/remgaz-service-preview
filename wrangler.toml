@@ -1,0 +1,20 @@
+name = "remgaz-leads"
+main = "worker/lead.js"
+compatibility_date = "2026-10-24"
+workers_dev = true
+
+[[ratelimits]]
+name = "LEAD_GLOBAL_LIMIT"
+namespace_id = "7869431"
+
+[ratelimits.simple]
+limit = 30
+period = 60
+
+[[ratelimits]]
+name = "LEAD_VISITOR_LIMIT"
+namespace_id = "7869432"
+
+[ratelimits.simple]
+limit = 3
+period = 60

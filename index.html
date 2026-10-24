@@ -808,38 +808,6 @@ body {
   margin-bottom: 8px;
 }
 
-/* Quick Object Type Pills on Form */
-.form-chips-label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  display: block;
-  font-weight: 600;
-}
-.form-chips-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 18px;
-}
-.chip-btn {
-  background: var(--blue-subtle);
-  border: 1px solid var(--blue-line);
-  color: var(--blue-deep);
-  padding: 7px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.chip-btn:hover, .chip-btn.active {
-  background: var(--blue-primary);
-  color: white;
-  border-color: var(--blue-primary);
-}
 
 .editorial-form {
   border-top: 2px solid var(--blue-deep);
@@ -1231,13 +1199,13 @@ body {
       </div>
       <div class="dv-gallery" role="group" aria-label="Фотографии выбранного объекта">
         <div class="dv-visual-wrap">
-          <a class="dv-visual-link" id="dvImageLink" href="assets/portfolio/home-boiler-itp-04.webp" data-lightbox data-lightbox-src="assets/portfolio/home-boiler-itp-04-lightbox.webp" target="_blank" rel="noopener" aria-label="Открыть выбранную фотографию крупнее"><img src="assets/portfolio/home-boiler-itp-04-view.webp" alt="Частный жилой дом в Громово: котельная и тепловой пункт, фото 4 из 6" class="dv-visual-img" id="dvImg" loading="eager" fetchpriority="low" decoding="async" width="750" height="1000"></a>
+          <a class="dv-visual-link" id="dvImageLink" href="assets/portfolio/home-boiler-itp-05.webp" data-lightbox data-lightbox-src="assets/portfolio/home-boiler-itp-05-lightbox.webp" data-lightbox-photos="5,1,2,3,6" target="_blank" rel="noopener" aria-label="Открыть выбранную фотографию крупнее"><img src="assets/portfolio/home-boiler-itp-05-view.webp" alt="Частный жилой дом в Громово: котельная и тепловой пункт, фото 1 из 5" class="dv-visual-img" id="dvImg" loading="eager" fetchpriority="low" decoding="async" width="1000" height="462"></a>
           <button type="button" class="dv-gallery-arrow dv-gallery-prev" onclick="changePhoto(-1)" onpointerenter="prefetchAdjacentPhoto(-1)" aria-label="Предыдущее фото">‹</button>
           <button type="button" class="dv-gallery-arrow dv-gallery-next" onclick="changePhoto(1)" onpointerenter="prefetchAdjacentPhoto(1)" aria-label="Следующее фото">›</button>
           <span class="dv-gallery-status" id="dvGalleryStatus" role="status" aria-live="polite" hidden></span>
           <div class="dv-visual-overlay"><span id="dvLocation">Ленинградская область · деревня Громово</span></div>
         </div>
-        <div class="dv-gallery-footer"><div class="dv-gallery-thumbs" id="dvGalleryThumbs" role="group" aria-label="Выбор фотографии"></div><span class="dv-gallery-count" id="dvGalleryCount" aria-live="polite">Фото 4 из 6</span></div>
+        <div class="dv-gallery-footer"><div class="dv-gallery-thumbs" id="dvGalleryThumbs" role="group" aria-label="Выбор фотографии"></div><span class="dv-gallery-count" id="dvGalleryCount" aria-live="polite">Фото 1 из 5</span></div>
       </div>
     </div>
   </section>
@@ -1337,15 +1305,6 @@ body {
 
       <div>
         <form class="editorial-form" onsubmit="prepareEmail(event)">
-          <span class="form-chips-label">Быстрый выбор типа объекта:</span>
-          <div class="form-chips-row">
-            <button type="button" class="chip-btn" onclick="setChip(this, 'Частный дом')">Частный дом</button>
-            <button type="button" class="chip-btn" onclick="setChip(this, 'Отель / база отдыха')">Отель / база отдыха</button>
-            <button type="button" class="chip-btn" onclick="setChip(this, 'SPA-комплекс')">SPA-комплекс</button>
-            <button type="button" class="chip-btn" onclick="setChip(this, 'Предприятие / склад')">Предприятие / склад</button>
-            <button type="button" class="chip-btn" onclick="setChip(this, 'Сервис котельной')">Сервис котельной</button>
-            <button type="button" class="chip-btn" onclick="setChip(this, 'Поставка СУГ')">Поставка СУГ</button>
-          </div>
 
           <div class="form-row-line">
             <label for="formName">Ваше имя</label>
@@ -1484,7 +1443,7 @@ const projectData = {
     tags: ["Подземные резервуары", "Теплотрасса Usystems", "Тепловой пункт"],
     task: "Подать тепло в несколько зданий и предусмотреть управление котельной с телефона.",
     work: "Установили подземные резервуары и котлы De Dietrich AMC PRO, предусмотрели резервные электрокотлы Baxi Ampera. Проложили теплотрассу Usystems к дому, собрали тепловой пункт с отдельными контурами и щит My Heat. Заключили договор на обслуживание.",
-    photoPrefix: "home-boiler-itp", photos: [1, 2, 3, 4, 5, 6], startPhoto: 4,
+    photoPrefix: "home-boiler-itp", photos: [5, 1, 2, 3, 6], startPhoto: 1,
     loc: "Ленинградская область · деревня Громово",
     anchor: "home"
   },
@@ -1547,6 +1506,11 @@ function cancelHoverPhoto() {
   hoveredPhotoThumb = undefined;
 }
 
+document.getElementById('dvImageLink').addEventListener('lightbox:navigate', event => {
+  cancelHoverPhoto();
+  showPhoto(event.detail.index);
+});
+
 galleryThumbs.addEventListener('pointerover', event => {
   if (event.pointerType !== 'mouse' || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   const button = event.target.closest('.dv-gallery-thumb');
@@ -1586,6 +1550,7 @@ function commitPhoto(project, index, src, message = '') {
   const imageLink = document.getElementById('dvImageLink');
   imageLink.href = photoSrc(project, index);
   imageLink.dataset.lightboxSrc = photoSrc(project, index, 'lightbox');
+  imageLink.dataset.lightboxPhotos = project.photos.join(',');
   document.getElementById('dvLocation').textContent = project.loc;
   document.getElementById('dvGalleryCount').textContent = `Фото ${index + 1} из ${project.photos.length}`;
   document.querySelectorAll('.dv-gallery-thumb').forEach((thumb, i) => {
@@ -1746,12 +1711,6 @@ function prefillForm(name) {
 }
 
 
-function setChip(btn, text) {
-  document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const inp = document.getElementById('formObjectType');
-  if (inp) inp.value = text;
-}
 
 function prepareEmail(event) {
   event.preventDefault();
