@@ -1,5 +1,8 @@
+import { DurableObject } from "cloudflare:workers";
+
 const ALLOWED_ORIGIN = "https://salewam.github.io";
 const MAX_BODY_BYTES = 4096;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 function reply(body, status = 200, cors = true) {
   const headers = {
@@ -44,6 +47,109 @@ function field(value, maximum, required = false) {
   const cleaned = value.replace(/[\u0000-\u001f\u007f-\u009f\s]+/gu, " ").trim();
   if (cleaned.length > maximum || (required && !cleaned)) return null;
   return cleaned;
+}
+
+function validPhone(phone) {
+  if (!/^(?:\+?\d+(?:[ -]?\(\d{1,5}\))?|\(\d{1,5}\))(?:[ -]?\d+)*$/.test(phone)) return false;
+  const digits = phone.replace(/\D/g, "");
+  return digits.length >= 10 && digits.length <= 15 && !/^(\d)\1+$/.test(digits);
+}
+
+// One durable object per IP serializes the rolling-window check and delivery.
+export class LeadVisitorGuard extends DurableObject {
+  constructor(ctx, env) {
+    super(ctx, env);
+    this.pending = Promise.resolve();
+  }
+
+  runExclusive(work) {
+    const task = this.pending.then(work);
+    this.pending = task.catch(() => {});
+    return task;
+  }
+
+  submit(lead) {
+    return this.runExclusive(() => this.deliver(lead));
+  }
+
+  async deliver({ name, phone, object, location }) {
+    const now = Date.now();
+    const recent = ((await this.ctx.storage.get("submissions")) || []).filter(
+      (time) => time > now - DAY_MS,
+    );
+    if (recent.length >= 3) {
+      return { ok: false, status: 429, error: "Слишком много заявок. Повторите позже" };
+    }
+    // Rejected repeat visitors must not consume the additional per-location burst limiter.
+    const globalLimit = await this.env.LEAD_GLOBAL_LIMIT.limit({ key: "lead" });
+    if (!globalLimit.success) {
+      return { ok: false, status: 429, error: "Слишком много заявок. Повторите позже" };
+    }
+
+    // Reserve before the external call: a restart or uncertain timeout must not
+    // allow a fourth delivered message. Known Telegram rejections release the slot.
+    const reserved = [...recent, now];
+    await this.ctx.storage.put("submissions", reserved);
+    await this.ctx.storage.setAlarm(now + DAY_MS);
+
+    const text = [
+      "Новая заявка с сайта РемГаз",
+      `Имя: ${name}`,
+      `Телефон: ${phone}`,
+      ...(object ? [`Объект: ${object}`] : []),
+      ...(location ? [`Местоположение: ${location}`] : []),
+    ].join("\n");
+    const controller = new AbortController();
+    let timer;
+    const timeout = new Promise((_, reject) => {
+      timer = setTimeout(() => {
+        controller.abort();
+        reject(new Error("Telegram timed out"));
+      }, 8000);
+    });
+    try {
+      // A response body can stall even after fetch resolves. Race the entire
+      // exchange; late results must never release a reserved slot.
+      const outcome = await Promise.race([timeout, (async () => {
+        const telegram = await fetch(`https://api.telegram.org/bot${this.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: this.env.TELEGRAM_CHAT_ID, text }),
+          signal: controller.signal,
+        });
+        if (!telegram.ok) return telegram.status >= 400 && telegram.status < 500 ? "rejected" : "uncertain";
+        const result = await telegram.json();
+        return result?.ok === true ? "delivered" : result?.ok === false ? "rejected" : "uncertain";
+      })()]);
+      if (outcome === "rejected") {
+        // Only a confirmed Telegram rejection releases the reservation.
+        await this.ctx.storage.put("submissions", recent);
+      }
+      return outcome === "delivered"
+        ? { ok: true }
+        : { ok: false, status: 502, error: "Не удалось отправить заявку" };
+    } catch {
+      // A timeout, malformed response, or network error leaves delivery uncertain.
+      return { ok: false, status: 502, error: "Не удалось отправить заявку" };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  alarm() {
+    return this.runExclusive(async () => {
+      const now = Date.now();
+      const recent = ((await this.ctx.storage.get("submissions")) || []).filter(
+        (time) => time > now - DAY_MS,
+      );
+      if (!recent.length) {
+        await this.ctx.storage.deleteAll();
+      } else {
+        await this.ctx.storage.put("submissions", recent);
+        await this.ctx.storage.setAlarm(recent[recent.length - 1] + DAY_MS);
+      }
+    });
+  }
 }
 
 export default {
@@ -96,58 +202,26 @@ export default {
     }
 
     const name = field(data.name, 100, true);
-    const phone = field(data.phone, 40, true);
+    const phone = typeof data.phone === "string" ? data.phone.trim() : null;
     const object = field(data.object, 200);
     const location = field(data.location, 200);
-    if (name === null || phone === null || object === null || location === null) {
+    if (name === null || phone === null || phone.length > 40 || !validPhone(phone) || object === null || location === null) {
       return reply({ ok: false, error: "Проверьте поля заявки" }, 400);
     }
 
     // Origin is a browser CORS boundary, not authentication for script clients.
-    // The global cap also bounds traffic from clients that change IP addresses.
-    try {
-      const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-      const visitorLimit = await env.LEAD_VISITOR_LIMIT.limit({ key: ip });
-      if (!visitorLimit.success) {
-        return reply({ ok: false, error: "Слишком много заявок. Повторите позже" }, 429);
-      }
-      const globalLimit = await env.LEAD_GLOBAL_LIMIT.limit({ key: "lead" });
-      if (!globalLimit.success) {
-        return reply({ ok: false, error: "Слишком много заявок. Повторите позже" }, 429);
-      }
-    } catch {
+    const ip = request.headers.get("CF-Connecting-IP");
+    if (!ip) return reply({ ok: false, error: "Сервис временно недоступен" }, 503);
+
+    if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID || !env.LEAD_VISITOR_GUARD) {
       return reply({ ok: false, error: "Сервис временно недоступен" }, 503);
     }
-
-    if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) {
-      return reply({ ok: false, error: "Сервис временно недоступен" }, 503);
-    }
-    const text = [
-      "Новая заявка с сайта РемГаз",
-      `Имя: ${name}`,
-      `Телефон: ${phone}`,
-      ...(object ? [`Объект: ${object}`] : []),
-      ...(location ? [`Местоположение: ${location}`] : []),
-    ].join("\n");
-
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
     try {
-      const telegram = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, text }),
-        signal: controller.signal,
-      });
-      const result = await telegram.json();
-      if (!telegram.ok || result?.ok !== true) {
-        return reply({ ok: false, error: "Не удалось отправить заявку" }, 502);
-      }
-      return reply({ ok: true });
+      const id = env.LEAD_VISITOR_GUARD.idFromName(ip);
+      const result = await env.LEAD_VISITOR_GUARD.get(id).submit({ name, phone, object, location });
+      return reply(result.ok ? { ok: true } : { ok: false, error: result.error }, result.status || 200);
     } catch {
-      return reply({ ok: false, error: "Не удалось отправить заявку" }, 502);
-    } finally {
-      clearTimeout(timer);
+      return reply({ ok: false, error: "Сервис временно недоступен" }, 503);
     }
   },
 };

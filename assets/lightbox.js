@@ -231,16 +231,87 @@
     const match = link.href.match(/^(.*-)(\d+)\.webp$/i);
     const ids = link.dataset.lightboxPhotos?.split(',').map(id => id.trim());
     if (!match || !ids?.length || !ids.every(id => /^\d+$/.test(id))) return [];
+    const caption = link.querySelector('img')?.alt?.replace(/, фото \d+ из \d+$/i, '') || 'Фотография объекта';
     return ids.map((id, index) => {
       const original = `${match[1]}${id.padStart(match[2].length, '0')}.webp`;
       return {
         original,
         preview: original.replace(/\.webp$/i, '-thumb.webp'),
         large: original.replace(/\.webp$/i, '-lightbox.webp'),
-        alt: `Фото ${index + 1} из ${ids.length}`
+        alt: `${caption}, фото ${index + 1} из ${ids.length}`
       };
     });
   }
+  function initializeCaseGalleries() {
+    document.querySelectorAll('.case-img-wrap > a[data-lightbox-photos]').forEach(link => {
+      const image = link.querySelector('img');
+      const gallery = displayedGallerySlides(link);
+      if (!image || gallery.length < 2) return;
+
+      const wrapper = link.parentElement;
+      const project = wrapper.closest('.case-box')?.querySelector('.case-body h3')?.textContent.trim() || image.alt;
+      const message = document.createElement('span');
+      message.className = 'case-gallery-status';
+      message.setAttribute('role', 'status');
+      message.hidden = true;
+      let displayedIndex = gallery.findIndex(slide => slide.original === link.href);
+      if (displayedIndex < 0) return;
+      let requestedIndex = displayedIndex;
+      let frameRequestId = 0;
+
+      function selectFrame(index) {
+        requestedIndex = index;
+        const id = ++frameRequestId;
+        message.textContent = '';
+        message.hidden = true;
+        if (index === displayedIndex) return;
+
+        const slide = gallery[index];
+        const view = new Image();
+        view.decoding = 'async';
+        view.src = slide.original.replace(/\.webp$/i, '-view.webp');
+        view.decode().then(() => {
+          if (id !== frameRequestId) return;
+          image.src = view.src;
+          image.alt = slide.alt;
+          link.href = slide.original;
+          link.dataset.lightboxSrc = slide.large;
+          link.setAttribute('aria-label', `Открыть крупнее: ${slide.alt}`);
+          displayedIndex = index;
+        }).catch(() => {
+          if (id !== frameRequestId) return;
+          requestedIndex = displayedIndex;
+          message.textContent = 'Не удалось загрузить фото. Попробуйте ещё раз.';
+          message.hidden = false;
+        });
+      }
+
+      function arrow(step, direction) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `case-gallery-arrow case-gallery-${direction}`;
+        button.setAttribute('aria-label', `${step < 0 ? 'Предыдущее' : 'Следующее'} фото: ${project}`);
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', '20');
+        svg.setAttribute('height', '20');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.setAttribute('focusable', 'false');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', step < 0 ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6');
+        svg.append(path);
+        button.append(svg);
+        button.addEventListener('click', () => selectFrame((requestedIndex + step + gallery.length) % gallery.length));
+        return button;
+      }
+
+      wrapper.append(arrow(-1, 'prev'), arrow(1, 'next'), message);
+      link.addEventListener('lightbox:navigate', event => selectFrame(event.detail.index));
+    });
+  }
+
+  initializeCaseGalleries();
+
 
   function showFrame(preview, largeSource) {
     const id = ++requestId;
@@ -289,11 +360,12 @@
     if (!overlay) createLightbox();
 
     sourceLink = link;
-    slides = gallerySlides(link);
+    slides = link.matches('.case-img-wrap > a[data-lightbox-photos]')
+      ? displayedGallerySlides(link) : gallerySlides(link);
     detachedGallery = false;
     slideIndex = slides.findIndex(slide => slide.original === link.href);
     if (slideIndex < 0) {
-      slides = link.id === 'dvImageLink' ? displayedGallerySlides(link) : [];
+      slides = displayedGallerySlides(link);
       slideIndex = slides.findIndex(slide => slide.original === link.href);
       detachedGallery = slideIndex >= 0;
       if (slideIndex < 0) slides = [];

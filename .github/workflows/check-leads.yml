@@ -1,0 +1,40 @@
+name: Check lead protection
+
+on:
+  push:
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check assets/form.js
+          node --check worker/lead.js
+
+      - name: Check form and server contracts
+        run: node --experimental-vm-modules --test assets/form.test.mjs worker/lead.test.mjs
+
+      - name: Install Wrangler 4.156.0
+        run: npm install --global wrangler@4.156.0
+
+      - name: Build Worker without publishing
+        run: wrangler deploy --dry-run --config wrangler.toml --outdir "$RUNNER_TEMP/remgaz-worker"

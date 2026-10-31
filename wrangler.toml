@@ -11,10 +11,10 @@ namespace_id = "7869431"
 limit = 30
 period = 60
 
-[[ratelimits]]
-name = "LEAD_VISITOR_LIMIT"
-namespace_id = "7869432"
+[[durable_objects.bindings]]
+name = "LEAD_VISITOR_GUARD"
+class_name = "LeadVisitorGuard"
 
-[ratelimits.simple]
-limit = 3
-period = 60
+[[migrations]]
+tag = "v1-lead-visitor-24h"
+new_sqlite_classes = ["LeadVisitorGuard"]
