@@ -21,6 +21,17 @@
   let previousStyles;
   let inertElements;
 
+  function arrowIcon(direction) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', direction === 'prev' ? 'M15 4 7 12l8 8' : 'm9 4 8 8-8 8');
+    svg.append(path);
+    return svg;
+  }
+
   function createLightbox() {
     const style = document.createElement('style');
     style.textContent = `
@@ -43,17 +54,6 @@
         padding: 0; border: 0; border-radius: 50%; background: #fff; color: #111;
         font: 36px/1 Arial, sans-serif; cursor: pointer;
       }
-      .rg-lightbox__arrow {
-        position: absolute; top: 50%; z-index: 1; transform: translateY(-50%);
-        display: grid; place-items: center; width: 52px; height: 52px;
-        padding: 0; border: 0; border-radius: 50%;
-        background: rgba(255, 255, 255, .93); color: #111;
-        font: 38px/1 Arial, sans-serif; cursor: pointer;
-      }
-      .rg-lightbox__arrow[hidden] { display: none; }
-      .rg-lightbox__prev { left: calc(12px + env(safe-area-inset-left)); }
-      .rg-lightbox__next { right: calc(12px + env(safe-area-inset-right)); }
-      .rg-lightbox__arrow:focus-visible { outline: 3px solid #7dc9ff; outline-offset: 3px; }
       .rg-lightbox--gallery { padding-left: 72px; padding-right: 72px; }
       @media (max-width: 600px) {
         .rg-lightbox--gallery { padding-left: 12px; padding-right: 12px; }
@@ -85,16 +85,16 @@
     closeButton.textContent = '×';
     previousButton = document.createElement('button');
     previousButton.type = 'button';
-    previousButton.className = 'rg-lightbox__arrow rg-lightbox__prev';
+    previousButton.className = 'rg-lightbox__arrow rg-lightbox__prev photo-gallery-arrow photo-gallery-arrow--prev';
     previousButton.setAttribute('aria-label', 'Предыдущее фото');
-    previousButton.textContent = '‹';
+    previousButton.append(arrowIcon('prev'));
     previousButton.hidden = true;
 
     nextButton = document.createElement('button');
     nextButton.type = 'button';
-    nextButton.className = 'rg-lightbox__arrow rg-lightbox__next';
+    nextButton.className = 'rg-lightbox__arrow rg-lightbox__next photo-gallery-arrow photo-gallery-arrow--next';
     nextButton.setAttribute('aria-label', 'Следующее фото');
-    nextButton.textContent = '›';
+    nextButton.append(arrowIcon('next'));
     nextButton.hidden = true;
 
     count = document.createElement('p');
@@ -221,7 +221,7 @@
       return {
         preview: url,
         original: url.replace(/-thumb\.webp(?=$|[?#])/i, '.webp'),
-        large: url.replace(/-thumb\.webp(?=$|[?#])/i, '-lightbox.webp'),
+        previewImage: thumb,
         alt: thumb.alt || thumb.closest('.dv-gallery-thumb, .gallery-thumb')?.getAttribute('aria-label') || ''
       };
     }).filter(Boolean);
@@ -237,12 +237,23 @@
       return {
         original,
         preview: original.replace(/\.webp$/i, '-thumb.webp'),
-        large: original.replace(/\.webp$/i, '-lightbox.webp'),
         alt: `${caption}, фото ${index + 1} из ${ids.length}`
       };
     });
   }
   function initializeCaseGalleries() {
+    const photos = window.RemgazPhotos;
+    const visible = new Map();
+    const observer = 'IntersectionObserver' in window
+      ? new IntersectionObserver(entries => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          visible.get(entry.target)();
+          visible.delete(entry.target);
+          observer.unobserve(entry.target);
+        }
+      }, { rootMargin: '250px' }) : null;
+
     document.querySelectorAll('.case-img-wrap > a[data-lightbox-photos]').forEach(link => {
       const image = link.querySelector('img');
       const gallery = displayedGallerySlides(link);
@@ -259,88 +270,158 @@
       let requestedIndex = displayedIndex;
       let frameRequestId = 0;
 
+      function warmNeighbors(index) {
+        const adjacent = new Set([(index + 1) % gallery.length, (index - 1 + gallery.length) % gallery.length]);
+        photos.prefetch(Array.from(adjacent).flatMap(next => [
+          gallery[next].preview, photos.source(gallery[next].original)
+        ]));
+      }
+
+      function display(index, src) {
+        const slide = gallery[index];
+        image.src = src;
+        image.alt = slide.alt;
+        link.href = slide.original;
+        link.dataset.lightboxSrc = photos.source(slide.original, 'large');
+        link.setAttribute('aria-label', `Открыть крупнее: ${slide.alt}`);
+        displayedIndex = index;
+      }
+
       function selectFrame(index) {
         requestedIndex = index;
         const id = ++frameRequestId;
         message.textContent = '';
         message.hidden = true;
-        if (index === displayedIndex) return;
-
         const slide = gallery[index];
-        const view = new Image();
-        view.decoding = 'async';
-        view.src = slide.original.replace(/\.webp$/i, '-view.webp');
-        view.decode().then(() => {
+        const sharpSource = photos.source(slide.original);
+        if (index === displayedIndex && image.src === new URL(sharpSource, document.baseURI).href) {
+          warmNeighbors(index);
+          return;
+        }
+        let sharpShown = false;
+        let sharpFailed = false;
+        let previewFailed = false;
+
+        if (index !== displayedIndex) {
+          photos.load(slide.preview, 'high').then(preview => {
+            if (id !== frameRequestId || sharpShown) return;
+            display(index, preview.src);
+            if (sharpFailed) {
+              message.textContent = 'Чёткий снимок недоступен — показан предпросмотр.';
+              message.hidden = false;
+            }
+          }).catch(() => {
+            if (id !== frameRequestId || sharpShown) return;
+            previewFailed = true;
+            if (sharpFailed) {
+              requestedIndex = displayedIndex;
+              message.textContent = 'Не удалось загрузить фото. Попробуйте ещё раз.';
+              message.hidden = false;
+            }
+          });
+        }
+
+        photos.load(sharpSource, 'high').then(sharp => {
           if (id !== frameRequestId) return;
-          image.src = view.src;
-          image.alt = slide.alt;
-          link.href = slide.original;
-          link.dataset.lightboxSrc = slide.large;
-          link.setAttribute('aria-label', `Открыть крупнее: ${slide.alt}`);
-          displayedIndex = index;
+          sharpShown = true;
+          display(index, sharp.src);
+          message.textContent = '';
+          message.hidden = true;
         }).catch(() => {
           if (id !== frameRequestId) return;
-          requestedIndex = displayedIndex;
-          message.textContent = 'Не удалось загрузить фото. Попробуйте ещё раз.';
-          message.hidden = false;
+          sharpFailed = true;
+          if (index === displayedIndex) {
+            message.textContent = 'Чёткий снимок недоступен — показан предпросмотр.';
+            message.hidden = false;
+          } else if (previewFailed) {
+            requestedIndex = displayedIndex;
+            message.textContent = 'Не удалось загрузить фото. Попробуйте ещё раз.';
+            message.hidden = false;
+          }
         });
+        warmNeighbors(index);
       }
 
       function arrow(step, direction) {
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = `case-gallery-arrow case-gallery-${direction}`;
+        button.className = `case-gallery-arrow case-gallery-${direction} photo-gallery-arrow photo-gallery-arrow--${direction}`;
         button.setAttribute('aria-label', `${step < 0 ? 'Предыдущее' : 'Следующее'} фото: ${project}`);
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('width', '20');
-        svg.setAttribute('height', '20');
-        svg.setAttribute('viewBox', '0 0 24 24');
-        svg.setAttribute('aria-hidden', 'true');
-        svg.setAttribute('focusable', 'false');
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', step < 0 ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6');
-        svg.append(path);
-        button.append(svg);
+        button.append(arrowIcon(direction));
         button.addEventListener('click', () => selectFrame((requestedIndex + step + gallery.length) % gallery.length));
         return button;
       }
 
       wrapper.append(arrow(-1, 'prev'), arrow(1, 'next'), message);
       link.addEventListener('lightbox:navigate', event => selectFrame(event.detail.index));
+      if (observer) {
+        visible.set(wrapper, () => selectFrame(displayedIndex));
+        observer.observe(wrapper);
+      } else selectFrame(displayedIndex);
     });
   }
 
   initializeCaseGalleries();
 
 
-  function showFrame(preview, largeSource) {
+  function showFrame(preview, original) {
     const id = ++requestId;
-    const image = document.createElement('img');
-    image.className = 'rg-lightbox__image';
-    image.alt = preview.alt || '';
-    image.draggable = false;
-    image.src = preview.src;
-    if (picture) picture.replaceWith(image);
-    else overlay.insertBefore(image, heading);
-    picture = image;
+    const photos = window.RemgazPhotos;
+    const sharpSource = photos.source(original, 'large');
     status.textContent = '';
+    let sharpShown = false;
+    let sharpFailed = false;
+    let previewShown = false;
+    let previewFailed = false;
 
-    if (!largeSource) return;
-    const large = new Image();
-    large.className = 'rg-lightbox__image';
-    large.alt = image.alt;
-    large.draggable = false;
-    large.decoding = 'async';
-    large.src = largeSource;
-    large.decode().then(() => {
-      if (!open || id !== requestId) return;
-      image.replaceWith(large);
-      picture = large;
+    function display(src) {
+      const image = document.createElement('img');
+      image.className = 'rg-lightbox__image';
+      image.alt = preview.alt || '';
+      image.draggable = false;
+      image.src = src;
+      if (picture) picture.replaceWith(image);
+      else overlay.insertBefore(image, heading);
+      picture = image;
+    }
+
+    if (preview.available) {
+      display(preview.src);
+      previewShown = true;
+    } else photos.load(preview.src, 'high').then(image => {
+      if (!open || id !== requestId || sharpShown) return;
+      display(image.src);
+      previewShown = true;
+      if (sharpFailed) status.textContent = 'Крупный снимок недоступен — показан предпросмотр.';
     }).catch(() => {
-      if (open && id === requestId) {
-        status.textContent = 'Крупный снимок недоступен — показан предпросмотр.';
-      }
+      if (!open || id !== requestId || sharpShown) return;
+      previewFailed = true;
+      status.textContent = sharpFailed
+        ? 'Не удалось загрузить фото. Попробуйте ещё раз.'
+        : 'Не удалось загрузить предпросмотр. Ожидаем крупный снимок.';
     });
+
+    photos.load(sharpSource, 'high').then(image => {
+      if (!open || id !== requestId) return;
+      sharpShown = true;
+      display(image.src);
+      status.textContent = '';
+    }).catch(() => {
+      if (!open || id !== requestId) return;
+      sharpFailed = true;
+      status.textContent = previewFailed
+        ? 'Не удалось загрузить фото. Попробуйте ещё раз.'
+        : previewShown ? 'Крупный снимок недоступен — показан предпросмотр.'
+          : 'Крупный снимок недоступен — ожидаем предпросмотр.';
+    });
+  }
+
+  function warmLightboxNeighbors() {
+    if (slides.length < 2) return;
+    const adjacent = new Set([(slideIndex + 1) % slides.length, (slideIndex - 1 + slides.length) % slides.length]);
+    window.RemgazPhotos.prefetch(Array.from(adjacent).flatMap(index => [
+      slides[index].preview, window.RemgazPhotos.source(slides[index].original, 'large')
+    ]));
   }
 
   function navigate(step) {
@@ -348,7 +429,9 @@
     slideIndex = (slideIndex + step + slides.length) % slides.length;
     const slide = slides[slideIndex];
     count.textContent = `Фото ${slideIndex + 1} из ${slides.length}`;
-    showFrame({ src: slide.preview, alt: slide.alt }, slide.large);
+    showFrame({ src: slide.preview, alt: slide.alt,
+      available: slide.previewImage?.complete && slide.previewImage.naturalWidth > 0 }, slide.original);
+    warmLightboxNeighbors();
     if (!detachedGallery) {
       sourceLink.dispatchEvent(new CustomEvent('lightbox:navigate', { detail: { index: slideIndex } }));
     }
@@ -378,8 +461,9 @@
     count.textContent = gallery ? `Фото ${slideIndex + 1} из ${slides.length}` : '';
     heading.textContent = gallery ? 'Просмотр фотографий'
       : link.getAttribute('aria-label') || preview.alt || 'Просмотр фотографии';
-    showFrame({ src: preview.currentSrc || preview.src, alt: preview.alt },
-      gallery ? slides[slideIndex].large : link.getAttribute('data-lightbox-src'));
+    showFrame({ src: preview.currentSrc || preview.src, alt: preview.alt, available: true },
+      gallery ? slides[slideIndex].original : link.href);
+    warmLightboxNeighbors();
 
     if (!open) {
       lockPage();

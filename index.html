@@ -288,6 +288,10 @@ body {
   margin-bottom: 26px;
   overflow-wrap: break-word;
 }
+.hero-heading-first { display: block; }
+.hero-heading-line { display: grid; grid-template-columns: minmax(0, 1fr); }
+.hero-heading-line > span { grid-area: 1 / 1; min-width: 0; }
+.hero-heading-measure { visibility: hidden; }
 .hero-heading .typing-cursor {
   color: var(--blue-primary);
   border-right: 3px solid var(--flame-orange);
@@ -568,23 +572,6 @@ body {
   pointer-events: none;
   font-family: var(--font-mono);
 }
-.dv-gallery-arrow {
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--blue-line);
-  border-radius: 50%;
-  background: rgba(255,255,255,.93);
-  color: var(--blue-deep);
-  font: 700 28px/1 var(--font-main);
-  cursor: pointer;
-}
-.dv-gallery-arrow:hover { background: var(--white); color: var(--blue-primary); }
-.dv-gallery-prev { left: 12px; }
-.dv-gallery-next { right: 12px; }
 .dv-gallery-footer { padding: 10px; border-top: 1px solid var(--blue-line); }
 .dv-gallery-thumbs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; }
 .dv-gallery-thumb {
@@ -661,12 +648,6 @@ body {
 .case-img-wrap > a { display: block; width: 100%; height: 100%; }
 .case-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .case-box:first-child .case-img-wrap img { object-fit: cover; }
-.case-gallery-arrow { position: absolute; top: 50%; z-index: 1; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; transform: translateY(-50%); border: 0; border-radius: 50%; background: rgba(0, 0, 0, .30); color: rgba(255, 255, 255, .88); cursor: pointer; }
-.case-gallery-arrow svg { display: block; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .6)); }
-.case-gallery-arrow:hover { background: rgba(0, 0, 0, .42); color: var(--white); }
-.case-gallery-arrow:focus-visible { outline: 3px solid var(--white); outline-offset: 3px; }
-.case-gallery-prev { left: 10px; }
-.case-gallery-next { right: 10px; }
 .case-gallery-status { position: absolute; right: 10px; bottom: 10px; left: 10px; padding: 8px 10px; background: rgba(0, 0, 0, .75); color: var(--white); font: 500 12px/1.4 var(--font-main); pointer-events: none; }
 .case-body { display: flex; flex-direction: column; flex: 1; padding: 24px; }
 .case-kicker { font: 600 11px/1.5 var(--font-mono); color: var(--blue-primary); margin-bottom: 12px; }
@@ -978,7 +959,6 @@ body {
   .dv-title { font-size: 24px; }
   .dv-desc { font-size: 14px; }
   .dv-visual-wrap { height: clamp(210px, 56vw, 280px); }
-  .dv-gallery-arrow { width: 44px; height: 44px; }
   .dv-gallery-thumbs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .dv-gallery-thumb { height: 48px; }
   .service-grid, .case-triad { grid-template-columns: minmax(0, 1fr); }
@@ -997,6 +977,7 @@ body {
   body:has(#mobileDrawer.open) .mobile-sticky-bar { display: none; }
 }
 </style>
+<link rel="stylesheet" href="assets/gallery-controls.css">
 </head>
 <body>
 
@@ -1043,7 +1024,7 @@ body {
   <section class="hero-editorial">
     <div>
       <div class="hero-badge-wrap"><span class="hero-kicker">РемГазСервис · работает с 2007 года</span></div>
-      <h1 class="hero-heading">Газификация и тепло<br>для <span class="typing-cursor" id="typewriter">частных домов</span></h1>
+      <h1 class="hero-heading"><span class="hero-heading-first">Газификация и тепло</span><span class="hero-heading-line"><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">частных домов</span></span><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">загородных отелей</span></span><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">SPA-комплексов</span></span><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">производственных цехов</span></span><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">тепличных комплексов</span></span><span>для <span class="typing-cursor" id="typewriter">частных домов</span></span></span></h1>
       <div class="hero-actions-row"><a href="#contact" class="btn-primary-lead">Обсудить задачу ↗</a><a href="#objects" class="btn-outline-lead">Выбрать объект</a><a href="gas.html#contact" class="btn-primary-lead">Заказать газ для газгольдера</a></div>
     </div>
     <div class="hero-footer-row">
@@ -1080,9 +1061,9 @@ body {
       </div>
       <div class="dv-gallery" role="group" aria-label="Фотографии выбранного объекта">
         <div class="dv-visual-wrap">
-          <a class="dv-visual-link" id="dvImageLink" href="assets/portfolio/home-boiler-itp-05.webp" data-lightbox data-lightbox-src="assets/portfolio/home-boiler-itp-05-lightbox.webp" data-lightbox-photos="5,1,2,3,6" target="_blank" rel="noopener" aria-label="Открыть выбранную фотографию крупнее"><img src="assets/portfolio/home-boiler-itp-05-view.webp" alt="Частный жилой дом в Громово: котельная и тепловой пункт, фото 1 из 5" class="dv-visual-img" id="dvImg" loading="eager" fetchpriority="low" decoding="async" width="1000" height="462"></a>
-          <button type="button" class="dv-gallery-arrow dv-gallery-prev" onclick="changePhoto(-1)" onpointerenter="prefetchAdjacentPhoto(-1)" aria-label="Предыдущее фото">‹</button>
-          <button type="button" class="dv-gallery-arrow dv-gallery-next" onclick="changePhoto(1)" onpointerenter="prefetchAdjacentPhoto(1)" aria-label="Следующее фото">›</button>
+          <a class="dv-visual-link" id="dvImageLink" href="assets/portfolio/home-boiler-itp-05.webp" data-lightbox data-lightbox-src="assets/portfolio/home-boiler-itp-05-lightbox.webp" data-lightbox-photos="5,1,2,3,6" target="_blank" rel="noopener" aria-label="Открыть выбранную фотографию крупнее"><img src="assets/portfolio/home-boiler-itp-05-mobile.webp" alt="Частный жилой дом в Громово: котельная и тепловой пункт, фото 1 из 5" class="dv-visual-img" id="dvImg" loading="eager" fetchpriority="low" decoding="async" width="1000" height="462"></a>
+          <button type="button" class="dv-gallery-arrow dv-gallery-prev photo-gallery-arrow photo-gallery-arrow--prev" onclick="changePhoto(-1)" onpointerenter="prefetchAdjacentPhoto(-1)" aria-label="Предыдущее фото"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 4 7 12l8 8"/></svg></button>
+          <button type="button" class="dv-gallery-arrow dv-gallery-next photo-gallery-arrow photo-gallery-arrow--next" onclick="changePhoto(1)" onpointerenter="prefetchAdjacentPhoto(1)" aria-label="Следующее фото"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 4 8 8-8 8"/></svg></button>
           <span class="dv-gallery-status" id="dvGalleryStatus" role="status" aria-live="polite" hidden></span>
           <div class="dv-visual-overlay"><span id="dvLocation">Ленинградская область, деревня Громово</span></div>
         </div>
@@ -1188,15 +1169,15 @@ body {
 
     <div class="case-triad">
       <article class="case-box">
-        <div class="case-img-wrap"><a href="assets/portfolio/residential-gasification-01.webp" data-lightbox data-lightbox-src="assets/portfolio/residential-gasification-01-lightbox.webp" data-lightbox-photos="1,2,3,4,5"><img src="assets/portfolio/residential-gasification-01-card.webp" alt="Работы по газоснабжению парк-отеля в Карелии" loading="lazy" decoding="async" width="800" height="600"></a></div>
+        <div class="case-img-wrap"><a href="assets/portfolio/residential-gasification-01.webp" data-lightbox data-lightbox-src="assets/portfolio/residential-gasification-01-lightbox.webp" data-lightbox-photos="1,2,3,4,5"><img src="assets/portfolio/residential-gasification-01-mobile.webp" alt="Работы по газоснабжению парк-отеля в Карелии" loading="lazy" decoding="async" width="800" height="600"></a></div>
         <div class="case-body"><div class="case-kicker">Республика Карелия, деревня Ляскеля</div><h3><a href="portfolio.html#park-hotel">Газификация парк-отеля в Карелии</a></h3><p>Монтаж двух подземных резервуаров для хранения сжиженного газа, изготовление и монтаж испарительной установки СУГ, прокладка газопроводов до потребителя.</p><div class="case-params">Производительность испарительной установки — 100 кг/ч</div></div>
       </article>
       <article class="case-box">
-        <div class="case-img-wrap"><a href="assets/portfolio/spa-boiler-05.webp" data-lightbox data-lightbox-src="assets/portfolio/spa-boiler-05-lightbox.webp" data-lightbox-photos="1,2,3,4,5"><img src="assets/portfolio/spa-boiler-05-card.webp" alt="Котельная SPA-комплекса Баня Кело" loading="lazy" decoding="async" width="800" height="1067"></a></div>
+        <div class="case-img-wrap"><a href="assets/portfolio/spa-boiler-05.webp" data-lightbox data-lightbox-src="assets/portfolio/spa-boiler-05-lightbox.webp" data-lightbox-photos="1,2,3,4,5"><img src="assets/portfolio/spa-boiler-05-mobile.webp" alt="Котельная SPA-комплекса Баня Кело" loading="lazy" decoding="async" width="800" height="1067"></a></div>
         <div class="case-body"><div class="case-kicker">Ленинградская область, деревня Новосаратовка</div><h3><a href="portfolio.html#spa">Котельная для СПА-комплекса «Баня Кело»</a></h3><p>Котельное оборудование DeDietrich AMC PRO, теплообменник для контура снеготаяния, бойлер Gekon XL и тепловой пункт с несколькими контурами отопления.</p><div class="case-params">Мощность котельного оборудования — 260 кВт</div></div>
       </article>
       <article class="case-box">
-        <div class="case-img-wrap"><a href="assets/portfolio/industrial-boiler-03.webp" data-lightbox data-lightbox-src="assets/portfolio/industrial-boiler-03-lightbox.webp" data-lightbox-photos="1,2,3,4,5"><img src="assets/portfolio/industrial-boiler-03-card.webp" alt="Котельная производственного комплекса в Санкт-Петербурге" loading="lazy" decoding="async" width="800" height="1067"></a></div>
+        <div class="case-img-wrap"><a href="assets/portfolio/industrial-boiler-03.webp" data-lightbox data-lightbox-src="assets/portfolio/industrial-boiler-03-lightbox.webp" data-lightbox-photos="1,2,3,4,5"><img src="assets/portfolio/industrial-boiler-03-mobile.webp" alt="Котельная производственного комплекса в Санкт-Петербурге" loading="lazy" decoding="async" width="800" height="1067"></a></div>
         <div class="case-body"><div class="case-kicker">Санкт-Петербург, Волго-Донский проспект</div><h3><a href="portfolio.html#production">Котельная для производственного комплекса</a></h3><p>Котельное оборудование DeDietrich AMC PRO, тепловой пункт с несколькими контурами отопления и щит управления котельной на основе контроллера My Heat.</p><div class="case-params">Мощность котельного оборудования — 180 кВт</div></div>
       </article>
     </div>
@@ -1286,6 +1267,7 @@ body {
 </div>
 
 
+<script src="assets/photo-loader.js"></script>
 <script>
 // Dynamic Typewriter
 const words = ["частных домов", "загородных отелей", "SPA-комплексов", "производственных цехов", "тепличных комплексов"];
@@ -1425,8 +1407,6 @@ let imageRequestId = 0;
 let galleryVisible = false;
 let displayedProject;
 let displayedPhotoIndex;
-let prefetchedForPhoto = '';
-const prefetchedViews = new Map();
 let hoverPhotoTimer;
 let hoveredPhotoThumb;
 const galleryThumbs = document.getElementById('dvGalleryThumbs');
@@ -1475,12 +1455,13 @@ function setGalleryStatus(message) {
 
 function commitPhoto(project, index, src, message = '') {
   const image = document.getElementById('dvImg');
+  image.onerror = null;
   image.hidden = false;
   if (image.getAttribute('src') !== src) image.src = src;
   image.alt = `${project.title}, фото ${index + 1} из ${project.photos.length}`;
   const imageLink = document.getElementById('dvImageLink');
   imageLink.href = photoSrc(project, index);
-  imageLink.dataset.lightboxSrc = photoSrc(project, index, 'lightbox');
+  imageLink.dataset.lightboxSrc = window.RemgazPhotos.source(photoSrc(project, index), 'large');
   imageLink.dataset.lightboxPhotos = project.photos.join(',');
   document.getElementById('dvLocation').textContent = project.loc;
   document.getElementById('dvGalleryCount').textContent = `Фото ${index + 1} из ${project.photos.length}`;
@@ -1490,72 +1471,82 @@ function commitPhoto(project, index, src, message = '') {
   });
   displayedProject = project;
   displayedPhotoIndex = index;
-  prefetchedForPhoto = '';
-  prefetchedViews.clear();
   setGalleryStatus(message);
-}
-
-function loadFallbackPhoto(project, index, request) {
-  setGalleryStatus('Загружается миниатюра…');
-  const thumb = new Image();
-  thumb.src = photoSrc(project, index, 'thumb');
-  thumb.decode().then(() => {
-    if (request === imageRequestId) commitPhoto(project, index, thumb.src, 'Крупное фото недоступно: показана миниатюра.');
-  }).catch(() => {
-    if (request === imageRequestId) setGalleryStatus('Не удалось загрузить фото. Попробуйте выбрать другое.');
-  });
+  if (galleryVisible && activeProject === project && activePhotoIndex === index) {
+    const neighbors = [-1, 1].map(step => (index + step + project.photos.length) % project.photos.length);
+    window.RemgazPhotos.prefetch([...new Set(neighbors)].map(next => window.RemgazPhotos.source(photoSrc(project, next))));
+  }
 }
 
 function showPhoto(index) {
   activePhotoIndex = index;
   const project = activeProject;
   const request = ++imageRequestId;
-  const view = photoSrc(project, index, 'view');
   const image = document.getElementById('dvImg');
-  if (!displayedProject && image.getAttribute('src') === view) {
-    commitPhoto(project, index, view);
+  const original = photoSrc(project, index);
+  const view = window.RemgazPhotos.source(original);
+  const thumbnail = photoSrc(project, index, 'thumb');
+  const current = () => request === imageRequestId;
+
+  // Keep the already painted first photo while the gallery is below the viewport.
+  if (!displayedProject && !galleryVisible && image.getAttribute('src') === photoSrc(project, index, 'mobile')) {
+    commitPhoto(project, index, image.getAttribute('src'));
     image.onerror = () => {
-      if (image.getAttribute('src') !== view || displayedProject !== project || activeProject !== project || activePhotoIndex !== index) return;
-      image.hidden = true;
-      loadFallbackPhoto(project, index, imageRequestId);
+      if (!current()) return;
+      image.onerror = null;
+      setGalleryStatus('Загружается миниатюра…');
+      window.RemgazPhotos.load(thumbnail, 'high').then(() => {
+        if (current()) commitPhoto(project, index, thumbnail, 'Основное фото недоступно: показана миниатюра.');
+      }).catch(() => {
+        if (current()) setGalleryStatus('Не удалось загрузить фото. Попробуйте выбрать другое.');
+      });
     };
     if (image.complete && !image.naturalWidth) image.onerror();
     return;
   }
-  if (displayedProject === project && displayedPhotoIndex === index && image.getAttribute('src') === view && !image.hidden) {
-    if (image.complete && !image.naturalWidth) {
-      image.hidden = true;
-      loadFallbackPhoto(project, index, request);
-    } else {
-      commitPhoto(project, index, view);
-    }
+
+  if (displayedProject === project && displayedPhotoIndex === index && image.getAttribute('src') === view && image.complete && image.naturalWidth) {
+    commitPhoto(project, index, view);
     return;
   }
 
-  setGalleryStatus('Загружается фото…');
-  const next = new Image();
-  next.decoding = 'async';
-  next.src = view;
-  next.decode().then(() => {
-    if (request === imageRequestId) commitPhoto(project, index, view);
+  const thumbImage = galleryThumbs.children[index]?.querySelector('img');
+  let previewShown = displayedProject === project && displayedPhotoIndex === index && image.complete && image.naturalWidth;
+  let sharpShown = false;
+  let sharpFailed = false;
+  let thumbnailFailed = false;
+  const showPreview = () => {
+    if (!current() || sharpShown) return;
+    previewShown = true;
+    commitPhoto(project, index, thumbnail, sharpFailed ? 'Чёткое фото недоступно: показана уменьшенная версия.' : galleryVisible ? 'Загружается фото…' : '');
+  };
+
+  if (previewShown) setGalleryStatus(galleryVisible ? 'Загружается фото…' : '');
+  else if (thumbImage?.complete && thumbImage.naturalWidth) showPreview();
+  else {
+    setGalleryStatus('Загружается фото…');
+    window.RemgazPhotos.load(thumbnail, 'high').then(showPreview).catch(() => {
+      thumbnailFailed = true;
+      if (current() && sharpFailed) setGalleryStatus('Не удалось загрузить фото. Попробуйте выбрать другое.');
+    });
+  }
+
+  if (!galleryVisible) return;
+  window.RemgazPhotos.load(view, 'high').then(() => {
+    if (!current()) return;
+    sharpShown = true;
+    commitPhoto(project, index, view);
   }).catch(() => {
-    if (request === imageRequestId) loadFallbackPhoto(project, index, request);
+    if (!current()) return;
+    sharpFailed = true;
+    setGalleryStatus(previewShown ? 'Чёткое фото недоступно: показана уменьшенная версия.' : thumbnailFailed ? 'Не удалось загрузить фото. Попробуйте выбрать другое.' : 'Чёткое фото недоступно: загружается миниатюра…');
   });
 }
 
 function prefetchAdjacentPhoto(step) {
-  if (!galleryVisible || !displayedProject || activeProject !== displayedProject) return;
-  const key = `${displayedProject.photoPrefix}-${displayedPhotoIndex}`;
-  if (prefetchedForPhoto !== key) {
-    prefetchedViews.clear();
-    prefetchedForPhoto = key;
-  }
-  const index = (displayedPhotoIndex + step + displayedProject.photos.length) % displayedProject.photos.length;
-  if (prefetchedViews.has(index) || prefetchedViews.size === 2) return;
-  const view = new Image();
-  view.fetchPriority = 'low';
-  view.src = photoSrc(displayedProject, index, 'view');
-  prefetchedViews.set(index, view);
+  if (!galleryVisible || !activeProject) return;
+  const index = (activePhotoIndex + step + activeProject.photos.length) % activeProject.photos.length;
+  window.RemgazPhotos.prefetch([window.RemgazPhotos.source(photoSrc(activeProject, index))]);
 }
 
 function changePhoto(step) {
@@ -1626,13 +1617,13 @@ document.querySelector('.object-matrix').addEventListener('keydown', event => {
 });
 
 const galleryObserver = new IntersectionObserver(([entry]) => {
-  if (!entry.isIntersecting || galleryVisible) return;
-  galleryVisible = true;
+  galleryVisible = entry.isIntersecting;
+  if (!galleryVisible) return;
   document.querySelectorAll('#dvGalleryThumbs img[data-src]').forEach(image => {
     image.src = image.dataset.src;
     delete image.dataset.src;
   });
-  galleryObserver.disconnect();
+  showPhoto(activePhotoIndex);
 }, { rootMargin: '200px 0px' });
 galleryObserver.observe(document.querySelector('.dv-gallery'));
 

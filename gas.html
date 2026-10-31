@@ -48,23 +48,18 @@ h1 { max-width: 600px; margin: 0 0 24px; color: var(--blue-deep); font-size: 62p
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .hero-note { margin: 23px 0 0; color: var(--muted); font-size: 13px; }
 .hero-photo { display: flex; flex-direction: column; justify-content: center; min-width: 0; margin: 0; padding: 20px; background: var(--blue-subtle); }
-.hero-photo-frame { position: relative; display: grid; min-width: 0; min-height: 0; background: var(--blue-deep); }
-.hero-photo-frame img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; background: var(--blue-deep); }
-.hero-photo-frame.is-portrait { grid-template-columns: minmax(0, .52fr) minmax(0, .48fr); grid-template-rows: minmax(0, 1fr); height: 500px; }
-.hero-photo-frame.is-portrait img { min-width: 0; min-height: 0; width: 100%; height: 100%; aspect-ratio: auto; object-fit: contain; }
+.hero-photo-frame { position: relative; width: 100%; min-width: 0; aspect-ratio: 4 / 3; overflow: hidden; background: var(--blue-deep); }
+.hero-photo-frame img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; background: var(--blue-deep); }
+.hero-photo-frame.is-portrait img { width: 52%; }
 .hero-photo-aside { display: none; flex-direction: column; justify-content: flex-start; min-width: 0; padding: 36px 28px; border-left: 1px solid var(--blue-primary); color: var(--white); }
-.is-portrait .hero-photo-aside { display: flex; }
+.is-portrait .hero-photo-aside { position: absolute; inset: 0 0 0 52%; display: flex; }
 .hero-photo-index { margin: 0; color: var(--blue-line); font: 700 13px/1.4 var(--font-mono); }
 .hero-photo-aside p:not(.hero-photo-index) { max-width: 220px; margin: 20px 0 0; font-size: 22px; line-height: 1.25; font-weight: 700; }
 .hero-photo-aside a { align-self: flex-start; margin-top: auto; color: var(--white); font-size: 13px; font-weight: 700; text-underline-offset: 5px; }
 .hero-photo-aside a:focus-visible { outline-color: var(--white); }
-.hero-photo-arrow { position: absolute; top: 50%; z-index: 1; display: grid; place-items: center; width: 48px; height: 48px; padding: 0; transform: translateY(-50%); border: 0; border-radius: 50%; background: rgba(0, 0, 0, .30); color: rgba(255, 255, 255, .88); cursor: pointer; }
-.hero-photo-arrow svg { display: block; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .6)); }
-.hero-photo-arrow:hover { background: rgba(0, 0, 0, .42); color: var(--white); }
-.hero-photo-arrow:focus-visible { outline-color: var(--white); }
-.hero-photo-arrow--prev { left: 12px; }
-.hero-photo-arrow--next { right: 12px; }
 .hero-photo figcaption { display: flex; justify-content: space-between; gap: 16px; padding-top: 12px; color: var(--ink-soft); font-size: 12px; }
+.hero-photo-status { position: absolute; bottom: 12px; left: 12px; z-index: 2; max-width: calc(100% - 24px); padding: 8px 12px; background: var(--blue-deep); color: var(--white); font-size: 12px; font-weight: 600; pointer-events: none; }
+.hero-photo-status[hidden] { display: none; }
 .hero-photo figcaption span:last-child { font-family: var(--font-mono); white-space: nowrap; }
 .hero-photo-thumbs { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
 .hero-photo-thumbs button { display: grid; place-items: center; flex: none; min-width: 44px; height: 54px; padding: 0; border: 0; border-radius: 0; background: transparent; cursor: pointer; }
@@ -142,11 +137,8 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
   .contact-phone { font-size: 22px; }
   .hero-lead { font-size: 15px; }
   .hero-photo { padding: 14px 16px 18px; }
-  .hero-photo-frame.is-portrait { height: 430px; }
   .hero-photo-aside { padding: 28px 22px; }
   .hero-photo-aside p:not(.hero-photo-index) { font-size: 20px; }
-  .hero-photo-arrow--prev { left: 8px; }
-  .hero-photo-arrow--next { right: 8px; }
   .section { padding: 56px 16px; }
   .price-layout, .contact-layout { gap: 24px; }
   .price-details { padding: 22px; }
@@ -165,7 +157,8 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
   .hero-actions { width: 100%; }
   .hero-actions a { flex: 1 1 100%; }
   .hero-note { margin-top: 17px; }
-  .hero-photo-frame.is-portrait { grid-template-columns: minmax(0, .53fr) minmax(0, .47fr); height: 352px; }
+  .hero-photo-frame.is-portrait img { width: 53%; }
+  .is-portrait .hero-photo-aside { left: 53%; }
   .hero-photo-aside { padding: 18px 12px; }
   .hero-photo-aside p:not(.hero-photo-index) { font-size: 17px; }
   .hero-photo-aside a { font-size: 12px; }
@@ -173,6 +166,7 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 </style>
+<link rel="stylesheet" href="assets/gallery-controls.css">
 <script defer src="assets/form.js"></script>
 </head>
 <body>
@@ -194,7 +188,7 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
         <p class="hero-note">Санкт-Петербург и Северо-Западный федеральный округ</p>
       </div>
       <figure class="hero-photo">
-        <div class="hero-photo-frame"><img id="gasHeroImg" src="assets/gas-delivery-truck.webp" alt="Фотография доставки сжиженного газа, кадр 1 из 3" width="1440" height="1080" fetchpriority="high" decoding="async"><div class="hero-photo-aside"><p class="hero-photo-index" id="gasPhotoAsideIndex" aria-hidden="true">ФОТО / 02</p><p>Кадры доставки сжиженного газа</p><a href="#contact">Запросить расчёт ↗</a></div></div>
+        <div class="hero-photo-frame"><img id="gasHeroImg" src="assets/gas-delivery-truck-mobile.webp" alt="Фотография доставки сжиженного газа, кадр 1 из 3" width="960" height="720" fetchpriority="high" decoding="async"><div class="hero-photo-aside"><p class="hero-photo-index" id="gasPhotoAsideIndex" aria-hidden="true">ФОТО / 01</p><p>Кадры доставки сжиженного газа</p><a href="#contact">Запросить расчёт ↗</a></div></div>
         <figcaption><span id="gasPhotoCount" aria-live="polite">Фото 1 из 3 · Доставка сжиженного газа</span><span id="gasPhotoNumber">01 / 03</span></figcaption>
         <div class="hero-photo-thumbs" role="group" aria-label="Выбрать фотографию доставки"><button type="button" aria-label="Показать фото 1 из 3" aria-current="true" data-photo="0"><img src="assets/gas-delivery-truck-thumb.webp" alt="" width="192" height="144"></button><button type="button" aria-label="Показать фото 2 из 3" data-photo="1"><img src="assets/gas-delivery-02-thumb.webp" alt="" width="144" height="192"></button><button type="button" aria-label="Показать фото 3 из 3" data-photo="2"><img src="assets/gas-delivery-03-thumb.webp" alt="" width="93" height="192"></button></div>
       </figure>
@@ -235,6 +229,7 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
   <footer class="editorial-footer"><div class="ef-row"><div class="ef-brand"><img src="assets/remgaz-group-logo-display.png" alt="Группа компаний «РемГазСервис»" class="ef-brand-logo" width="600" height="169"><p>Проектирование, монтаж и обслуживание систем автономного газоснабжения, котельных и инженерных сетей в СЗФО.</p></div><nav class="ef-links" aria-label="Навигация внизу страницы"><a href="index.html">Главная</a><a href="index.html#services">Услуги</a><a href="portfolio.html">Портфолио</a><a href="#price">Цена доставки</a><a href="#contact">Заявка</a></nav></div><div class="ef-bottom"><span>ГК «РемГазСервис» · Северо-Западный федеральный округ</span><span><a href="tel:+78123855353">8 (812) 385-53-53</a> · <a href="mailto:info@remgaz.com">info@remgaz.com</a></span></div></footer>
   <div class="mobile-sticky-bar"><a href="tel:+78123855353">Позвонить</a><a href="#contact">Запросить расчёт</a></div>
 </div>
+<script src="assets/photo-loader.js"></script>
 <script>
 (() => {
   const photos = [
@@ -248,43 +243,116 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
   const number = document.getElementById('gasPhotoNumber');
   const asideIndex = document.getElementById('gasPhotoAsideIndex');
   const thumbs = document.querySelectorAll('.hero-photo-thumbs button');
+  const loader = window.RemgazPhotos;
+  const status = document.createElement('span');
+  status.className = 'hero-photo-status';
+  status.setAttribute('role', 'status');
+  status.hidden = true;
+  frame.append(status);
   let selected = 0;
   let displayed = 0;
   let requestId = 0;
+  let near = false;
+  let timeout;
 
-  function show(index) {
-    selected = (index + photos.length) % photos.length;
-    const request = ++requestId;
-    const [src, width, height] = photos[selected];
-    const next = new Image();
-    next.src = src;
-    next.decode().then(() => {
-      if (request !== requestId) return;
-      picture.src = src;
-      picture.width = width;
-      picture.height = height;
-      picture.alt = `Фотография доставки сжиженного газа, кадр ${selected + 1} из ${photos.length}`;
-      frame.classList.toggle('is-portrait', height > width);
-      caption.textContent = `Фото ${selected + 1} из ${photos.length} · Доставка сжиженного газа`;
-      number.textContent = `0${selected + 1} / 0${photos.length}`;
-      asideIndex.textContent = `ФОТО / 0${selected + 1}`;
-      thumbs.forEach((button, i) => {
-        if (i === selected) button.setAttribute('aria-current', 'true');
-        else button.removeAttribute('aria-current');
-      });
-      displayed = selected;
-    }).catch(() => {
-      if (request !== requestId) return;
-      selected = displayed;
-      caption.textContent = `Фото ${displayed + 1} из ${photos.length} · Другое фото недоступно`;
+  function showStatus(message) {
+    status.textContent = message;
+    status.hidden = !message;
+  }
+
+  function updateSelection(index) {
+    const [, width, height] = photos[index];
+    frame.classList.toggle('is-portrait', height > width);
+    caption.textContent = `Фото ${index + 1} из ${photos.length} · Доставка сжиженного газа`;
+    number.textContent = `0${index + 1} / 0${photos.length}`;
+    asideIndex.textContent = `ФОТО / 0${index + 1}`;
+    thumbs.forEach((button, i) => {
+      if (i === index) button.setAttribute('aria-current', 'true');
+      else button.removeAttribute('aria-current');
     });
   }
+
+  function warmNeighbors(index) {
+    if (!near) return;
+    loader.prefetch([...new Set([
+      loader.source(photos[(index + 1) % photos.length][0]),
+      loader.source(photos[(index - 1 + photos.length) % photos.length][0])
+    ])]);
+  }
+
+  function show(index) {
+    const nextIndex = (index + photos.length) % photos.length;
+    if (nextIndex === selected && !status.textContent) return;
+    selected = nextIndex;
+    const request = ++requestId;
+    clearTimeout(timeout);
+    updateSelection(selected);
+    const thumb = thumbs[selected].querySelector('img');
+    let preview = false;
+    let settled = false;
+    const showPreview = () => {
+      if (request !== requestId || settled || preview || !thumb.naturalWidth) return;
+      picture.src = thumb.currentSrc || thumb.src;
+      picture.width = thumb.naturalWidth;
+      picture.height = thumb.naturalHeight;
+      picture.alt = `Фотография доставки сжиженного газа, кадр ${nextIndex + 1} из ${photos.length}`;
+      displayed = nextIndex;
+      preview = true;
+    };
+    if (thumb.complete && thumb.naturalWidth) showPreview();
+    else thumb.addEventListener('load', showPreview, { once: true });
+    showStatus(`Загружаем фотографию ${nextIndex + 1} из ${photos.length}…`);
+    warmNeighbors(nextIndex);
+    const fail = () => {
+      if (request !== requestId) return;
+      ++requestId;
+      clearTimeout(timeout);
+      settled = true;
+      if (!preview) {
+        selected = displayed;
+        updateSelection(displayed);
+      }
+      showStatus(preview
+        ? `Чёткое фото ${nextIndex + 1} не загрузилось — показан предпросмотр.`
+        : `Фото ${nextIndex + 1} не загрузилось. Выберите другое или попробуйте ещё раз.`);
+    };
+    timeout = setTimeout(fail, 20000);
+    loader.load(loader.source(photos[nextIndex][0]), 'high').then(loaded => {
+      if (request !== requestId) return;
+      settled = true;
+      clearTimeout(timeout);
+      picture.src = loaded.src;
+      picture.width = loaded.naturalWidth;
+      picture.height = loaded.naturalHeight;
+      picture.alt = `Фотография доставки сжиженного газа, кадр ${nextIndex + 1} из ${photos.length}`;
+      displayed = nextIndex;
+      showStatus('');
+    }).catch(fail);
+  }
+
+  const watch = new IntersectionObserver(entries => {
+    near = entries[0].isIntersecting;
+    if (!near) return;
+    const index = selected;
+    const request = requestId;
+    const source = loader.source(photos[index][0]);
+    if (picture.src !== new URL(source, document.baseURI).href) {
+      loader.load(source, 'high').then(loaded => {
+        if (request !== requestId || displayed !== index || !near) return;
+        picture.src = loaded.src;
+      }).catch(() => {
+        if (!requestId && !picture.naturalWidth) showStatus('Не удалось загрузить фото доставки.');
+      });
+    }
+    warmNeighbors(index);
+  }, { rootMargin: '450px 0px' });
+  watch.observe(frame);
 
   for (const step of [-1, 1]) {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = `hero-photo-arrow hero-photo-arrow--${step < 0 ? 'prev' : 'next'}`;
-    button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${step < 0 ? 'M15 4 7 12l8 8' : 'm9 4 8 8-8 8'}"/></svg>`;
+    button.className = `hero-photo-arrow hero-photo-arrow--${step < 0 ? 'prev' : 'next'} photo-gallery-arrow photo-gallery-arrow--${step < 0 ? 'prev' : 'next'}`;
+    button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${step < 0 ? 'M15 4 7 12l8 8' : 'm9 4 8 8-8 8'}"/></svg>`;
     button.setAttribute('aria-label', step < 0 ? 'Предыдущее фото доставки' : 'Следующее фото доставки');
     button.setAttribute('aria-controls', 'gasHeroImg');
     button.addEventListener('click', () => show(selected + step));
