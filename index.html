@@ -255,6 +255,39 @@ body {
   margin-bottom: 22px;
   flex-wrap: wrap;
 }
+.hero-gas-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  margin-left: auto;
+  padding: 8px 12px;
+  border: 1px solid var(--blue-line);
+  border-radius: 4px;
+  background: var(--white);
+  color: var(--blue-deep);
+  text-decoration: none;
+  line-height: 1.3;
+  transition: background .2s ease, border-color .2s ease;
+}
+.hero-gas-price:hover {
+  background: var(--blue-subtle);
+  border-color: var(--blue-primary);
+}
+.hero-gas-price:focus-visible {
+  outline: 2px solid var(--blue-primary);
+  outline-offset: 3px;
+}
+.hero-gas-price-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+.hero-gas-price-value {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
 .hero-kicker {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -944,6 +977,7 @@ body {
 @media (max-width: 600px) {
   body { padding-bottom: 64px; }
   .top-header { padding: 0 16px; }
+  .hero-gas-price { margin-left: 0; }
   .editorial-section { padding: 56px 20px; }
   .sec-title { font-size: 28px; }
   .sec-desc { font-size: 14px; margin-bottom: 28px; }
@@ -1023,7 +1057,7 @@ body {
 
   <section class="hero-editorial">
     <div>
-      <div class="hero-badge-wrap"><span class="hero-kicker">РемГазСервис · работает с 2007 года</span></div>
+      <div class="hero-badge-wrap"><span class="hero-kicker">РемГазСервис · работает с 2007 года</span><a class="hero-gas-price" href="gas.html#price"><span class="hero-gas-price-label">Сжиженный газ</span><strong class="hero-gas-price-value">50 ₽/л</strong></a></div>
       <h1 class="hero-heading"><span class="hero-heading-first">Газификация и тепло</span><span class="hero-heading-line"><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">частных домов</span></span><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">загородных отелей</span></span><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">SPA-комплексов</span></span><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">производственных цехов</span></span><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">тепличных комплексов</span></span><span>для <span class="typing-cursor" id="typewriter">частных домов</span></span></span></h1>
       <div class="hero-actions-row"><a href="#contact" class="btn-primary-lead">Обсудить задачу ↗</a><a href="#objects" class="btn-outline-lead">Выбрать объект</a><a href="gas.html#contact" class="btn-primary-lead">Заказать газ для газгольдера</a></div>
     </div>
@@ -1155,7 +1189,7 @@ body {
       </div>
       <div class="service-detail-facts">
         <div><small>Объём</small><strong>По заявке</strong></div>
-        <div><small>Стоимость</small><strong>По расчёту</strong></div>
+        <div><small>Цена газа</small><strong>50 ₽/л</strong></div>
         <div><small>Дата</small><strong>По согласованию</strong></div>
         <div><small>Поставка</small><strong>Наполнение резервуара</strong></div>
       </div>
