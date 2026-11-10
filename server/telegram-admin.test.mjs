@@ -6,7 +6,6 @@ import { TelegramAuthError, verifyTelegramInitData } from './telegram-admin.mjs'
 const token = '123456:TEST_ONLY_NOT_A_REAL_BOT_TOKEN';
 const now = 1_800_000_000_000;
 const admin = { id: 123456789, first_name: 'Иван Петров', username: 'remgaz_admin', is_bot: false };
-const adminIds = [String(admin.id)];
 
 function fields(changes = {}) {
   return { query_id: 'AAE_test_query', user: JSON.stringify(admin), auth_date: String(now / 1000), ...changes };
@@ -21,8 +20,8 @@ function sign(values = fields(), signingToken = token) {
   return params.toString();
 }
 
-function verify(initData, ids = adminIds, options = {}) {
-  return verifyTelegramInitData(initData, token, ids, { now, ...options });
+function verify(initData, options = {}) {
+  return verifyTelegramInitData(initData, token, { now, ...options });
 }
 
 function authError(status) {
@@ -49,7 +48,6 @@ test('verifies decoded Cyrillic data, arbitrary fields and signature independent
   })));
   const reversed = new URLSearchParams([...params].reverse()).toString();
   assert.deepEqual(verify(reversed), expected);
-  assert.deepEqual(verify(reversed, new Set(adminIds)), expected);
   assert.deepEqual(verify(reversed.replaceAll('+', '%20')), expected);
   assert.equal(typeof verify(reversed).id, 'number');
 });
@@ -60,13 +58,11 @@ test('accepts uppercase hexadecimal hash without changing the signed data', () =
   assert.deepEqual(verify(params.toString()), admin);
 });
 
-test('checks the numeric user id allowlist, not username or client-provided identity fields', () => {
-  const unknown = sign(fields({ user: JSON.stringify({ ...admin, id: admin.id + 1 }), userId: String(admin.id) }));
-  assert.throws(() => verify(unknown), authError(403));
-  assert.throws(() => verify(sign(), []), authError(403));
-  assert.throws(() => verify(sign(), new Set([admin.id])), authError(403));
-  assert.throws(() => verifyTelegramInitData(sign(), token, undefined, { now }), authError(403));
-  assert.throws(() => verify(sign(), ['-100123456789']), authError(403));
+test('accepts different authenticated Telegram users without checking their username or client identity hints', () => {
+  const anotherUser = { id: 987654321, first_name: 'Другой пользователь', username: 'another_user', is_bot: false };
+  for (const user of [admin, anotherUser]) {
+    assert.deepEqual(verify(sign(fields({ user: JSON.stringify(user), userId: 'untrusted-client-value' }))), user);
+  }
   const renamed = { ...admin, username: 'another_username' };
   assert.deepEqual(verify(sign(fields({ user: JSON.stringify(renamed) }))), renamed);
 });
@@ -84,15 +80,15 @@ test('rejects modifications to every signed field, including third-party signatu
   assert.throws(() => verify(`${original}&extra=unsigned`), authError(401));
   assert.throws(() => verify(sign(fields(), '654321:OTHER_TEST_TOKEN')), authError(401));
   for (const missingToken of [undefined, null, '', 123]) {
-    assert.throws(() => verifyTelegramInitData(original, missingToken, adminIds, { now }), authError(401));
+    assert.throws(() => verifyTelegramInitData(original, missingToken, { now }), authError(401));
   }
 });
 
-test('checks authenticity before reporting a missing administrator permission', () => {
+test('rejects forged and expired identities regardless of their user id', () => {
   const params = new URLSearchParams(sign());
   params.set('user', JSON.stringify({ ...admin, id: admin.id + 1 }));
   assert.throws(() => verify(params.toString()), authError(401));
-  assert.throws(() => verify(sign(fields({ auth_date: String(now / 1000 - 3601) })), []), authError(401));
+  assert.throws(() => verify(sign(fields({ auth_date: String(now / 1000 - 3601) }))), authError(401));
 });
 
 test('rejects missing or non-hex hashes without exposing input data', () => {
@@ -133,15 +129,15 @@ test('enforces one-hour age and thirty-second future tolerance at exact boundari
     assert.throws(() => verify(sign(fields({ auth_date: String(now / 1000 + offset) }))), authError(401));
   }
   const atLimit = sign(fields({ auth_date: String(now / 1000 - 3600) }));
-  assert.throws(() => verify(atLimit, adminIds, { now: now + 1 }), authError(401));
-  assert.deepEqual(verify(sign(fields({ auth_date: String(now / 1000 - 60) })), adminIds, { maxAgeSeconds: 60 }), admin);
-  assert.throws(() => verify(sign(fields({ auth_date: String(now / 1000 - 61) })), adminIds, { maxAgeSeconds: 60 }), authError(401));
+  assert.throws(() => verify(atLimit, { now: now + 1 }), authError(401));
+  assert.deepEqual(verify(sign(fields({ auth_date: String(now / 1000 - 60) })), { maxAgeSeconds: 60 }), admin);
+  assert.throws(() => verify(sign(fields({ auth_date: String(now / 1000 - 61) })), { maxAgeSeconds: 60 }), authError(401));
 });
 
 test('uses the current time and default lifetime when options are omitted', t => {
   t.mock.method(Date, 'now', () => now);
-  assert.deepEqual(verifyTelegramInitData(sign(), token, adminIds), admin);
-  assert.throws(() => verifyTelegramInitData(sign(fields({ auth_date: String(now / 1000 - 3601) })), token, adminIds), authError(401));
+  assert.deepEqual(verifyTelegramInitData(sign(), token), admin);
+  assert.throws(() => verifyTelegramInitData(sign(fields({ auth_date: String(now / 1000 - 3601) })), token), authError(401));
 });
 
 test('requires canonical integer auth_date and rejects invalid clock or lifetime settings', () => {
@@ -150,7 +146,7 @@ test('requires canonical integer auth_date and rejects invalid clock or lifetime
   }
   assert.throws(() => verify(sign({ user: JSON.stringify(admin) })), authError(401));
   for (const options of [{ now: NaN }, { now: Infinity }, { now: -1 }, { maxAgeSeconds: -1 }, { maxAgeSeconds: 1.5 }, { maxAgeSeconds: Infinity }]) {
-    assert.throws(() => verify(sign(), adminIds, options), authError(401));
+    assert.throws(() => verify(sign(), options), authError(401));
   }
 });
 
@@ -168,5 +164,5 @@ test('rejects malformed signed user data, unsafe ids and bots', () => {
 
 test('accepts an omitted is_bot flag and safe positive Telegram ids without coercion', () => {
   const user = { id: Number.MAX_SAFE_INTEGER, first_name: 'Администратор' };
-  assert.deepEqual(verify(sign(fields({ user: JSON.stringify(user) })), [String(user.id)]), user);
+  assert.deepEqual(verify(sign(fields({ user: JSON.stringify(user) }))), user);
 });

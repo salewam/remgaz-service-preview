@@ -34,7 +34,7 @@ function mockTelegram(respond = method => Response.json({ ok: true, result: resu
 }
 
 function configure(stub, changes = {}) {
-  return configureAdminBot({ botToken: token, adminIds: ['101', '202'], origin, fetchImpl: stub.fetchImpl, ...changes });
+  return configureAdminBot({ botToken: token, origin, fetchImpl: stub.fetchImpl, ...changes });
 }
 
 function safeError(error) {
@@ -47,17 +47,11 @@ function safeError(error) {
   return true;
 }
 
-test('sets and verifies only explicit private-chat menus without changing the default or update delivery', async () => {
+test('sets and verifies the default private-chat menu once without changing update delivery', async () => {
   const stub = mockTelegram();
-  assert.deepEqual(await configure(stub), { username: bot.username, configuredAdminIds: ['101', '202'], url });
-  assert.deepEqual(stub.calls.map(call => call.method), [
-    'getMe', 'setChatMenuButton', 'getChatMenuButton', 'setChatMenuButton', 'getChatMenuButton'
-  ]);
-  assert.deepEqual(stub.calls.map(call => call.body), [
-    {},
-    { chat_id: 101, menu_button: menu }, { chat_id: 101 },
-    { chat_id: 202, menu_button: menu }, { chat_id: 202 }
-  ]);
+  assert.deepEqual(await configure(stub), { username: bot.username, url });
+  assert.deepEqual(stub.calls.map(call => call.method), ['getMe', 'setChatMenuButton', 'getChatMenuButton']);
+  assert.deepEqual(stub.calls.map(call => call.body), [{}, { menu_button: menu }, {}]);
   for (const call of stub.calls) {
     assert.equal(call.endpoint.origin, 'https://api.telegram.org');
     assert.equal(call.endpoint.pathname, `/bot${token}/${call.method}`);
@@ -66,31 +60,9 @@ test('sets and verifies only explicit private-chat menus without changing the de
     assert.equal(call.options.headers['Content-Type'], 'application/json');
     assert.equal(call.options.redirect, 'error');
     assert.ok(call.options.signal instanceof AbortSignal);
-    if (call.method !== 'getMe') {
-      assert.ok(Number.isSafeInteger(call.body.chat_id));
-      assert.ok(call.body.chat_id > 0);
-    }
   }
 });
 
-test('accepts Set allowlists and configures duplicate administrator ids only once', async () => {
-  for (const adminIds of [['101', '101', '202'], new Set(['101', '202'])]) {
-    const stub = mockTelegram();
-    assert.deepEqual((await configure(stub, { adminIds })).configuredAdminIds, ['101', '202']);
-    assert.equal(stub.calls.length, 5);
-  }
-});
-
-test('rejects missing, group, non-canonical and unsafe administrator ids before making requests', async () => {
-  for (const adminIds of [
-    undefined, null, '101', 101, [], new Set(), ['0'], ['-100123456789'], ['@admin'],
-    ['1.5'], ['2e3'], [' 101 '], ['01'], ['101\n'], ['9007199254740992'], [101], ['101', '']
-  ]) {
-    const stub = mockTelegram();
-    await assert.rejects(configure(stub, { adminIds }), safeError);
-    assert.equal(stub.calls.length, 0);
-  }
-});
 
 test('requires a canonical HTTPS origin with no credentials, path, query or fragment', async () => {
   for (const invalidOrigin of [
@@ -227,26 +199,31 @@ test('clears completed request deadlines', async t => {
 
 const cliEnvironment = {
   TELEGRAM_BOT_TOKEN: token,
-  TELEGRAM_ADMIN_IDS: '101, 202,101',
-  TELEGRAM_CHAT_ID: '-100999999',
   PUBLIC_ORIGIN: origin,
   LEAD_DB_PATH: '',
   LEAD_IP_HASH_SECRET: ''
 };
 const cliMock = `
-  const menus = new Map();
+  let menu;
+  const methods = [];
+  process.on('beforeExit', () => {
+    if (JSON.stringify(methods) !== JSON.stringify(['getMe', 'setChatMenuButton', 'getChatMenuButton'])) throw new Error('Wrong Telegram method sequence');
+  });
   globalThis.fetch = async (address, options) => {
     const endpoint = new URL(address);
     if (endpoint.origin !== 'https://api.telegram.org' || !endpoint.pathname.startsWith('/bot${token}/')) throw new Error('Wrong API host');
     const method = endpoint.pathname.split('/').at(-1);
     const body = JSON.parse(options.body);
+    methods.push(method);
+    const expectedKeys = method === 'setChatMenuButton' ? ['menu_button'] : [];
+    if (JSON.stringify(Object.keys(body)) !== JSON.stringify(expectedKeys)) throw new Error('Expected default menu request');
     if (method === 'getMe') return Response.json({ ok: true, result: ${JSON.stringify(bot)} });
-    if (!Number.isSafeInteger(body.chat_id) || body.chat_id <= 0) throw new Error('Missing private chat id');
     if (method === 'setChatMenuButton') {
-      menus.set(body.chat_id, body.menu_button);
+      if (JSON.stringify(body.menu_button) !== JSON.stringify(${JSON.stringify(menu)})) throw new Error('Wrong menu');
+      menu = body.menu_button;
       return Response.json({ ok: true, result: true });
     }
-    if (method === 'getChatMenuButton') return Response.json({ ok: true, result: menus.get(body.chat_id) });
+    if (method === 'getChatMenuButton') return Response.json({ ok: true, result: menu });
     throw new Error('Forbidden Telegram method');
   };
 `;
@@ -257,25 +234,15 @@ function runCli(changes = {}, preload = cliMock) {
   });
 }
 
-test('direct CLI reads only its own configuration and prints username, public URL and count', () => {
+test('direct CLI requires no user or chat id and prints only username and public URL', () => {
   const result = runCli();
   assert.equal(result.error, undefined);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.stderr, '');
-  assert.deepEqual(JSON.parse(result.stdout), { username: bot.username, url, count: 2 });
+  assert.deepEqual(JSON.parse(result.stdout), { username: bot.username, url });
   assert.equal(result.stdout.includes(token), false);
-  assert.equal(result.stdout.includes('101'), false);
-  assert.equal(result.stdout.includes('202'), false);
 });
 
-test('CLI cannot use TELEGRAM_CHAT_ID as an administrator allowlist', () => {
-  const result = runCli({ TELEGRAM_ADMIN_IDS: '', TELEGRAM_CHAT_ID: '101' });
-  assert.equal(result.error, undefined);
-  assert.equal(result.status, 1);
-  assert.equal(result.stdout, '');
-  assert.match(result.stderr, /TELEGRAM_ADMIN_IDS/);
-  assert.equal(result.stderr.includes(token), false);
-});
 
 test('CLI failure output never includes tokens, request URLs or private Telegram responses', () => {
   const result = runCli({}, `globalThis.fetch = async () => Response.json({ ok: false, description: ${JSON.stringify(privateDetail)} });`);

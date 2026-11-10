@@ -239,12 +239,11 @@ function webpSize(bytes) {
 }
 
 export function createContentService(config, { seedPath = new URL('../content/site.json', import.meta.url) } = {}) {
-  const { origin, telegramBotToken, adminIds, contentDbPath, contentMediaDir } = config;
+  const { origin, telegramBotToken, contentDbPath, contentMediaDir } = config;
   let configuredOrigin;
   try { configuredOrigin = new URL(origin); } catch { throw new Error('Invalid content service configuration'); }
   if (!['http:', 'https:'].includes(configuredOrigin.protocol) || configuredOrigin.origin !== origin ||
-      typeof telegramBotToken !== 'string' || !telegramBotToken || !Array.isArray(adminIds) ||
-      adminIds.some(id => typeof id !== 'string' || !/^[1-9][0-9]*$/.test(id)) ||
+      typeof telegramBotToken !== 'string' || !telegramBotToken ||
       typeof contentDbPath !== 'string' || !contentDbPath || typeof contentMediaDir !== 'string' || !contentMediaDir) {
     throw new Error('Invalid content service configuration');
   }
@@ -371,7 +370,7 @@ export function createContentService(config, { seedPath = new URL('../content/si
     const authorization = request.headers.get('authorization') || '';
     const match = /^tma (.+)$/i.exec(authorization);
     if (!match) throw new TelegramAuthError();
-    verifyTelegramInitData(match[1], telegramBotToken, adminIds);
+    verifyTelegramInitData(match[1], telegramBotToken);
     if (write && request.headers.get('origin') !== origin) throw new ContentError(403, 'Изменения разрешены только из приложения на нашем сайте.');
   }
 

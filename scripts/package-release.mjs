@@ -22,7 +22,7 @@ const fontLicenses = [
 const envNames = new Set([
   'PUBLIC_ORIGIN', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID', 'LEAD_IP_HASH_SECRET',
   'LEAD_DB_PATH', 'HOST', 'PORT', 'TRUST_PROXY', 'TURNSTILE_SECRET',
-  'TELEGRAM_ADMIN_IDS', 'CONTENT_DB_PATH', 'CONTENT_MEDIA_DIR'
+  'CONTENT_DB_PATH', 'CONTENT_MEDIA_DIR'
 ]);
 const safeEnvDefaults = new Map([
   ['LEAD_DB_PATH', '/var/lib/remgaz/leads.sqlite'],

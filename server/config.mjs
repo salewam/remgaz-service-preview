@@ -19,7 +19,7 @@ export function loadConfig(env = process.env) {
   } catch { throw new Error('PUBLIC_ORIGIN must be a bare http(s) origin'); }
 
   const telegramBotToken = required('TELEGRAM_BOT_TOKEN');
-  const telegramChatId = required('TELEGRAM_CHAT_ID');
+  const telegramChatId = env.TELEGRAM_CHAT_ID?.trim() || undefined;
   const ipHashSecret = required('LEAD_IP_HASH_SECRET');
   if (Buffer.byteLength(ipHashSecret) < 32) throw new Error('LEAD_IP_HASH_SECRET must be at least 32 bytes');
   const dbPath = required('LEAD_DB_PATH');
@@ -37,10 +37,6 @@ export function loadConfig(env = process.env) {
   const trustProxy = env.TRUST_PROXY || 'false';
   if (!['true', 'false'].includes(trustProxy)) throw new Error('TRUST_PROXY must be true or false');
   const turnstileSecret = env.TURNSTILE_SECRET?.trim() || undefined;
-  const adminIds = (env.TELEGRAM_ADMIN_IDS || '').split(',').map(id => id.trim()).filter(Boolean);
-  if (adminIds.some(id => !/^[1-9]\d{0,15}$/.test(id) || !Number.isSafeInteger(Number(id)))) {
-    throw new Error('TELEGRAM_ADMIN_IDS must contain comma-separated positive Telegram user IDs');
-  }
   const outsideDist = (name, value) => {
     if (!isAbsolute(value)) throw new Error(`${name} must be an absolute path`);
     const path = resolve(value);
@@ -59,6 +55,6 @@ export function loadConfig(env = process.env) {
   return {
     origin, telegramBotToken, telegramChatId, ipHashSecret, dbPath,
     host, port: Number(rawPort), trustProxy: trustProxy === 'true', turnstileSecret,
-    adminIds: [...new Set(adminIds)], contentDbPath, contentMediaDir
+    contentDbPath, contentMediaDir
   };
 }

@@ -37,18 +37,10 @@ async function telegramRequest(botToken, method, body, fetchImpl) {
   }
 }
 
-export async function configureAdminBot({ botToken, adminIds, origin, fetchImpl = fetch }) {
+export async function configureAdminBot({ botToken, origin, fetchImpl = fetch }) {
   if (typeof botToken !== 'string' || !/^[1-9][0-9]*:[A-Za-z0-9_-]+$/.test(botToken)) {
     throw new Error('Не задан корректный TELEGRAM_BOT_TOKEN.');
   }
-  if (!(Array.isArray(adminIds) || adminIds instanceof Set)) {
-    throw new Error('Укажите положительные ID в TELEGRAM_ADMIN_IDS.');
-  }
-  const ids = [...new Set(adminIds)];
-  if (!ids.length || ids.some(id => typeof id !== 'string' || !/^[1-9][0-9]*$/.test(id) || !Number.isSafeInteger(Number(id)))) {
-    throw new Error('Укажите положительные ID в TELEGRAM_ADMIN_IDS.');
-  }
-
   let parsedOrigin;
   try { parsedOrigin = new URL(origin); }
   catch { throw new Error('PUBLIC_ORIGIN должен быть точным HTTPS origin без пути.'); }
@@ -64,27 +56,21 @@ export async function configureAdminBot({ botToken, adminIds, origin, fetchImpl 
   }
 
   const menuButton = { type: 'web_app', text: 'Управление сайтом', web_app: { url } };
-  const configuredAdminIds = [];
-  for (const id of ids) {
-    const chatId = Number(id);
-    const result = await telegramRequest(botToken, 'setChatMenuButton', { chat_id: chatId, menu_button: menuButton }, fetchImpl);
-    if (result !== true) throw new Error('Telegram не подтвердил настройку меню.');
-    const button = await telegramRequest(botToken, 'getChatMenuButton', { chat_id: chatId }, fetchImpl);
-    if (!button || button.type !== menuButton.type || button.text !== menuButton.text || button.web_app?.url !== url) {
-      throw new Error('Меню Telegram не совпадает с настройкой.');
-    }
-    configuredAdminIds.push(id);
+  const result = await telegramRequest(botToken, 'setChatMenuButton', { menu_button: menuButton }, fetchImpl);
+  if (result !== true) throw new Error('Telegram не подтвердил настройку меню.');
+  const button = await telegramRequest(botToken, 'getChatMenuButton', {}, fetchImpl);
+  if (!button || button.type !== menuButton.type || button.text !== menuButton.text || button.web_app?.url !== url) {
+    throw new Error('Меню Telegram не совпадает с настройкой.');
   }
-  return { username: bot.username, configuredAdminIds, url };
+  return { username: bot.username, url };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   configureAdminBot({
     botToken: process.env.TELEGRAM_BOT_TOKEN,
-    adminIds: process.env.TELEGRAM_ADMIN_IDS?.split(',').map(id => id.trim()),
     origin: process.env.PUBLIC_ORIGIN
-  }).then(({ username, configuredAdminIds, url }) => {
-    console.log(JSON.stringify({ username, url, count: configuredAdminIds.length }));
+  }).then(({ username, url }) => {
+    console.log(JSON.stringify({ username, url }));
   }).catch(error => {
     console.error(error.message);
     process.exitCode = 1;

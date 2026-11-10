@@ -75,7 +75,7 @@ async function fixture(t, { defaultSeed = false, seed = seedDocument() } = {}) {
   const dir = await mkdtemp(join(tmpdir(), 'remgaz-content-'));
   const seedPath = join(dir, 'seed.json');
   const config = {
-    origin, telegramBotToken: token, adminIds: [String(admin.id)],
+    origin, telegramBotToken: token,
     contentDbPath: join(dir, 'db', 'content.sqlite'), contentMediaDir: join(dir, 'media'),
   };
   const opened = new Set();
@@ -237,15 +237,44 @@ test('empty hidden drafts append, persist, filter out publicly and require title
   assert.equal((await app.send()).body.projects.some(item => item.id === 'home'), false);
 });
 
-test('every admin route rejects absent, forged, expired and unauthorized Telegram identities without consuming bodies', async t => {
+test('different authenticated Telegram users can read content and write prices, projects and media', async t => {
+  const app = await fixture(t);
+  const users = [admin, { id: 987654321, first_name: 'Пользователь бота', is_bot: false }];
+  let revision = 1;
+  for (const [index, user] of users.entries()) {
+    const authorization = `tma ${sign({ user })}`;
+    const content = await app.send({ path: '/api/admin/content', authorization, requestOrigin: null });
+    assert.equal(content.status, 200);
+    assert.equal(content.body.revision, revision);
+    const price = await app.savePrice(revision, 51 + index, { authorization });
+    assert.equal(price.status, 200);
+    assert.equal(price.body.gasPriceRub, 51 + index);
+    assert.equal(price.body.revision, ++revision);
+    const photo = await app.upload(webp.lossy, { authorization });
+    assert.equal(photo.status, 200);
+    const project = {
+      ...draft(`user-${user.id}`), title: 'Новый объект', published: true,
+      photos: [photo.body], coverPhoto: photo.body.src,
+    };
+    const saved = await app.saveProject(revision, project, { authorization });
+    assert.equal(saved.status, 200);
+    assert.equal(saved.body.revision, ++revision);
+    assert.deepEqual(saved.body.projects.at(-1), project);
+    const reread = await app.send({ path: '/api/admin/content', authorization });
+    assert.equal(reread.status, 200);
+    assert.deepEqual(reread.body, saved.body);
+  }
+});
+
+test('every admin route rejects absent, unsigned, forged, expired and bot identities without consuming bodies', async t => {
   const app = await fixture(t);
   const tampered = new URLSearchParams(sign());
   tampered.set('user', JSON.stringify({ ...admin, first_name: 'Подменено' }));
   const cases = [
-    [null, 401], [`Bearer ${sign()}`, 401], ['tma invalid', 401], [`tma ${tampered}`, 401],
+    [null, 401], ['tma ', 401], [`Bearer ${sign()}`, 401], ['tma invalid', 401], [`tma ${tampered}`, 401],
     [`tma ${sign({ signingToken: 'wrong-token' })}`, 401],
     [`tma ${sign({ authDate: now / 1000 - 3601 })}`, 401],
-    [`tma ${sign({ user: { ...admin, id: admin.id + 1 } })}`, 403],
+    [`tma ${sign({ user: { ...admin, is_bot: true } })}`, 401],
   ];
   for (const [authorization, status] of cases) {
     for (const [method, path] of [['GET', '/api/admin/content'], ['PUT', '/api/admin/price'], ['PUT', '/api/admin/projects/home'], ['POST', '/api/admin/media']]) {

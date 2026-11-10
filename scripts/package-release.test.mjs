@@ -41,7 +41,6 @@ test('release contains only executable runtime, keeps safe settings and names ba
     'PORT=8080',
     'TRUST_PROXY=true',
     `TURNSTILE_SECRET=${secrets[4]}`,
-    'TELEGRAM_ADMIN_IDS=123456789',
     'CONTENT_DB_PATH=/var/lib/remgaz/content.sqlite',
     'CONTENT_MEDIA_DIR=/var/lib/remgaz/media',
     ''
@@ -84,7 +83,7 @@ test('release contains only executable runtime, keeps safe settings and names ba
   for (const line of ['LEAD_DB_PATH=/var/lib/remgaz/leads.sqlite', 'CONTENT_DB_PATH=/var/lib/remgaz/content.sqlite', 'CONTENT_MEDIA_DIR=/var/lib/remgaz/media', 'HOST=127.0.0.1', 'PORT=8080', 'TRUST_PROXY=true']) {
     assert.ok(env.includes(`${line}\n`));
   }
-  for (const name of ['PUBLIC_ORIGIN', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID', 'LEAD_IP_HASH_SECRET', 'TURNSTILE_SECRET', 'TELEGRAM_ADMIN_IDS']) {
+  for (const name of ['PUBLIC_ORIGIN', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID', 'LEAD_IP_HASH_SECRET', 'TURNSTILE_SECRET']) {
     assert.match(env, new RegExp(`^${name}=$`, 'm'));
   }
   const scripts = JSON.parse(await readFile(join(unpacked, 'package.json'), 'utf8')).scripts;

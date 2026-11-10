@@ -1,14 +1,14 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
 export class TelegramAuthError extends Error {
-  constructor(status = 401) {
-    super(status === 403 ? 'Доступ разрешён только администраторам.' : 'Недействительные данные входа Telegram.');
+  constructor() {
+    super('Недействительные данные входа Telegram.');
     this.name = 'TelegramAuthError';
-    this.status = status;
+    this.status = 401;
   }
 }
 
-export function verifyTelegramInitData(initData, botToken, adminIds, { now = Date.now(), maxAgeSeconds = 3600 } = {}) {
+export function verifyTelegramInitData(initData, botToken, { now = Date.now(), maxAgeSeconds = 3600 } = {}) {
   if (typeof initData !== 'string' || !initData || initData.length > 8192 ||
       typeof botToken !== 'string' || !botToken ||
       !Number.isFinite(now) || now < 0 || !Number.isSafeInteger(maxAgeSeconds) || maxAgeSeconds < 0) {
@@ -46,8 +46,5 @@ export function verifyTelegramInitData(initData, botToken, adminIds, { now = Dat
     throw new TelegramAuthError();
   }
 
-  const id = String(user.id);
-  const allowed = adminIds instanceof Set ? adminIds.has(id) : Array.isArray(adminIds) && adminIds.includes(id);
-  if (!allowed) throw new TelegramAuthError(403);
   return user;
 }

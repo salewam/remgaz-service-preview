@@ -87,10 +87,10 @@ async function writeResponse(res, response) {
   else res.end();
 }
 
-export function createHttpServer(config, service = createLeadService(config), distRoot = root) {
+export function createHttpServer(config, service = config.telegramChatId ? createLeadService(config) : null, distRoot = root) {
   let contentService;
   try { contentService = config.contentDbPath ? createContentService(config) : null; }
-  catch (error) { service.close(); throw error; }
+  catch (error) { service?.close(); throw error; }
   const server = createServer({ maxHeaderSize: 16 * 1024 }, async (req, res) => {
     try {
       const path = pathnameOf(req.url || '');
@@ -112,6 +112,10 @@ export function createHttpServer(config, service = createLeadService(config), di
         return;
       }
       if (path === '/api/lead') {
+        if (!service) {
+          sendJson(res, 503, { ok: false, error: 'Приём заявок через сайт не настроен.' }, { Connection: 'close' });
+          return;
+        }
         if (req.method !== 'POST' && req.method !== 'OPTIONS') {
           sendJson(res, 405, { ok: false, error: 'Method not allowed' }, { Allow: 'POST, OPTIONS' });
           return;
@@ -164,7 +168,7 @@ export function createHttpServer(config, service = createLeadService(config), di
   server.headersTimeout = 10_000;
   server.keepAliveTimeout = 5_000;
   server.timeout = 30_000;
-  server.on('close', () => { service.close(); contentService?.close(); });
+  server.on('close', () => { service?.close(); contentService?.close(); });
   return server;
 }
 
