@@ -64,7 +64,7 @@
         text-align: center; font: 16px/1.4 Arial, sans-serif;
         text-shadow: 0 1px 5px #000;
       }
-      .rg-lightbox__title { bottom: calc(14px + env(safe-area-inset-bottom)); }
+      .rg-lightbox__title { bottom: calc(14px + env(safe-area-inset-bottom)); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
       .rg-lightbox__count { bottom: calc(42px + env(safe-area-inset-bottom)); }
       .rg-lightbox__count[hidden] { display: none; }
       .rg-lightbox__status { bottom: calc(70px + env(safe-area-inset-bottom)); }
@@ -208,6 +208,7 @@
   }
 
   function gallerySlides(link) {
+    if (link.dataset.lightboxPhotos) return displayedGallerySlides(link);
     const thumbs = link.id === 'dvImageLink'
       ? document.querySelectorAll('#dvGalleryThumbs .dv-gallery-thumb img')
       : link.matches('.gallery-stage')
@@ -215,12 +216,14 @@
         : null;
     if (!thumbs) return [];
     return Array.from(thumbs, (thumb) => {
-      const preview = thumb.getAttribute('src') || thumb.dataset.src;
-      if (!preview || !/-thumb\.webp(?=$|[?#])/i.test(preview)) return null;
-      const url = new URL(preview, document.baseURI).href;
+      const owner = thumb.closest('.dv-gallery-thumb, .gallery-thumb');
+      const original = owner?.href || owner?.dataset.photoSrc;
+      if (!original) return null;
+      const url = new URL(original, document.baseURI).href;
+      const preview = thumb.getAttribute('src') || thumb.dataset.src || window.RemgazPhotos.source(url, 'thumb');
       return {
-        preview: url,
-        original: url.replace(/-thumb\.webp(?=$|[?#])/i, '.webp'),
+        preview: new URL(preview, document.baseURI).href,
+        original: url,
         previewImage: thumb,
         alt: thumb.alt || thumb.closest('.dv-gallery-thumb, .gallery-thumb')?.getAttribute('aria-label') || ''
       };
@@ -228,16 +231,16 @@
   }
 
   function displayedGallerySlides(link) {
-    const match = link.href.match(/^(.*-)(\d+)\.webp$/i);
-    const ids = link.dataset.lightboxPhotos?.split(',').map(id => id.trim());
-    if (!match || !ids?.length || !ids.every(id => /^\d+$/.test(id))) return [];
-    const caption = link.querySelector('img')?.alt?.replace(/, фото \d+ из \d+$/i, '') || 'Фотография объекта';
-    return ids.map((id, index) => {
-      const original = `${match[1]}${id.padStart(match[2].length, '0')}.webp`;
+    let photos;
+    try { photos = JSON.parse(link.dataset.lightboxPhotos || '[]'); }
+    catch { return []; }
+    if (!Array.isArray(photos)) return [];
+    return photos.filter(photo => typeof photo?.src === 'string').map(photo => {
+      const original = new URL(photo.src, document.baseURI).href;
       return {
         original,
-        preview: original.replace(/\.webp$/i, '-thumb.webp'),
-        alt: `${caption}, фото ${index + 1} из ${ids.length}`
+        preview: window.RemgazPhotos.source(original, 'thumb'),
+        alt: photo.alt || 'Фотография объекта'
       };
     });
   }
@@ -255,9 +258,11 @@
       }, { rootMargin: '250px' }) : null;
 
     document.querySelectorAll('.case-img-wrap > a[data-lightbox-photos]').forEach(link => {
+      if (link.dataset.galleryReady) return;
       const image = link.querySelector('img');
       const gallery = displayedGallerySlides(link);
       if (!image || gallery.length < 2) return;
+      link.dataset.galleryReady = 'true';
 
       const wrapper = link.parentElement;
       const project = wrapper.closest('.case-box')?.querySelector('.case-body h3')?.textContent.trim() || image.alt;
@@ -279,7 +284,7 @@
 
       function display(index, src) {
         const slide = gallery[index];
-        image.src = src;
+        photos.display(image, src);
         image.alt = slide.alt;
         link.href = slide.original;
         link.dataset.lightboxSrc = photos.source(slide.original, 'large');
@@ -294,8 +299,23 @@
         message.hidden = true;
         const slide = gallery[index];
         const sharpSource = photos.source(slide.original);
-        if (index === displayedIndex && image.src === new URL(sharpSource, document.baseURI).href) {
-          warmNeighbors(index);
+        if (index === displayedIndex && image.currentSrc === new URL(sharpSource, document.baseURI).href) {
+          if (image.complete) {
+            if (!image.naturalWidth) {
+              message.textContent = 'Не удалось загрузить фото. Попробуйте ещё раз.';
+              message.hidden = false;
+            }
+            warmNeighbors(index);
+          } else {
+            const warm = () => { if (id === frameRequestId) warmNeighbors(index); };
+            image.addEventListener('load', warm, { once: true });
+            image.addEventListener('error', () => {
+              if (id !== frameRequestId) return;
+              message.textContent = 'Не удалось загрузить фото. Попробуйте ещё раз.';
+              message.hidden = false;
+              warmNeighbors(index);
+            }, { once: true });
+          }
           return;
         }
         let sharpShown = false;
@@ -327,6 +347,7 @@
           display(index, sharp.src);
           message.textContent = '';
           message.hidden = true;
+          warmNeighbors(index);
         }).catch(() => {
           if (id !== frameRequestId) return;
           sharpFailed = true;
@@ -338,8 +359,8 @@
             message.textContent = 'Не удалось загрузить фото. Попробуйте ещё раз.';
             message.hidden = false;
           }
+          warmNeighbors(requestedIndex);
         });
-        warmNeighbors(index);
       }
 
       function arrow(step, direction) {
@@ -361,7 +382,7 @@
     });
   }
 
-  initializeCaseGalleries();
+  (window.RemgazContent?.ready || Promise.resolve()).then(initializeCaseGalleries);
 
 
   function showFrame(preview, original) {
@@ -406,6 +427,7 @@
       sharpShown = true;
       display(image.src);
       status.textContent = '';
+      warmLightboxNeighbors();
     }).catch(() => {
       if (!open || id !== requestId) return;
       sharpFailed = true;
@@ -413,6 +435,7 @@
         ? 'Не удалось загрузить фото. Попробуйте ещё раз.'
         : previewShown ? 'Крупный снимок недоступен — показан предпросмотр.'
           : 'Крупный снимок недоступен — ожидаем предпросмотр.';
+      warmLightboxNeighbors();
     });
   }
 
@@ -429,9 +452,10 @@
     slideIndex = (slideIndex + step + slides.length) % slides.length;
     const slide = slides[slideIndex];
     count.textContent = `Фото ${slideIndex + 1} из ${slides.length}`;
+    heading.textContent = slide.alt || 'Просмотр фотографий';
+    heading.title = heading.textContent;
     showFrame({ src: slide.preview, alt: slide.alt,
       available: slide.previewImage?.complete && slide.previewImage.naturalWidth > 0 }, slide.original);
-    warmLightboxNeighbors();
     if (!detachedGallery) {
       sourceLink.dispatchEvent(new CustomEvent('lightbox:navigate', { detail: { index: slideIndex } }));
     }
@@ -443,8 +467,7 @@
     if (!overlay) createLightbox();
 
     sourceLink = link;
-    slides = link.matches('.case-img-wrap > a[data-lightbox-photos]')
-      ? displayedGallerySlides(link) : gallerySlides(link);
+    slides = gallerySlides(link);
     detachedGallery = false;
     slideIndex = slides.findIndex(slide => slide.original === link.href);
     if (slideIndex < 0) {
@@ -459,11 +482,11 @@
     nextButton.hidden = !gallery;
     count.hidden = !gallery;
     count.textContent = gallery ? `Фото ${slideIndex + 1} из ${slides.length}` : '';
-    heading.textContent = gallery ? 'Просмотр фотографий'
+    heading.textContent = gallery ? slides[slideIndex].alt || 'Просмотр фотографий'
       : link.getAttribute('aria-label') || preview.alt || 'Просмотр фотографии';
+    heading.title = heading.textContent;
     showFrame({ src: preview.currentSrc || preview.src, alt: preview.alt, available: true },
       gallery ? slides[slideIndex].original : link.href);
-    warmLightboxNeighbors();
 
     if (!open) {
       lockPage();

@@ -37,6 +37,43 @@ test('responsive sources respect viewport boundaries and preserve query/hash', (
   }
 });
 
+test('explicit thumbnail and initial picture sources keep the bundled variants', () => {
+  const { photos } = makeLoader(1440);
+  const original = 'https://example.test/site/assets.release/portfolio/project-01.webp';
+  for (const mode of ['thumb', 'mobile', 'tablet']) {
+    assert.equal(photos.source(original, mode), original.replace('.webp', `-${mode}.webp`));
+  }
+});
+
+test('uploaded WebP photos never request nonexistent generated variants', () => {
+  const { photos, window } = makeLoader();
+  const filename = `${'a'.repeat(64)}.webp`;
+  for (const width of [390, 900, 1440]) {
+    window.innerWidth = width;
+    for (const original of [`/media/${filename}`, `https://api.example.test/media/${filename}?v=2#photo`]) {
+      for (const mode of ['view', 'large', 'thumb', 'mobile', 'tablet']) {
+        assert.equal(photos.source(original, mode), original);
+      }
+    }
+  }
+});
+
+test('display clears initial picture sources on every dynamic frame change', () => {
+  const { photos } = makeLoader(900);
+  const events = [];
+  const sources = [1, 2].map(index => ({ remove() { events.push(`remove ${index}`); } }));
+  const image = {
+    parentElement: { localName: 'picture', querySelectorAll: () => sources },
+    set src(value) { events.push(`src ${value}`); }
+  };
+  photos.display(image, 'assets/photo-02-tablet.webp');
+  assert.deepEqual(events, ['src assets/photo-02-tablet.webp', 'remove 1', 'remove 2']);
+  events.length = 0;
+  image.parentElement = { localName: 'div' };
+  photos.display(image, 'assets/photo-03-thumb.webp');
+  assert.deepEqual(events, ['src assets/photo-03-thumb.webp']);
+});
+
 test('relative and absolute requests share one in-flight load and decoded image', async () => {
   const { photos, images } = makeLoader();
   const first = photos.load('assets/photo.webp');

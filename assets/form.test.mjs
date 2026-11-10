@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { createContext, runInContext } from 'node:vm';
 
 const script = readFileSync(new URL('./form.js', import.meta.url), 'utf8');
-const phoneCases = JSON.parse(readFileSync(new URL('../worker/phone-cases.json', import.meta.url), 'utf8'));
+const phoneCases = JSON.parse(readFileSync(new URL('../server/phone-cases.json', import.meta.url), 'utf8'));
 const pages = ['index.html', 'gas.html'];
 
 function attribute(tag, name) {
@@ -79,7 +79,7 @@ function makePage(page) {
 }
 
 for (const page of pages) {
-  test(`${page}: Worker phone cases agree with executed JS and native v-pattern`, () => {
+  test(`${page}: server phone cases agree with executed JS and native v-pattern`, () => {
     const { elements, context } = makePage(page);
     assert.equal(elements.name.required, true);
     assert.equal(elements.name.maxLength, 100);

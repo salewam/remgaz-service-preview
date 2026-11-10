@@ -1,4 +1,4 @@
-name: Check lead protection
+name: Check server and static build
 
 on:
   push:
@@ -12,29 +12,30 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      WRANGLER_SEND_METRICS: 'false'
     steps:
       - name: Check out source
         uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      - name: Set up Node.js 22
+      - name: Set up Node.js 22.22
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '22.22.0'
 
       - name: Check JavaScript syntax
         run: |
           node --check assets/form.js
-          node --check worker/lead.js
+          node --check assets/photo-loader.js
+          node --check server/lead.mjs
+          node --check server/http.mjs
+          node --check server/config.mjs
+          node --check scripts/build.mjs
+          node --check deploy/nginx.mjs
+          node --check deploy/install-assets.mjs
 
-      - name: Check form and server contracts
-        run: node --experimental-vm-modules --test assets/form.test.mjs worker/lead.test.mjs
+      - name: Check form, photos and server contracts
+        run: npm test
 
-      - name: Install Wrangler 4.156.0
-        run: npm install --global wrangler@4.156.0
-
-      - name: Build Worker without publishing
-        run: wrangler deploy --dry-run --config wrangler.toml --outdir "$RUNNER_TEMP/remgaz-worker"
+      - name: Build static release without publishing
+        run: npm run build

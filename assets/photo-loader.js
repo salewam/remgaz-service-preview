@@ -6,10 +6,18 @@
   const maxReady = 18;
 
   function source(original, mode = 'view') {
+    if (new URL(original, document.baseURI).pathname.startsWith('/media/')) return original;
     const width = window.innerWidth;
-    const variant = width <= 600 ? 'mobile' : width <= 1100 ? 'tablet'
-      : mode === 'large' ? 'lightbox' : 'view';
+    const variant = mode === 'thumb' || mode === 'mobile' || mode === 'tablet' ? mode
+      : width <= 600 ? 'mobile' : width <= 1100 ? 'tablet'
+        : mode === 'large' ? 'lightbox' : 'view';
     return original.replace(/\.webp(?=$|[?#])/i, `-${variant}.webp`);
+  }
+  function display(image, src) {
+    image.src = src;
+    if (image.parentElement?.localName === 'picture') {
+      for (const variant of image.parentElement.querySelectorAll('source')) variant.remove();
+    }
   }
 
   function load(src, priority = 'auto') {
@@ -54,5 +62,5 @@
     for (const src of new Set(sources)) load(src, 'low').catch(() => {});
   }
 
-  window.RemgazPhotos = { source, load, prefetch };
+  window.RemgazPhotos = { source, load, prefetch, display };
 })();

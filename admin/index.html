@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Управление сайтом — РемГазСервис</title>
+  <link rel="stylesheet" href="../assets/fonts.css">
+  <link rel="stylesheet" href="../assets/admin.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="../assets/admin.js" defer></script>
+</head>
+<body>
+  <main class="admin-shell">
+    <header class="admin-header">
+      <div><p class="eyebrow">РемГазСервис</p><h1>Управление сайтом</h1></div>
+      <a href="/" target="_blank" rel="noopener noreferrer" class="site-link">Открыть сайт ↗</a>
+    </header>
+    <section id="access-panel" class="access-panel" aria-live="polite">
+      <h2 id="access-title">Подключаемся к Telegram…</h2>
+      <p id="access-text">Проверяем доступ к управлению сайтом.</p>
+    </section>
+    <div id="workspace" hidden>
+      <nav class="section-tabs" aria-label="Управление содержимым">
+        <button type="button" id="portfolio-tab" aria-pressed="true" aria-controls="portfolio-section">Портфолио</button>
+        <button type="button" id="price-tab" aria-pressed="false" aria-controls="price-section">Цена газа</button>
+      </nav>
+      <p id="status" class="status" role="status" aria-live="polite" hidden></p>
+      <section id="portfolio-section" aria-labelledby="portfolio-heading">
+        <div id="project-list-panel">
+          <div class="section-heading"><div><h2 id="portfolio-heading">Работы и фотографии</h2><p>Выберите проект, чтобы изменить его наполнение.</p></div></div>
+          <button type="button" id="add-project" class="primary wide">Добавить проект</button>
+          <div id="project-list" class="project-list"></div>
+          <button type="button" id="reload-content" class="quiet wide">Обновить данные</button>
+        </div>
+        <form id="project-form" hidden>
+          <button type="button" id="back-to-list" class="back-link">← Все проекты</button>
+          <h2 id="editor-heading">Редактирование проекта</h2>
+          <label>Название проекта<input name="title" maxlength="200" autocomplete="off"></label>
+          <label>Город или место<input name="loc" maxlength="240" autocomplete="off"></label>
+          <label>Короткое описание<textarea name="desc" rows="3" maxlength="2000"></textarea></label>
+          <fieldset class="photo-fieldset" id="photo-fieldset">
+            <legend>Фотографии</legend>
+            <p class="field-hint">Можно выбрать сразу несколько. Обложка используется в карточке проекта.</p>
+            <label class="upload-label">Добавить фотографии<input type="file" id="photo-files" accept="image/*" multiple></label>
+            <p id="upload-status" class="field-hint" aria-live="polite"></p>
+            <div id="photo-list" class="photo-list"></div>
+          </fieldset>
+          <details class="extra-fields">
+            <summary>Задача, выполненные работы и другие поля</summary>
+            <label>Задача<textarea name="task" rows="4" maxlength="8000"></textarea></label>
+            <label>Что сделали<textarea name="work" rows="6" maxlength="12000"></textarea></label>
+            <label>Короткие теги<textarea name="tags" rows="3"></textarea><span class="field-hint">Один тег на строке.</span></label>
+            <label>Характеристики<textarea name="facts" rows="4"></textarea><span class="field-hint">Одна на строке: название — значение.</span></label>
+            <label>Короткое название в навигации<input name="navTitle" maxlength="200"></label>
+            <label>Описание карточки на главной<textarea name="cardDesc" rows="3" maxlength="2000"></textarea></label>
+            <label>Подпись в списке объектов<input name="categorySummary" maxlength="240"></label>
+          </details>
+          <label class="switch-label"><input type="checkbox" name="published"><span>Показывать проект на сайте</span></label>
+          <p class="field-hint">Изменения появятся на сайте после сохранения. Если выключено — проект останется черновиком.</p>
+          <div class="save-row"><button class="primary" type="submit" id="save-project">Сохранить проект</button><span id="dirty-label" class="field-hint" hidden>Есть несохранённые изменения</span></div>
+        </form>
+      </section>
+      <section id="price-section" aria-labelledby="price-heading" hidden>
+        <h2 id="price-heading">Цена сжиженного газа</h2>
+        <p id="current-price" class="section-description"></p>
+        <form id="price-form" class="price-form">
+          <label>Цена за литр, ₽<input name="gasPriceRub" id="gas-price" type="text" inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?" maxlength="12" required autocomplete="off"></label>
+          <p class="field-hint">Одна цена для главной страницы и раздела доставки газа.</p>
+          <button class="primary wide" type="submit" id="save-price">Сохранить цену</button>
+        </form>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

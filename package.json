@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.22.0" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "node server/http.mjs",
+    "test": "node --test assets/*.test.mjs server/*.test.mjs scripts/*.test.mjs",
+    "check": "npm test && npm run build",
+    "nginx:config": "node deploy/nginx.mjs",
+    "assets:install": "node deploy/install-assets.mjs",
+    "release": "npm run build && node scripts/package-release.mjs",
+    "bot:configure": "node scripts/configure-admin-bot.mjs"
+  }
+}

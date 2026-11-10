@@ -4,8 +4,11 @@
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="remgaz-content-api" content="/api/content">
 <title>РемГазСервис — Газификация, котельные, СУГ и инженерный сервис</title>
 <link rel="stylesheet" href="assets/fonts.css">
+<link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 :root {
   --blue-primary: #004D99;
@@ -571,6 +574,7 @@ body {
   height: 380px;
 }
 .dv-visual-link { display: block; width: 100%; height: 100%; }
+.dv-visual-link picture { display: block; width: 100%; height: 100%; }
 .dv-visual-img {
   width: 100%;
   height: 100%;
@@ -676,9 +680,11 @@ body {
 /* Three real project photographs */
 .case-triad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .case-box { display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--blue-line); background: var(--white); }
+.detail-view[hidden] { display: none; }
 .case-box:hover { border-color: var(--blue-primary); }
 .case-img-wrap { position: relative; height: 260px; overflow: hidden; background: var(--blue-subtle); border-bottom: 1px solid var(--blue-line); }
 .case-img-wrap > a { display: block; width: 100%; height: 100%; }
+.case-img-wrap picture { display: block; width: 100%; height: 100%; }
 .case-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .case-box:first-child .case-img-wrap img { object-fit: cover; }
 .case-gallery-status { position: absolute; right: 10px; bottom: 10px; left: 10px; padding: 8px 10px; background: rgba(0, 0, 0, .75); color: var(--white); font: 500 12px/1.4 var(--font-main); pointer-events: none; }
@@ -1057,7 +1063,7 @@ body {
 
   <section class="hero-editorial">
     <div>
-      <div class="hero-badge-wrap"><span class="hero-kicker">РемГазСервис · работает с 2007 года</span><a class="hero-gas-price" href="gas.html#price"><span class="hero-gas-price-label">Сжиженный газ</span><strong class="hero-gas-price-value">50 ₽/л</strong></a></div>
+      <div class="hero-badge-wrap"><span class="hero-kicker">РемГазСервис · работает с 2007 года</span><a class="hero-gas-price" href="gas.html#price"><span class="hero-gas-price-label">Сжиженный газ</span><strong class="hero-gas-price-value" data-gas-price>50 ₽/л</strong></a></div>
       <h1 class="hero-heading"><span class="hero-heading-first">Газификация и тепло</span><span class="hero-heading-line"><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">частных домов</span></span><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">загородных отелей</span></span><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">SPA-комплексов</span></span><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">производственных цехов</span></span><span class="hero-heading-measure" aria-hidden="true">для <span class="typing-cursor">тепличных комплексов</span></span><span>для <span class="typing-cursor" id="typewriter">частных домов</span></span></span></h1>
       <div class="hero-actions-row"><a href="#contact" class="btn-primary-lead">Обсудить задачу ↗</a><a href="#objects" class="btn-outline-lead">Выбрать объект</a><a href="gas.html#contact" class="btn-primary-lead">Заказать газ для газгольдера</a></div>
     </div>
@@ -1072,13 +1078,13 @@ body {
     <h2 class="sec-title">Выберите объект — мы покажем подходящее направление</h2>
     <p class="sec-desc">Семь типов задач — семь выполненных проектов. Выберите объект, чтобы увидеть состав работ и фотографии.</p>
     <div class="object-matrix">
-      <div class="matrix-cell active" role="button" tabindex="0" aria-pressed="true" onclick="selectObject('house', this)"><div class="cell-top"><div class="cell-index">01 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square"><path d="M3 15 16 5l13 10M7 13v15h18V13M12 28V17h8v11"/></svg></span></div><div><div class="cell-name">Частные дома</div><div class="cell-sub">Котельная и тепловой пункт дома</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
-      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" onclick="selectObject('hotel', this)"><div class="cell-top"><div class="cell-index">02 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 28V9h22v19M2 28h28M10 14h4m4 0h4m-12 5h4m4 0h4M14 28v-5h4v5M9 9V5h14v4"/></svg></span></div><div><div class="cell-name">Базы отдыха и отели</div><div class="cell-sub">Газоснабжение парк-отеля</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
-      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" onclick="selectObject('spa', this)"><div class="cell-top"><div class="cell-index">03 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 21c4-3 7-3 11 0s7 3 11 0M5 27c4-3 7-3 11 0s7 3 11 0M11 16c-3-3 3-5 0-9m10 9c-3-3 3-5 0-9"/></svg></span></div><div><div class="cell-name">SPA-комплексы</div><div class="cell-sub">Отопление, бассейн и горячая вода</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
-      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" onclick="selectObject('production', this)"><div class="cell-top"><div class="cell-index">04 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 28V14l9 5v-5l9 5v9M21 28V6h6v22M2 28h28M7 24h3m5 0h3M23 10h4"/></svg></span></div><div><div class="cell-name">Предприятия</div><div class="cell-sub">Котельная и тепловой пункт</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
-      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" onclick="selectObject('restaurant', this)"><div class="cell-top"><div class="cell-index">05 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 26h24M7 22h18M9 18c0-5 3-9 7-9s7 4 7 9M16 9V6M5 26v3m22-3v3"/></svg></span></div><div><div class="cell-name">Рестораны</div><div class="cell-sub">Тёплый пол для коктейль-бара</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
-      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" onclick="selectObject('agro', this)"><div class="cell-top"><div class="cell-index">06 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M16 29V5m0 7-5-4m5 10-6-4m6 10-6-4m6-8 5-4m-5 10 6-4m-6 10 6-4M8 28h16"/></svg></span></div><div><div class="cell-name">Аграрные объекты</div><div class="cell-sub">Газ для зерносушильного комплекса</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
-      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" onclick="selectObject('seasonal', this)"><div class="cell-top"><div class="cell-index">07 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M16 3v26M3 16h26M7 7l18 18m0-18L7 25M12 6l4 4 4-4M12 26l4-4 4 4"/></svg></span></div><div><div class="cell-name">Сезонные объекты</div><div class="cell-sub">Снеготаяние во дворе гостиницы</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
+      <div class="matrix-cell active" role="button" tabindex="0" aria-pressed="true" data-category="house" onclick="selectObject('house', this)"><div class="cell-top"><div class="cell-index">01 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square"><path d="M3 15 16 5l13 10M7 13v15h18V13M12 28V17h8v11"/></svg></span></div><div><div class="cell-name">Частные дома</div><div class="cell-sub">Котельная и тепловой пункт дома</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
+      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" data-category="hotel" onclick="selectObject('hotel', this)"><div class="cell-top"><div class="cell-index">02 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 28V9h22v19M2 28h28M10 14h4m4 0h4m-12 5h4m4 0h4M14 28v-5h4v5M9 9V5h14v4"/></svg></span></div><div><div class="cell-name">Базы отдыха и отели</div><div class="cell-sub">Газоснабжение парк-отеля</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
+      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" data-category="spa" onclick="selectObject('spa', this)"><div class="cell-top"><div class="cell-index">03 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 21c4-3 7-3 11 0s7 3 11 0M5 27c4-3 7-3 11 0s7 3 11 0M11 16c-3-3 3-5 0-9m10 9c-3-3 3-5 0-9"/></svg></span></div><div><div class="cell-name">SPA-комплексы</div><div class="cell-sub">Отопление, бассейн и горячая вода</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
+      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" data-category="production" onclick="selectObject('production', this)"><div class="cell-top"><div class="cell-index">04 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 28V14l9 5v-5l9 5v9M21 28V6h6v22M2 28h28M7 24h3m5 0h3M23 10h4"/></svg></span></div><div><div class="cell-name">Предприятия</div><div class="cell-sub">Котельная и тепловой пункт</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
+      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" data-category="restaurant" onclick="selectObject('restaurant', this)"><div class="cell-top"><div class="cell-index">05 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 26h24M7 22h18M9 18c0-5 3-9 7-9s7 4 7 9M16 9V6M5 26v3m22-3v3"/></svg></span></div><div><div class="cell-name">Рестораны</div><div class="cell-sub">Тёплый пол для коктейль-бара</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
+      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" data-category="agro" onclick="selectObject('agro', this)"><div class="cell-top"><div class="cell-index">06 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M16 29V5m0 7-5-4m5 10-6-4m6 10-6-4m6-8 5-4m-5 10 6-4m-6 10 6-4M8 28h16"/></svg></span></div><div><div class="cell-name">Аграрные объекты</div><div class="cell-sub">Газ для зерносушильного комплекса</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
+      <div class="matrix-cell" role="button" tabindex="0" aria-pressed="false" data-category="seasonal" onclick="selectObject('seasonal', this)"><div class="cell-top"><div class="cell-index">07 / 07</div><span class="cell-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M16 3v26M3 16h26M7 7l18 18m0-18L7 25M12 6l4 4 4-4M12 26l4-4 4 4"/></svg></span></div><div><div class="cell-name">Сезонные объекты</div><div class="cell-sub">Снеготаяние во дворе гостиницы</div></div><span class="cell-arrow" aria-hidden="true">↗</span></div>
     </div>
 
     <div class="detail-view" id="detailDrawer">
@@ -1095,7 +1101,7 @@ body {
       </div>
       <div class="dv-gallery" role="group" aria-label="Фотографии выбранного объекта">
         <div class="dv-visual-wrap">
-          <a class="dv-visual-link" id="dvImageLink" href="assets/portfolio/home-boiler-itp-05.webp" data-lightbox data-lightbox-src="assets/portfolio/home-boiler-itp-05-lightbox.webp" data-lightbox-photos="5,1,2,3,6" target="_blank" rel="noopener" aria-label="Открыть выбранную фотографию крупнее"><img src="assets/portfolio/home-boiler-itp-05-mobile.webp" alt="Частный жилой дом в Громово: котельная и тепловой пункт, фото 1 из 5" class="dv-visual-img" id="dvImg" loading="eager" fetchpriority="low" decoding="async" width="1000" height="462"></a>
+          <a class="dv-visual-link" id="dvImageLink" href="assets/portfolio/home-boiler-itp-05.webp" data-lightbox data-lightbox-src="assets/portfolio/home-boiler-itp-05-lightbox.webp" data-lightbox-photos="[{&quot;src&quot;:&quot;assets/portfolio/home-boiler-itp-05.webp&quot;,&quot;alt&quot;:&quot;Котельная и тепловой пункт частного жилого комплекса&quot;,&quot;width&quot;:1280,&quot;height&quot;:591},{&quot;src&quot;:&quot;assets/portfolio/home-boiler-itp-01.webp&quot;,&quot;alt&quot;:&quot;Котельная и тепловой пункт жилого комплекса: фотография 2 из 5&quot;,&quot;width&quot;:1800,&quot;height&quot;:1769},{&quot;src&quot;:&quot;assets/portfolio/home-boiler-itp-02.webp&quot;,&quot;alt&quot;:&quot;Котельная и тепловой пункт жилого комплекса: фотография 3 из 5&quot;,&quot;width&quot;:960,&quot;height&quot;:1280},{&quot;src&quot;:&quot;assets/portfolio/home-boiler-itp-03.webp&quot;,&quot;alt&quot;:&quot;Котельная и тепловой пункт жилого комплекса: фотография 4 из 5&quot;,&quot;width&quot;:1280,&quot;height&quot;:960},{&quot;src&quot;:&quot;assets/portfolio/home-boiler-itp-06.webp&quot;,&quot;alt&quot;:&quot;Котельная и тепловой пункт жилого комплекса: фотография 5 из 5&quot;,&quot;width&quot;:1280,&quot;height&quot;:591}]" target="_blank" rel="noopener" aria-label="Открыть выбранную фотографию крупнее"><picture><source media="(min-width: 1101px)" srcset="assets/portfolio/home-boiler-itp-05-view.webp"><source media="(min-width: 601px)" srcset="assets/portfolio/home-boiler-itp-05-tablet.webp"><img src="assets/portfolio/home-boiler-itp-05-mobile.webp" alt="Частный жилой дом в Громово: котельная и тепловой пункт, фото 1 из 5" class="dv-visual-img" id="dvImg" loading="eager" fetchpriority="low" decoding="async" width="1000" height="462"></picture></a>
           <button type="button" class="dv-gallery-arrow dv-gallery-prev photo-gallery-arrow photo-gallery-arrow--prev" onclick="changePhoto(-1)" onpointerenter="prefetchAdjacentPhoto(-1)" aria-label="Предыдущее фото"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 4 7 12l8 8"/></svg></button>
           <button type="button" class="dv-gallery-arrow dv-gallery-next photo-gallery-arrow photo-gallery-arrow--next" onclick="changePhoto(1)" onpointerenter="prefetchAdjacentPhoto(1)" aria-label="Следующее фото"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 4 8 8-8 8"/></svg></button>
           <span class="dv-gallery-status" id="dvGalleryStatus" role="status" aria-live="polite" hidden></span>
@@ -1189,7 +1195,7 @@ body {
       </div>
       <div class="service-detail-facts">
         <div><small>Объём</small><strong>По заявке</strong></div>
-        <div><small>Цена газа</small><strong>50 ₽/л</strong></div>
+        <div><small>Цена газа</small><strong data-gas-price>50 ₽/л</strong></div>
         <div><small>Дата</small><strong>По согласованию</strong></div>
         <div><small>Поставка</small><strong>Наполнение резервуара</strong></div>
       </div>
@@ -1202,16 +1208,16 @@ body {
     <p class="sec-desc">Фотографии и состав выполненных работ: газоснабжение парк-отеля, котельная SPA-комплекса и отопление производства.</p>
 
     <div class="case-triad">
-      <article class="case-box">
-        <div class="case-img-wrap"><a href="assets/portfolio/residential-gasification-01.webp" data-lightbox data-lightbox-src="assets/portfolio/residential-gasification-01-lightbox.webp" data-lightbox-photos="1,2,3,4,5"><img src="assets/portfolio/residential-gasification-01-mobile.webp" alt="Работы по газоснабжению парк-отеля в Карелии" loading="lazy" decoding="async" width="800" height="600"></a></div>
+      <article class="case-box" data-project-id="park-hotel">
+        <div class="case-img-wrap"><a href="assets/portfolio/residential-gasification-01.webp" data-lightbox data-lightbox-src="assets/portfolio/residential-gasification-01-lightbox.webp" data-lightbox-photos="[{&quot;src&quot;:&quot;assets/portfolio/residential-gasification-01.webp&quot;,&quot;alt&quot;:&quot;Работы по газоснабжению парк-отеля в Карелии&quot;,&quot;width&quot;:1800,&quot;height&quot;:1350},{&quot;src&quot;:&quot;assets/portfolio/residential-gasification-02.webp&quot;,&quot;alt&quot;:&quot;Газоснабжение парк-отеля: фотография 2 из 5&quot;,&quot;width&quot;:1800,&quot;height&quot;:1350},{&quot;src&quot;:&quot;assets/portfolio/residential-gasification-03.webp&quot;,&quot;alt&quot;:&quot;Газоснабжение парк-отеля: фотография 3 из 5&quot;,&quot;width&quot;:1350,&quot;height&quot;:1800},{&quot;src&quot;:&quot;assets/portfolio/residential-gasification-04.webp&quot;,&quot;alt&quot;:&quot;Газоснабжение парк-отеля: фотография 4 из 5&quot;,&quot;width&quot;:1800,&quot;height&quot;:1350},{&quot;src&quot;:&quot;assets/portfolio/residential-gasification-05.webp&quot;,&quot;alt&quot;:&quot;Газоснабжение парк-отеля: фотография 5 из 5&quot;,&quot;width&quot;:1350,&quot;height&quot;:1800}]"><picture><source media="(min-width: 1101px)" srcset="assets/portfolio/residential-gasification-01-view.webp"><source media="(min-width: 601px)" srcset="assets/portfolio/residential-gasification-01-tablet.webp"><img src="assets/portfolio/residential-gasification-01-mobile.webp" alt="Работы по газоснабжению парк-отеля в Карелии" loading="lazy" decoding="async" width="800" height="600"></picture></a></div>
         <div class="case-body"><div class="case-kicker">Республика Карелия, деревня Ляскеля</div><h3><a href="portfolio.html#park-hotel">Газификация парк-отеля в Карелии</a></h3><p>Монтаж двух подземных резервуаров для хранения сжиженного газа, изготовление и монтаж испарительной установки СУГ, прокладка газопроводов до потребителя.</p><div class="case-params">Производительность испарительной установки — 100 кг/ч</div></div>
       </article>
-      <article class="case-box">
-        <div class="case-img-wrap"><a href="assets/portfolio/spa-boiler-05.webp" data-lightbox data-lightbox-src="assets/portfolio/spa-boiler-05-lightbox.webp" data-lightbox-photos="1,2,3,4,5"><img src="assets/portfolio/spa-boiler-05-mobile.webp" alt="Котельная SPA-комплекса Баня Кело" loading="lazy" decoding="async" width="800" height="1067"></a></div>
+      <article class="case-box" data-project-id="spa">
+        <div class="case-img-wrap"><a href="assets/portfolio/spa-boiler-05.webp" data-lightbox data-lightbox-src="assets/portfolio/spa-boiler-05-lightbox.webp" data-lightbox-photos="[{&quot;src&quot;:&quot;assets/portfolio/spa-boiler-01.webp&quot;,&quot;alt&quot;:&quot;Котельная для SPA-комплекса «Баня Кело»: фотография 1 из 5&quot;,&quot;width&quot;:1350,&quot;height&quot;:1800},{&quot;src&quot;:&quot;assets/portfolio/spa-boiler-02.webp&quot;,&quot;alt&quot;:&quot;Котельная для SPA-комплекса «Баня Кело»: фотография 2 из 5&quot;,&quot;width&quot;:1350,&quot;height&quot;:1800},{&quot;src&quot;:&quot;assets/portfolio/spa-boiler-03.webp&quot;,&quot;alt&quot;:&quot;Котельная для SPA-комплекса «Баня Кело»: фотография 3 из 5&quot;,&quot;width&quot;:1350,&quot;height&quot;:1800},{&quot;src&quot;:&quot;assets/portfolio/spa-boiler-04.webp&quot;,&quot;alt&quot;:&quot;Котельная для SPA-комплекса «Баня Кело»: фотография 4 из 5&quot;,&quot;width&quot;:1350,&quot;height&quot;:1800},{&quot;src&quot;:&quot;assets/portfolio/spa-boiler-05.webp&quot;,&quot;alt&quot;:&quot;Котельная SPA-комплекса Баня Кело&quot;,&quot;width&quot;:1350,&quot;height&quot;:1800}]"><picture><source media="(min-width: 1101px)" srcset="assets/portfolio/spa-boiler-05-view.webp"><source media="(min-width: 601px)" srcset="assets/portfolio/spa-boiler-05-tablet.webp"><img src="assets/portfolio/spa-boiler-05-mobile.webp" alt="Котельная SPA-комплекса Баня Кело" loading="lazy" decoding="async" width="800" height="1067"></picture></a></div>
         <div class="case-body"><div class="case-kicker">Ленинградская область, деревня Новосаратовка</div><h3><a href="portfolio.html#spa">Котельная для СПА-комплекса «Баня Кело»</a></h3><p>Котельное оборудование DeDietrich AMC PRO, теплообменник для контура снеготаяния, бойлер Gekon XL и тепловой пункт с несколькими контурами отопления.</p><div class="case-params">Мощность котельного оборудования — 260 кВт</div></div>
       </article>
-      <article class="case-box">
-        <div class="case-img-wrap"><a href="assets/portfolio/industrial-boiler-03.webp" data-lightbox data-lightbox-src="assets/portfolio/industrial-boiler-03-lightbox.webp" data-lightbox-photos="1,2,3,4,5"><img src="assets/portfolio/industrial-boiler-03-mobile.webp" alt="Котельная производственного комплекса в Санкт-Петербурге" loading="lazy" decoding="async" width="800" height="1067"></a></div>
+      <article class="case-box" data-project-id="production">
+        <div class="case-img-wrap"><a href="assets/portfolio/industrial-boiler-03.webp" data-lightbox data-lightbox-src="assets/portfolio/industrial-boiler-03-lightbox.webp" data-lightbox-photos="[{&quot;src&quot;:&quot;assets/portfolio/industrial-boiler-01.webp&quot;,&quot;alt&quot;:&quot;Котельная для производственного комплекса: фотография 1 из 5&quot;,&quot;width&quot;:1800,&quot;height&quot;:1350},{&quot;src&quot;:&quot;assets/portfolio/industrial-boiler-02.webp&quot;,&quot;alt&quot;:&quot;Котельная для производственного комплекса: фотография 2 из 5&quot;,&quot;width&quot;:1350,&quot;height&quot;:1800},{&quot;src&quot;:&quot;assets/portfolio/industrial-boiler-03.webp&quot;,&quot;alt&quot;:&quot;Котельная производственного комплекса&quot;,&quot;width&quot;:1350,&quot;height&quot;:1800},{&quot;src&quot;:&quot;assets/portfolio/industrial-boiler-04.webp&quot;,&quot;alt&quot;:&quot;Котельная для производственного комплекса: фотография 4 из 5&quot;,&quot;width&quot;:1800,&quot;height&quot;:1350},{&quot;src&quot;:&quot;assets/portfolio/industrial-boiler-05.webp&quot;,&quot;alt&quot;:&quot;Котельная для производственного комплекса: фотография 5 из 5&quot;,&quot;width&quot;:1350,&quot;height&quot;:1800}]"><picture><source media="(min-width: 1101px)" srcset="assets/portfolio/industrial-boiler-03-view.webp"><source media="(min-width: 601px)" srcset="assets/portfolio/industrial-boiler-03-tablet.webp"><img src="assets/portfolio/industrial-boiler-03-mobile.webp" alt="Котельная производственного комплекса в Санкт-Петербурге" loading="lazy" decoding="async" width="800" height="1067"></picture></a></div>
         <div class="case-body"><div class="case-kicker">Санкт-Петербург, Волго-Донский проспект</div><h3><a href="portfolio.html#production">Котельная для производственного комплекса</a></h3><p>Котельное оборудование DeDietrich AMC PRO, тепловой пункт с несколькими контурами отопления и щит управления котельной на основе контроллера My Heat.</p><div class="case-params">Мощность котельного оборудования — 180 кВт</div></div>
       </article>
     </div>
@@ -1302,6 +1308,7 @@ body {
 
 
 <script src="assets/photo-loader.js"></script>
+<script src="assets/site-content.js"></script>
 <script>
 // Dynamic Typewriter
 const words = ["частных домов", "загородных отелей", "SPA-комплексов", "производственных цехов", "тепличных комплексов"];
@@ -1352,88 +1359,7 @@ document.addEventListener('keydown', event => {
   toggle.focus();
 });
 
-// Real projects for the seven object categories.
-const projectData = {
-  park: {
-    title: "Газификация парк-отеля в Карелии",
-    desc: "Новое строительство: парк-отель для загородного отдыха.",
-    tags: ["Два подземных резервуара", "Испарительная установка СУГ", "Поставка газа и обслуживание"],
-    task: "Газифицировать ресторан, жилые дома и административные посёлки. Обеспечить поставки сжиженного газа и взять объект на обслуживание.",
-    work: "Монтаж двух подземных резервуаров для хранения сжиженного газа объёмом 24 000 литров. Изготовление и монтаж испарительной установки СУГ производительностью 100 кг/ч. Прокладка подземных и наружных участков газопроводов до потребителя. Сдача объекта в эксплуатацию. Поставка сжиженного газа и обслуживание.",
-    photoPrefix: "residential-gasification", photos: [1, 2, 3, 4, 5], startPhoto: 1,
-    loc: "Республика Карелия, деревня Ляскеля",
-    anchor: "park-hotel"
-  },
-  spa: {
-    title: "Котельная для СПА-комплекса «Баня Кело»",
-    desc: "Новое строительство: СПА-комплекс «Баня Кело».",
-    tags: ["DeDietrich AMC PRO · 260 кВт", "Gekon XL", "My Heat"],
-    task: "Обеспечить теплоснабжение СПА-комплекса, подогрев уличного бассейна и системы снеготаяния вокруг него, приготовление большого объёма горячей воды и отдельный температурный режим в массажном кабинете. Вывести управление и диспетчеризацию на телефон. Взять котельную на обслуживание.",
-    work: "Котельное оборудование DeDietrich AMC PRO мощностью 260 кВт. Установка теплообменника для отделения контура снеготаяния от основной системы отопления. Установка бойлера с теплообменником высокой производительности Gekon XL. Монтаж теплового пункта с несколькими контурами отопления. Сборка щита управления котельной на основе контроллера My Heat. Заключение договора на сервисное обслуживание.",
-    photoPrefix: "spa-boiler", photos: [1, 2, 3, 4, 5], startPhoto: 5,
-    loc: "Ленинградская область, деревня Новосаратовка",
-    anchor: "spa"
-  },
-  production: {
-    title: "Котельная для производственного комплекса",
-    desc: "Новое строительство: производственный комплекс.",
-    tags: ["DeDietrich AMC PRO · 180 кВт", "Тепловой пункт", "My Heat"],
-    task: "Обеспечить теплом производственный комплекс с радиаторной и воздушной системами отопления, нагрев приточной вентиляции и удалённое управление котельной.",
-    work: "Котельное оборудование DeDietrich AMC PRO мощностью 180 кВт. Монтаж теплового пункта с несколькими контурами отопления. Сборка щита управления котельной на основе контроллера My Heat. Заключение договора на сервисное обслуживание.",
-    photoPrefix: "industrial-boiler", photos: [1, 2, 3, 4, 5], startPhoto: 3,
-    loc: "Санкт-Петербург, Волго-Донский проспект",
-    anchor: "production"
-  },
-  home: {
-    title: "Котельная и ИТП частного жилого дома",
-    desc: "Новое строительство: частный жилой дом.",
-    tags: ["Подземные резервуары · 20 м³", "Теплотрасса Usystems", "My Heat"],
-    task: "Обеспечить теплоснабжение комплекса жилых зданий от сжиженного газа. Проложить теплотрассу к основному дому. Обеспечить удалённое управление котельной и ИТП с телефона. Взять объект на обслуживание.",
-    work: "Газификация сжиженным газом: подземные резервуары объёмом 20 м³. Котельное оборудование DeDietrich AMC PRO мощностью 180 кВт. Резервный источник тепла — электрические котлы Baxi Ampera 90 кВт. Прокладка теплотрассы Usystems от котельной к ИТП жилого дома. Сборка теплового пункта с несколькими отдельными контурами отопления. Сборка щита управления котельной на основе контроллера My Heat. Заключение договора на сервисное обслуживание.",
-    photoPrefix: "home-boiler-itp", photos: [5, 1, 2, 3, 6], startPhoto: 1,
-    loc: "Ленинградская область, деревня Громово",
-    anchor: "home"
-  },
-  hotel: {
-    title: "Система снеготаяния во дворе гостиницы",
-    desc: "Реконструкция здания под гостиничный комплекс.",
-    tags: ["Внутренний двор · 150 м²", "Трубопроводы с антифризом", "Автоматика управления"],
-    task: "Обеспечить отсутствие снега и влаги во внутреннем дворе гостиницы площадью 150 м².",
-    work: "Прокладка трубопроводов с антифризом в плите внутреннего двора для нагрева поверхности. Установка теплообменника для отделения контура с антифризом от системы отопления. Установка автоматики управления нагревом.",
-    photoPrefix: "hotel-snowmelt", photos: [4, 6, 3, 2], startPhoto: 1,
-    loc: "Санкт-Петербург, Дворцовая набережная",
-    anchor: "hotel"
-  },
-  bar: {
-    title: "Напольное отопление для бара",
-    desc: "Реконструкция помещения под размещение бара.",
-    tags: ["Напольное отопление", "Теплоизолированные плиты", "Коллекторы"],
-    task: "Смонтировать напольное отопление в помещении бара, расположенного в цоколе здания 1815 года постройки.",
-    work: "Подготовка основания для размещения теплоизолированных плит. Укладка теплоизолированных плит для размещения трубопроводов напольного отопления. Размещение коллекторов системы напольного отопления. Укладка трубопроводов и опрессовка системы, сдача под заливку.",
-    photoPrefix: "cocktail-bar-floor", photos: [4, 3, 5, 6, 7], startPhoto: 1,
-    loc: "Санкт-Петербург, Дворцовая набережная",
-    anchor: "bar"
-  },
-  grain: {
-    title: "Поставки газа для зерносушильного комплекса",
-    desc: "Производственный комплекс по сушке зерновых культур.",
-    tags: ["Расчёт количества газа", "График поставок и оплат", "Резерв газа в хранилище"],
-    task: "Обеспечить гарантированные поставки газа для сушки зерна.",
-    work: "Расчёт необходимого количества газа и согласование графика поставок и оплат. Резервирование необходимого количества газа в хранилище. Поставки газа согласно графику.",
-    photoPrefix: "grain-dryer", photos: [1, 2, 3], startPhoto: 1,
-    loc: "Ленинградская область, город Луга",
-    anchor: "grain"
-  }
-};
-const objectData = {
-  house: projectData.home,
-  hotel: projectData.park,
-  spa: projectData.spa,
-  production: projectData.production,
-  restaurant: projectData.bar,
-  agro: projectData.grain,
-  seasonal: projectData.hotel
-};
+const objectData = Object.create(null);
 
 let activeProject;
 let activePhotoIndex = 0;
@@ -1478,7 +1404,8 @@ galleryThumbs.addEventListener('pointerleave', cancelHoverPhoto);
 
 
 function photoSrc(project, index, variant = '') {
-  return `assets/portfolio/${project.photoPrefix}-${String(project.photos[index]).padStart(2, '0')}${variant ? `-${variant}` : ''}.webp`;
+  const src = project.photos[index].src;
+  return variant ? window.RemgazPhotos.source(src, variant) : src;
 }
 
 function setGalleryStatus(message) {
@@ -1491,12 +1418,12 @@ function commitPhoto(project, index, src, message = '') {
   const image = document.getElementById('dvImg');
   image.onerror = null;
   image.hidden = false;
-  if (image.getAttribute('src') !== src) image.src = src;
-  image.alt = `${project.title}, фото ${index + 1} из ${project.photos.length}`;
+  if (image.currentSrc !== new URL(src, document.baseURI).href && image.getAttribute('src') !== src) window.RemgazPhotos.display(image, src);
+  image.alt = project.photos[index].alt || `${project.title}, фото ${index + 1} из ${project.photos.length}`;
   const imageLink = document.getElementById('dvImageLink');
   imageLink.href = photoSrc(project, index);
   imageLink.dataset.lightboxSrc = window.RemgazPhotos.source(photoSrc(project, index), 'large');
-  imageLink.dataset.lightboxPhotos = project.photos.join(',');
+  imageLink.dataset.lightboxPhotos = JSON.stringify(project.photos);
   document.getElementById('dvLocation').textContent = project.loc;
   document.getElementById('dvGalleryCount').textContent = `Фото ${index + 1} из ${project.photos.length}`;
   document.querySelectorAll('.dv-gallery-thumb').forEach((thumb, i) => {
@@ -1506,13 +1433,16 @@ function commitPhoto(project, index, src, message = '') {
   displayedProject = project;
   displayedPhotoIndex = index;
   setGalleryStatus(message);
-  if (galleryVisible && activeProject === project && activePhotoIndex === index) {
-    const neighbors = [-1, 1].map(step => (index + step + project.photos.length) % project.photos.length);
-    window.RemgazPhotos.prefetch([...new Set(neighbors)].map(next => window.RemgazPhotos.source(photoSrc(project, next))));
-  }
+}
+
+function warmPhotoNeighbors(project, index) {
+  if (!galleryVisible || activeProject !== project || activePhotoIndex !== index) return;
+  const neighbors = [-1, 1].map(step => (index + step + project.photos.length) % project.photos.length);
+  window.RemgazPhotos.prefetch([...new Set(neighbors)].map(next => window.RemgazPhotos.source(photoSrc(project, next))));
 }
 
 function showPhoto(index) {
+  if (!activeProject || !activeProject.photos[index]) return;
   activePhotoIndex = index;
   const project = activeProject;
   const request = ++imageRequestId;
@@ -1523,7 +1453,7 @@ function showPhoto(index) {
   const current = () => request === imageRequestId;
 
   // Keep the already painted first photo while the gallery is below the viewport.
-  if (!displayedProject && !galleryVisible && image.getAttribute('src') === photoSrc(project, index, 'mobile')) {
+  if (!displayedProject && !galleryVisible && new URL(image.getAttribute('src'), document.baseURI).href === photoSrc(project, index, 'mobile')) {
     commitPhoto(project, index, image.getAttribute('src'));
     image.onerror = () => {
       if (!current()) return;
@@ -1539,8 +1469,28 @@ function showPhoto(index) {
     return;
   }
 
-  if (displayedProject === project && displayedPhotoIndex === index && image.getAttribute('src') === view && image.complete && image.naturalWidth) {
-    commitPhoto(project, index, view);
+  if (displayedProject === project && displayedPhotoIndex === index && image.currentSrc === new URL(view, document.baseURI).href) {
+    if (image.complete && image.naturalWidth) {
+      commitPhoto(project, index, view);
+      warmPhotoNeighbors(project, index);
+    } else if (!image.complete) {
+      image.onerror = null;
+      image.addEventListener('load', () => {
+        if (!current()) return;
+        commitPhoto(project, index, view);
+        warmPhotoNeighbors(project, index);
+      }, { once: true });
+      image.addEventListener('error', () => {
+        if (!current()) return;
+        warmPhotoNeighbors(project, index);
+        setGalleryStatus('Чёткое фото недоступно: загружается миниатюра…');
+        window.RemgazPhotos.load(thumbnail, 'high').then(() => {
+          if (current()) commitPhoto(project, index, thumbnail, 'Чёткое фото недоступно: показана уменьшенная версия.');
+        }).catch(() => {
+          if (current()) setGalleryStatus('Не удалось загрузить фото. Попробуйте выбрать другое.');
+        });
+      }, { once: true });
+    } else warmPhotoNeighbors(project, index);
     return;
   }
 
@@ -1570,9 +1520,11 @@ function showPhoto(index) {
     if (!current()) return;
     sharpShown = true;
     commitPhoto(project, index, view);
+    warmPhotoNeighbors(project, index);
   }).catch(() => {
     if (!current()) return;
     sharpFailed = true;
+    warmPhotoNeighbors(project, index);
     setGalleryStatus(previewShown ? 'Чёткое фото недоступно: показана уменьшенная версия.' : thumbnailFailed ? 'Не удалось загрузить фото. Попробуйте выбрать другое.' : 'Чёткое фото недоступно: загружается миниатюра…');
   });
 }
@@ -1584,6 +1536,7 @@ function prefetchAdjacentPhoto(step) {
 }
 
 function changePhoto(step) {
+  if (!activeProject) return;
   cancelHoverPhoto();
   showPhoto((activePhotoIndex + step + activeProject.photos.length) % activeProject.photos.length);
 }
@@ -1596,7 +1549,8 @@ function renderGallery(project) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'dv-gallery-thumb';
-    button.setAttribute('aria-label', `Фото ${i + 1} из ${project.photos.length}`);
+    button.dataset.photoSrc = project.photos[i].src;
+    button.setAttribute('aria-label', project.photos[i].alt || `Фото ${i + 1} из ${project.photos.length}`);
     button.addEventListener('click', () => {
       cancelHoverPhoto();
       showPhoto(i);
@@ -1604,14 +1558,14 @@ function renderGallery(project) {
     const image = document.createElement('img');
     if (galleryVisible) image.src = photoSrc(project, i, 'thumb');
     else image.dataset.src = photoSrc(project, i, 'thumb');
-    image.alt = '';
+    image.alt = project.photos[i].alt;
     image.loading = 'lazy';
     image.decoding = 'async';
     button.appendChild(image);
     thumbs.appendChild(button);
   }
   document.getElementById('dvGalleryThumbs').replaceChildren(thumbs);
-  showPhoto(project.startPhoto - 1);
+  showPhoto(Math.max(0, project.photos.findIndex(photo => photo.src === project.coverPhoto)));
 }
 
 function selectObject(key, cell) {
@@ -1630,7 +1584,7 @@ function selectObject(key, cell) {
   document.getElementById('dvTask').textContent = d.task;
   document.getElementById('dvWork').textContent = d.work;
   renderGallery(d);
-  document.getElementById('dvCaseLink').href = `portfolio.html#${d.anchor}`;
+  document.getElementById('dvCaseLink').href = `portfolio.html#${d.id}`;
 
   const tagsContainer = document.getElementById('dvTags');
   tagsContainer.replaceChildren();
@@ -1642,7 +1596,23 @@ function selectObject(key, cell) {
   });
 }
 
-selectObject('house', document.querySelector('.matrix-cell.active'));
+window.RemgazContent.ready.then(content => {
+  if (!content) return;
+  content.projects.forEach(project => {
+    if (project.categoryKey) objectData[project.categoryKey] = project;
+  });
+  const cells = Array.from(document.querySelectorAll('.matrix-cell[data-category]'));
+  cells.forEach(cell => {
+    const project = objectData[cell.dataset.category];
+    cell.setAttribute('aria-disabled', String(!project));
+    cell.tabIndex = project ? 0 : -1;
+    if (project) cell.querySelector('.cell-sub').textContent = project.categorySummary || project.desc;
+  });
+  const selected = cells.find(cell => cell.classList.contains('active') && objectData[cell.dataset.category])
+    || cells.find(cell => objectData[cell.dataset.category]);
+  document.getElementById('detailDrawer').hidden = !selected;
+  if (selected) selectObject(selected.dataset.category, selected);
+});
 document.querySelector('.object-matrix').addEventListener('keydown', event => {
   if ((event.key === 'Enter' || event.key === ' ') && event.target.classList.contains('matrix-cell')) {
     event.preventDefault();

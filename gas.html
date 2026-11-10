@@ -3,9 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="remgaz-content-api" content="/api/content">
 <meta name="description" content="Доставка сжиженного газа для частных домов и предприятий в Санкт-Петербурге и СЗФО. Запросите расчёт стоимости с учётом объёма, адреса и условий подъезда.">
 <title>Доставка сжиженного газа — РемГазСервис</title>
 <link rel="stylesheet" href="assets/fonts.css">
+<link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 :root {
   --blue-primary: #004D99; --blue-deep: #082142; --blue-dark: #05152B;
@@ -191,14 +194,14 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
         <p class="hero-note">Санкт-Петербург и Северо-Западный федеральный округ</p>
       </div>
       <figure class="hero-photo">
-        <div class="hero-photo-frame"><img id="gasHeroImg" src="assets/gas-delivery-truck-mobile.webp" alt="Фотография доставки сжиженного газа, кадр 1 из 3" width="960" height="720" fetchpriority="high" decoding="async"><div class="hero-photo-aside"><p class="hero-photo-index" id="gasPhotoAsideIndex" aria-hidden="true">ФОТО / 01</p><p>Кадры доставки сжиженного газа</p><a href="#contact">Запросить расчёт ↗</a></div></div>
+        <div class="hero-photo-frame"><picture><source media="(min-width: 1101px)" srcset="assets/gas-delivery-truck-view.webp"><source media="(min-width: 601px)" srcset="assets/gas-delivery-truck-tablet.webp"><img id="gasHeroImg" src="assets/gas-delivery-truck-mobile.webp" alt="Фотография доставки сжиженного газа, кадр 1 из 3" width="960" height="720" fetchpriority="high" decoding="async"></picture><div class="hero-photo-aside"><p class="hero-photo-index" id="gasPhotoAsideIndex" aria-hidden="true">ФОТО / 01</p><p>Кадры доставки сжиженного газа</p><a href="#contact">Запросить расчёт ↗</a></div></div>
         <figcaption><span id="gasPhotoCount" aria-live="polite">Фото 1 из 3 · Доставка сжиженного газа</span><span id="gasPhotoNumber">01 / 03</span></figcaption>
         <div class="hero-photo-thumbs" role="group" aria-label="Выбрать фотографию доставки"><button type="button" aria-label="Показать фото 1 из 3" aria-current="true" data-photo="0"><img src="assets/gas-delivery-truck-thumb.webp" alt="" width="192" height="144"></button><button type="button" aria-label="Показать фото 2 из 3" data-photo="1"><img src="assets/gas-delivery-02-thumb.webp" alt="" width="144" height="192"></button><button type="button" aria-label="Показать фото 3 из 3" data-photo="2"><img src="assets/gas-delivery-03-thumb.webp" alt="" width="93" height="192"></button></div>
       </figure>
     </section>
     <section class="section price-section" id="price" aria-labelledby="price-title">
       <div class="price-layout">
-        <div class="price-heading"><p class="section-kicker">Сжиженный газ</p><h2 id="price-title">50 <span>₽/л</span></h2><p>Цена газа указана за литр. Условия и итоговую стоимость поставки согласуем по заявке.</p></div>
+        <div class="price-heading"><p class="section-kicker">Сжиженный газ</p><h2 id="price-title" data-gas-price="number">50 <span>₽/л</span></h2><p>Цена газа указана за литр. Условия и итоговую стоимость поставки согласуем по заявке.</p></div>
         <div class="price-details"><strong>Что нужно для расчёта</strong><p>Укажите ориентировочный объём газа, адрес объекта и условия подъезда к резервуару. По этим данным можно обсудить полную стоимость поставки и подходящую дату доставки.</p><ul class="price-factors"><li>Объём СУГ</li><li>Адрес доставки</li><li>Подъезд к резервуару</li></ul><a class="btn-primary" href="#contact">Оставить данные для расчёта ↗</a></div>
       </div>
     </section>
@@ -233,6 +236,7 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
   <div class="mobile-sticky-bar"><a href="tel:+78123855353">Позвонить</a><a href="#contact">Запросить расчёт</a></div>
 </div>
 <script src="assets/photo-loader.js"></script>
+<script src="assets/site-content.js"></script>
 <script>
 (() => {
   const photos = [
@@ -295,7 +299,7 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
     let settled = false;
     const showPreview = () => {
       if (request !== requestId || settled || preview || !thumb.naturalWidth) return;
-      picture.src = thumb.currentSrc || thumb.src;
+      loader.display(picture, thumb.currentSrc || thumb.src);
       picture.width = thumb.naturalWidth;
       picture.height = thumb.naturalHeight;
       picture.alt = `Фотография доставки сжиженного газа, кадр ${nextIndex + 1} из ${photos.length}`;
@@ -305,7 +309,6 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
     if (thumb.complete && thumb.naturalWidth) showPreview();
     else thumb.addEventListener('load', showPreview, { once: true });
     showStatus(`Загружаем фотографию ${nextIndex + 1} из ${photos.length}…`);
-    warmNeighbors(nextIndex);
     const fail = () => {
       if (request !== requestId) return;
       ++requestId;
@@ -318,20 +321,32 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
       showStatus(preview
         ? `Чёткое фото ${nextIndex + 1} не загрузилось — показан предпросмотр.`
         : `Фото ${nextIndex + 1} не загрузилось. Выберите другое или попробуйте ещё раз.`);
+      warmNeighbors(selected);
     };
     timeout = setTimeout(fail, 20000);
     loader.load(loader.source(photos[nextIndex][0]), 'high').then(loaded => {
       if (request !== requestId) return;
       settled = true;
       clearTimeout(timeout);
-      picture.src = loaded.src;
+      loader.display(picture, loaded.src);
       picture.width = loaded.naturalWidth;
       picture.height = loaded.naturalHeight;
       picture.alt = `Фотография доставки сжиженного газа, кадр ${nextIndex + 1} из ${photos.length}`;
       displayed = nextIndex;
       showStatus('');
+      warmNeighbors(nextIndex);
     }).catch(fail);
   }
+
+  picture.addEventListener('load', () => {
+    if (!requestId) warmNeighbors(selected);
+  });
+  picture.addEventListener('error', () => {
+    if (!requestId) {
+      showStatus('Не удалось загрузить фото доставки.');
+      warmNeighbors(selected);
+    }
+  });
 
   const watch = new IntersectionObserver(entries => {
     near = entries[0].isIntersecting;
@@ -339,15 +354,16 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
     const index = selected;
     const request = requestId;
     const source = loader.source(photos[index][0]);
-    if (picture.src !== new URL(source, document.baseURI).href) {
+    if (picture.currentSrc !== new URL(source, document.baseURI).href) {
       loader.load(source, 'high').then(loaded => {
         if (request !== requestId || displayed !== index || !near) return;
-        picture.src = loaded.src;
+        loader.display(picture, loaded.src);
+        warmNeighbors(index);
       }).catch(() => {
         if (!requestId && !picture.naturalWidth) showStatus('Не удалось загрузить фото доставки.');
+        if (request === requestId) warmNeighbors(selected);
       });
-    }
-    warmNeighbors(index);
+    } else if (picture.complete) warmNeighbors(index);
   }, { rootMargin: '450px 0px' });
   watch.observe(frame);
 

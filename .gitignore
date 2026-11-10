@@ -3,3 +3,11 @@
 .wrangler/
 node_modules/
 *.bak_*
+dist/
+.remgaz-build-*/
+artifacts/
+server.env
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+.data/

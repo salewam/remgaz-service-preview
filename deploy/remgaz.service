@@ -1,0 +1,33 @@
+# Build releases outside /opt/remgaz/current; install shared assets before atomic current switch.
+# Restart this service only after the operator has switched current to the new release.
+[Unit]
+Description=Remgaz lead API and static preview
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=remgaz
+Group=remgaz
+WorkingDirectory=/opt/remgaz/current
+EnvironmentFile=/etc/remgaz/server.env
+ExecStart=/usr/bin/node /opt/remgaz/current/server/http.mjs
+StateDirectory=remgaz
+StateDirectoryMode=0700
+UMask=0077
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=35
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target
