@@ -1,6 +1,3 @@
-import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
-
 async function telegramRequest(botToken, method, body, fetchImpl) {
   const controller = new AbortController();
   let timer;
@@ -65,7 +62,7 @@ export async function configureAdminBot({ botToken, origin, fetchImpl = fetch })
   return { username: bot.username, url };
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+if (import.meta.main) {
   configureAdminBot({
     botToken: process.env.TELEGRAM_BOT_TOKEN,
     origin: process.env.PUBLIC_ORIGIN

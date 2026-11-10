@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { mkdtemp, rm, symlink } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { configureAdminBot } from './configure-admin-bot.mjs';
@@ -228,14 +231,27 @@ const cliMock = `
   };
 `;
 
-function runCli(changes = {}, preload = cliMock) {
-  return spawnSync(process.execPath, ['--import', `data:text/javascript,${encodeURIComponent(preload)}`, script], {
+function runCli(changes = {}, preload = cliMock, entry = script) {
+  return spawnSync(process.execPath, ['--import', `data:text/javascript,${encodeURIComponent(preload)}`, entry], {
     env: { ...cliEnvironment, ...changes }, encoding: 'utf8', timeout: 5000
   });
 }
 
 test('direct CLI requires no user or chat id and prints only username and public URL', () => {
   const result = runCli();
+  assert.equal(result.error, undefined);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stderr, '');
+  assert.deepEqual(JSON.parse(result.stdout), { username: bot.username, url });
+  assert.equal(result.stdout.includes(token), false);
+});
+
+test('CLI executes through a release directory symlink and configures the default menu without IDs', async t => {
+  const dir = await mkdtemp(join(tmpdir(), 'remgaz-admin-bot-cli-'));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  const current = join(dir, 'current');
+  await symlink(dirname(dirname(script)), current, 'dir');
+  const result = runCli({}, cliMock, join(current, 'scripts', 'configure-admin-bot.mjs'));
   assert.equal(result.error, undefined);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.stderr, '');

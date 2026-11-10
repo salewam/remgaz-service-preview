@@ -1,12 +1,14 @@
 import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
 import { createHmac } from 'node:crypto';
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { once } from 'node:events';
-import { request } from 'node:http';
+import { createServer, request } from 'node:http';
 import { DatabaseSync } from 'node:sqlite';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { createHttpServer } from './http.mjs';
 import { loadConfig } from './config.mjs';
 
@@ -201,4 +203,63 @@ test('content initialization failures preserve the original error and safely clo
   let closed = 0;
   assert.throws(() => createHttpServer(config, { close() { closed += 1; } }), /Media root must be a dedicated directory/);
   assert.equal(closed, 1);
+});
+
+test('CLI launched through a directory symlink starts the CMS without a lead recipient', async t => {
+  const dir = await mkdtemp(join(tmpdir(), 'remgaz-symlink-cli-'));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  const current = join(dir, 'current');
+  await symlink(fileURLToPath(new URL('../', import.meta.url)), current, 'dir');
+  const reservation = createServer();
+  reservation.listen(0, '127.0.0.1');
+  await once(reservation, 'listening');
+  const port = reservation.address().port;
+  await new Promise(resolve => reservation.close(resolve));
+  const origin = `http://127.0.0.1:${port}`;
+  const child = spawn(process.execPath, [join(current, 'server/http.mjs')], {
+    cwd: dir,
+    env: {
+      PUBLIC_ORIGIN: origin, TELEGRAM_BOT_TOKEN: 'local-cli-test-token',
+      LEAD_IP_HASH_SECRET: 'a'.repeat(32), LEAD_DB_PATH: join(dir, 'leads.sqlite'),
+      CONTENT_DB_PATH: join(dir, 'content.sqlite'), CONTENT_MEDIA_DIR: join(dir, 'media'),
+      HOST: '127.0.0.1', PORT: String(port)
+    },
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  const exited = new Promise(resolve => child.once('exit', (code, signal) => resolve({ code, signal })));
+  let stdout = '';
+  let stderr = '';
+  let startupTimeout;
+  child.stderr.on('data', chunk => { stderr += chunk; });
+  try {
+    await new Promise((resolve, reject) => {
+      startupTimeout = setTimeout(() => reject(new Error(`CLI did not start: ${stderr}`)), 5_000);
+      child.once('error', reject);
+      child.once('exit', code => reject(new Error(`CLI exited before listening (${code}): ${stderr}`)));
+      child.stdout.on('data', chunk => {
+        stdout += chunk;
+        if (stdout.includes(`Listening on 127.0.0.1:${port}`)) resolve();
+      });
+    });
+    clearTimeout(startupTimeout);
+    const health = await fetch(`${origin}/healthz`, { signal: AbortSignal.timeout(2_000) });
+    assert.equal(health.status, 200);
+    assert.deepEqual(await health.json(), { ok: true });
+    const content = await fetch(`${origin}/api/content`, { signal: AbortSignal.timeout(2_000) });
+    assert.equal(content.status, 200);
+    assert.ok((await content.json()).projects.length > 0);
+    assert.equal((await fetch(`${origin}/api/admin/content`, { signal: AbortSignal.timeout(2_000) })).status, 401);
+    assert.equal((await fetch(`${origin}/api/lead`, {
+      method: 'POST', signal: AbortSignal.timeout(2_000)
+    })).status, 503);
+  } finally {
+    clearTimeout(startupTimeout);
+    if (child.pid) {
+      if (child.exitCode === null && child.signalCode === null) child.kill('SIGTERM');
+      const killTimeout = setTimeout(() => child.kill('SIGKILL'), 3_000);
+      try { await exited; }
+      finally { clearTimeout(killTimeout); }
+    }
+  }
+  assert.equal(child.exitCode, 0, stderr);
 });

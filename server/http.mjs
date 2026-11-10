@@ -172,7 +172,7 @@ export function createHttpServer(config, service = config.telegramChatId ? creat
   return server;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (import.meta.main) {
   try {
     const config = loadConfig();
     const server = createHttpServer(config);
