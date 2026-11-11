@@ -2,6 +2,8 @@
   'use strict';
 
   let overlay;
+  let content;
+  let stage;
   let picture;
   let heading;
   let status;
@@ -37,37 +39,51 @@
     style.textContent = `
       .rg-lightbox {
         position: fixed; inset: 0; z-index: 2147483647;
-        box-sizing: border-box; display: flex; align-items: center; justify-content: center;
-        padding: calc(64px + env(safe-area-inset-top)) 16px calc(70px + env(safe-area-inset-bottom));
+        box-sizing: border-box; display: grid; grid-template-rows: minmax(0, 1fr);
+        padding-top: calc(64px + env(safe-area-inset-top)); overflow: hidden;
         background: rgba(9, 13, 18, .96); color: #fff;
         touch-action: pan-y pinch-zoom; overscroll-behavior: contain;
       }
       .rg-lightbox[hidden] { display: none; }
+      .rg-lightbox__content {
+        display: grid; grid-template-rows: minmax(64px, 1fr) max-content;
+        min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+      }
+      .rg-lightbox__stage {
+        position: relative; display: flex; align-items: center; justify-content: center;
+        min-width: 0; min-height: 0; padding: 0 16px; overflow: hidden;
+      }
+      .rg-lightbox__caption {
+        box-sizing: border-box; display: flex; flex-direction: column; justify-content: safe flex-end;
+        min-width: 0; min-height: calc(70px + env(safe-area-inset-bottom)); gap: 6px;
+        padding: 0 max(16px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      }
       .rg-lightbox__image {
         display: block; max-width: 100%; max-height: 100%; width: auto; height: auto;
         object-fit: contain; box-shadow: 0 8px 36px rgba(0, 0, 0, .35);
       }
       .rg-lightbox__close {
         position: absolute; top: calc(10px + env(safe-area-inset-top));
-        right: calc(10px + env(safe-area-inset-right)); z-index: 1;
+        right: calc(10px + env(safe-area-inset-right)); z-index: 2;
         display: grid; place-items: center; width: 52px; height: 52px;
         padding: 0; border: 0; border-radius: 50%; background: #fff; color: #111;
-        font: 36px/1 Arial, sans-serif; cursor: pointer;
+        cursor: pointer;
       }
-      .rg-lightbox--gallery { padding-left: 72px; padding-right: 72px; }
+      .rg-lightbox__close svg {
+        display: block; width: 36px; height: 36px; fill: none; stroke: currentColor; stroke-width: 1.5;
+      }
+      .rg-lightbox--gallery .rg-lightbox__stage { padding-left: 72px; padding-right: 72px; }
       @media (max-width: 600px) {
-        .rg-lightbox--gallery { padding-left: 12px; padding-right: 12px; }
+        .rg-lightbox--gallery .rg-lightbox__stage { padding-left: 12px; padding-right: 12px; }
       }
       .rg-lightbox__close:focus-visible { outline: 3px solid #7dc9ff; outline-offset: 3px; }
       .rg-lightbox__title, .rg-lightbox__status, .rg-lightbox__count {
-        position: absolute; left: 16px; right: 16px; margin: 0;
+        flex: none; min-width: 0; margin: 0; overflow-wrap: anywhere;
         text-align: center; font: 16px/1.4 Arial, sans-serif;
         text-shadow: 0 1px 5px #000;
       }
-      .rg-lightbox__title { bottom: calc(14px + env(safe-area-inset-bottom)); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-      .rg-lightbox__count { bottom: calc(42px + env(safe-area-inset-bottom)); }
+      .rg-lightbox__status:empty { display: none; }
       .rg-lightbox__count[hidden] { display: none; }
-      .rg-lightbox__status { bottom: calc(70px + env(safe-area-inset-bottom)); }
     `;
     document.head.append(style);
 
@@ -78,11 +94,25 @@
     overlay.setAttribute('aria-labelledby', 'rg-lightbox-title');
     overlay.hidden = true;
 
+    content = document.createElement('div');
+    content.className = 'rg-lightbox__content';
+    stage = document.createElement('div');
+    stage.className = 'rg-lightbox__stage';
+    const caption = document.createElement('div');
+    caption.className = 'rg-lightbox__caption';
+
     closeButton = document.createElement('button');
     closeButton.type = 'button';
     closeButton.className = 'rg-lightbox__close';
     closeButton.setAttribute('aria-label', 'Закрыть фотографию');
-    closeButton.textContent = '×';
+    const closeIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    closeIcon.setAttribute('viewBox', '0 0 24 24');
+    closeIcon.setAttribute('aria-hidden', 'true');
+    closeIcon.setAttribute('focusable', 'false');
+    const closePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    closePath.setAttribute('d', 'M6 6 18 18M18 6 6 18');
+    closeIcon.append(closePath);
+    closeButton.append(closeIcon);
     previousButton = document.createElement('button');
     previousButton.type = 'button';
     previousButton.className = 'rg-lightbox__arrow rg-lightbox__prev photo-gallery-arrow photo-gallery-arrow--prev';
@@ -111,7 +141,10 @@
     status.setAttribute('role', 'status');
     status.setAttribute('aria-live', 'polite');
 
-    overlay.append(closeButton, previousButton, nextButton, heading, count, status);
+    stage.append(previousButton, nextButton);
+    caption.append(status, count, heading);
+    content.append(stage, caption);
+    overlay.append(closeButton, content);
     document.body.append(overlay);
     closeButton.addEventListener('click', closeLightbox);
     previousButton.addEventListener('click', () => navigate(-1));
@@ -133,7 +166,7 @@
     }, { passive: true });
     overlay.addEventListener('touchcancel', () => { touchStart = null; });
     overlay.addEventListener('click', (event) => {
-      if (event.target === overlay) closeLightbox();
+      if (event.target === overlay || event.target === content || event.target === stage) closeLightbox();
     });
   }
 
@@ -402,7 +435,7 @@
       image.draggable = false;
       image.src = src;
       if (picture) picture.replaceWith(image);
-      else overlay.insertBefore(image, heading);
+      else stage.prepend(image);
       picture = image;
     }
 
@@ -492,6 +525,7 @@
       lockPage();
       open = true;
       overlay.hidden = false;
+      content.scrollTop = 0;
     }
     closeButton.focus({ preventScroll: true });
   }
