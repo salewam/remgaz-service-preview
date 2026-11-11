@@ -85,6 +85,8 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
 .price-details { padding: 26px 30px; border: 1px solid var(--blue-line); border-left: 4px solid var(--blue-primary); border-radius: 6px; background: var(--white); }
 .price-details strong { display: block; margin-bottom: 10px; color: var(--blue-deep); font-size: 23px; line-height: 1.3; }
 .price-details p { margin: 0 0 12px; color: var(--ink-soft); }
+.price-factors { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; padding: 0; list-style: none; }
+.price-factors li { padding: 7px 11px; border: 1px solid var(--blue-line); border-radius: 4px; color: var(--blue-deep); font-size: 13px; font-weight: 600; }
 .delivery-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
 .delivery-steps article { padding-top: 20px; border-top: 2px solid var(--blue-line); }
 .step-number { display: block; margin-bottom: 14px; color: var(--blue-primary); font: 700 13px var(--font-mono); }
@@ -209,7 +211,7 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
     <section class="section price-section" id="price" aria-labelledby="price-title">
       <div class="price-layout">
         <div class="price-heading"><p class="section-kicker">Сжиженный газ</p><h2 id="price-title" data-gas-price="number">50 <span>₽/л</span></h2><p>Цена газа указана за литр. Условия и итоговую стоимость поставки согласуем по заявке.</p></div>
-        <div class="price-details"><strong>Что нужно для расчёта</strong><p>Укажите ориентировочный объём газа, адрес объекта и условия подъезда к резервуару. По этим данным можно обсудить полную стоимость поставки и подходящую дату доставки.</p><a class="btn-primary" href="#contact">Оставить заявку</a></div>
+        <div class="price-details"><strong>Что нужно для расчёта</strong><p>Укажите ориентировочный объём газа и адрес объекта. По этим данным можно обсудить полную стоимость поставки и подходящую дату доставки.</p><ul class="price-factors"><li>Объём СУГ</li><li>Адрес доставки</li></ul><a class="btn-primary" href="#contact">Оставить заявку</a></div>
       </div>
     </section>
     <section class="section" aria-labelledby="delivery-title">
