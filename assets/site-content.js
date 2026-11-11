@@ -204,12 +204,6 @@
     article.querySelector('.gallery-count').textContent = `Фото ${index + 1} из ${project.photos.length} · стрелки или миниатюры`;
   }
 
-  function projectCount(count) {
-    const last = count % 10;
-    const teens = count % 100 >= 11 && count % 100 <= 14;
-    return `${count} ${!teens && last === 1 ? 'проект' : !teens && last >= 2 && last <= 4 ? 'проекта' : 'проектов'}`;
-  }
-
   function renderPortfolio(projects) {
     const list = document.querySelector('.project-list');
     if (!list) return;
@@ -231,10 +225,6 @@
         link.append(element('span', '', String(index + 1).padStart(2, '0')), document.createTextNode(project.navTitle || project.title));
         return link;
       }));
-    }
-    if (projects.length !== 7) {
-      updateText(document, '#projects > h2', projectCount(projects.length));
-      updateText(document, '.intro-content > p', `Газоснабжение, котельные и тепловые системы: ${projectCount(projects.length)} с фотографиями, задачей и выполненными работами.`);
     }
   }
 
