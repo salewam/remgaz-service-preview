@@ -118,7 +118,8 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
 .ef-links a { color: #D1E1F4; text-decoration: none; font-size: 13px; font-weight: 600; }
 .ef-links a:hover { text-decoration: underline; }
 .ef-bottom { display: flex; justify-content: space-between; gap: 12px; padding-top: 23px; border-top: 1px solid #26405F; color: #A9BDD6; font: 11px/1.6 var(--font-mono); }
-.ef-bottom a { color: inherit; }
+.ef-bottom a { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; color: var(--white); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.ef-contact-links { display: flex; flex-wrap: wrap; gap: 4px 20px; }
 .mobile-sticky-bar { display: none; }
 @media (min-width: 1001px) and (max-width: 1150px) {
   .header-phone small, .btn-head { display: none; }
@@ -240,7 +241,7 @@ h3 { margin: 0 0 9px; color: var(--blue-deep); font-size: 19px; line-height: 1.3
       </div>
     </section>
   </main>
-  <footer class="editorial-footer"><div class="ef-row"><div class="ef-brand"><img src="assets/remgaz-group-logo-display.png" alt="Группа компаний «РемГазСервис»" class="ef-brand-logo" width="600" height="169"><p>Проектирование, монтаж и обслуживание систем автономного газоснабжения, котельных и инженерных сетей в СЗФО.</p></div><nav class="ef-links" aria-label="Навигация внизу страницы"><a href="index.html">Главная</a><a href="index.html#services">Услуги</a><a href="portfolio.html">Портфолио</a><a href="#price">Цена доставки</a><a href="#contact">Оставить заявку</a></nav></div><div class="ef-bottom"><span>ГК «РемГазСервис» · Северо-Западный федеральный округ</span><span><a href="tel:+78123855353">8 (812) 385-53-53</a> · <a href="mailto:info@remgaz.com">info@remgaz.com</a></span></div></footer>
+  <footer class="editorial-footer"><div class="ef-row"><div class="ef-brand"><img src="assets/remgaz-group-logo-display.png" alt="Группа компаний «РемГазСервис»" class="ef-brand-logo" width="600" height="169"><p>Проектирование, монтаж и обслуживание систем автономного газоснабжения, котельных и инженерных сетей в СЗФО.</p></div><nav class="ef-links" aria-label="Навигация внизу страницы"><a href="index.html">Главная</a><a href="index.html#services">Услуги</a><a href="portfolio.html">Портфолио</a><a href="#price">Цена доставки</a><a href="#contact">Оставить заявку</a></nav></div><div class="ef-bottom"><span>ГК «РемГазСервис» · Северо-Западный федеральный округ</span><span class="ef-contact-links"><a href="tel:+78123855353">8 (812) 385-53-53</a><a href="mailto:info@remgaz.com">info@remgaz.com</a></span></div></footer>
   <div class="mobile-sticky-bar"><a href="tel:+78123855353">Позвонить</a><a href="#contact">Оставить заявку</a></div>
 </div>
 <script src="assets/photo-loader.js"></script>

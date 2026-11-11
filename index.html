@@ -891,7 +891,8 @@ body {
   font-family: var(--font-mono);
   font-size: 11px;
 }
-.ef-bottom a { color: inherit; }
+.ef-bottom a { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; color: var(--white); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.ef-contact-links { display: flex; flex-wrap: wrap; gap: 4px 20px; }
 
 /* Floating Sticky Mobile Bottom Bar */
 .mobile-sticky-bar {
@@ -1316,7 +1317,7 @@ body {
 
     <div class="ef-bottom">
       <div>ГК «РемГазСервис» · Северо-Западный федеральный округ.</div>
-      <div><a href="tel:+78123855353">8 (812) 385-53-53</a> · <a href="mailto:info@remgaz.com">info@remgaz.com</a></div>
+      <div class="ef-contact-links"><a href="tel:+78123855353">8 (812) 385-53-53</a><a href="mailto:info@remgaz.com">info@remgaz.com</a></div>
     </div>
   </footer>
 
