@@ -114,7 +114,6 @@
     document.querySelectorAll('.object-matrix, .case-triad, .project-list').forEach(container => {
       container.replaceChildren(message());
     });
-    document.querySelector('.intro-index')?.replaceChildren();
     const details = document.getElementById('detailDrawer');
     if (details) details.hidden = true;
     document.querySelector('#price .price-heading')?.append(message());
@@ -216,16 +215,6 @@
     list.replaceChildren(...articles);
     const total = String(projects.length).padStart(2, '0');
     list.style.setProperty('--project-total', `"${total}"`);
-    const navigation = document.querySelector('.intro-index');
-    if (navigation) {
-      const label = element('p', 'intro-index-label', projects.length ? `Проекты / 01—${total}` : 'Проекты');
-      navigation.replaceChildren(label, ...projects.map((project, index) => {
-        const link = element('a');
-        link.href = `#${project.id}`;
-        link.append(element('span', '', String(index + 1).padStart(2, '0')), document.createTextNode(project.navTitle || project.title));
-        return link;
-      }));
-    }
   }
 
   const content = { state: 'loading', document: null, photoURL, ready: null };
