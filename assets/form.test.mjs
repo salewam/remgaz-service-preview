@@ -34,6 +34,7 @@ function makePage(page, options = {}) {
       matchesPattern,
       customError: '',
       invalidCount: 0,
+      reportValidityCount: 0,
       setCustomValidity(message) { this.customError = message; },
       addEventListener(type, listener) {
         if (!listeners.has(type)) listeners.set(type, []);
@@ -47,6 +48,7 @@ function makePage(page, options = {}) {
         // Programmatically assigned values do not trigger native tooLong.
         const valid = !this.customError && (!this.required || this.value !== '')
           && (!this.value || !this.matchesPattern || this.matchesPattern.test(this.value));
+        this.reportValidityCount++;
         if (!valid) { this.invalidCount++; this.dispatch('invalid'); }
         return valid;
       },
@@ -151,17 +153,40 @@ for (const page of pages) {
     assert.equal(view.requests.length, 1);
   });
 
-  test(`${page}: native invalid phone, blur and corrected input do not leave a sticky error`, async () => {
+  test(`${page}: leaving empty or partial phone via blur does not report validity or trap focus; submission still validates`, async () => {
     const view = makePage(page);
     const { name, phone, location } = view.elements;
-    name.value = 'Анна';
-    location.value = 'СПб';
-    phone.value = 'abc 79212345678';
+
+    // Leaving empty phone does not trigger reportValidity or trap user
+    phone.dispatch('blur');
+    assert.equal(phone.reportValidityCount, 0);
+    assert.equal(phone.customError, '');
+    assert.equal(view.requests.length, 0);
+
+    // User can focus and edit name while phone is empty
+    name.input('Анна');
+    assert.equal(name.value, 'Анна');
+    assert.equal(name.customError, '');
+
+    // Typing partial/incomplete phone and leaving to another field does not trigger reportValidity
+    phone.input('+7 (9');
+    phone.dispatch('blur');
+    assert.equal(phone.reportValidityCount, 0);
+    assert.equal(phone.customError, '');
+    assert.equal(view.requests.length, 0);
+
+    // User can still edit location/object without premature validity errors
+    location.input('Санкт-Петербург');
+    assert.equal(location.value, 'Санкт-Петербург');
+
+    // Actual submit with incomplete phone triggers validation and blocks request
     await view.submit();
     assert.ok(phone.invalidCount);
     assert.ok(phone.customError);
     assert.equal(view.requests.length, 0);
-    phone.input('79212345678');
+
+    // Correcting phone clears error and allows successful submission
+    phone.input('+7 (921) 234-56-78');
     assert.equal(phone.customError, '');
     phone.dispatch('blur');
     assert.equal(phone.customError, '');

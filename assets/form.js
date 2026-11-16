@@ -72,7 +72,4 @@ document.querySelectorAll('form.editorial-form').forEach(form => {
   phoneInput?.addEventListener('invalid', () => {
     if (!phoneInput.validity.customError) phoneInput.setCustomValidity(phoneError);
   });
-  phoneInput?.addEventListener('blur', () => {
-    if (!validatePhone(phoneInput)) phoneInput.reportValidity();
-  });
 });
