@@ -689,20 +689,7 @@ body {
 }
 /* Carousel of real project photographs */
 .case-carousel-section { position: relative; }
-.case-carousel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
-.case-carousel-header > div { flex: 1; min-width: 260px; }
-.case-carousel-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-shrink: 0; }
-.case-carousel-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  height: 44px; min-width: 44px; padding: 0 14px;
-  background: var(--white); border: 1px solid var(--blue-line); border-radius: 4px;
-  color: var(--blue-deep); font-family: var(--font-main); font-size: 13px; font-weight: 600;
-  cursor: pointer; transition: background .15s, border-color .15s, color .15s;
-}
-.case-carousel-btn:hover { background: var(--blue-subtle); border-color: var(--blue-primary); color: var(--blue-primary); }
-.case-carousel-btn:focus-visible { outline: 2px solid var(--blue-primary); outline-offset: 2px; }
-.case-carousel-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.case-carousel-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+.case-carousel-header { margin-bottom: 24px; }
 .case-triad, .case-carousel-track {
   display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px;
@@ -1250,18 +1237,6 @@ body {
         <div class="sec-kicker">03 / Портфолио</div>
         <h2 class="sec-title">Выполненные работы</h2>
         <p class="sec-desc">Фотографии и состав выполненных объектов: автономное газоснабжение, котельные комплексы и промышленные инженерные сети.</p>
-      </div>
-      <div class="case-carousel-controls" role="toolbar" aria-label="Управление просмотром объектов">
-        <button type="button" class="case-carousel-btn case-carousel-prev" aria-label="Предыдущий объект">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
-        <button type="button" class="case-carousel-btn case-carousel-toggle" aria-label="Приостановить автопрокрутку портфолио" aria-pressed="false">
-          <span class="case-carousel-toggle-text">Пауза</span>
-        </button>
-        <button type="button" class="case-carousel-btn case-carousel-next" aria-label="Следующий объект">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18l6-6-6-6"/></svg>
-        </button>
-        <span class="case-carousel-status" role="status" aria-live="polite">Автопрокрутка включена</span>
       </div>
     </div>
     <div class="case-triad case-carousel-track" role="region" aria-label="Лента выполненных работ" tabindex="0">

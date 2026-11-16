@@ -12,6 +12,55 @@ function attribute(tag, name) {
   return tag.match(new RegExp(`\\s${name}="([^"]*)"`, 'u'))?.[1];
 }
 
+class DOMNode {
+  constructor(tag) {
+    this.tag = tag;
+    this.children = [];
+    this.attributes = new Map();
+    this.listeners = new Map();
+    this.style = {};
+    this.textContent = '';
+    this.className = '';
+    this.isConnected = true;
+    this.id = '';
+    this.type = '';
+    this.open = false;
+  }
+  append(...nodes) {
+    for (const node of nodes) {
+      node.parent = this;
+      this.children.push(node);
+    }
+  }
+  setAttribute(name, value) {
+    this.attributes.set(name, value);
+    if (name === 'id') this.id = value;
+  }
+  getAttribute(name) {
+    return this.attributes.get(name) ?? null;
+  }
+  addEventListener(name, callback) {
+    if (!this.listeners.has(name)) this.listeners.set(name, []);
+    this.listeners.get(name).push(callback);
+  }
+  dispatch(name, event = {}) {
+    for (const cb of this.listeners.get(name) || []) cb(event);
+  }
+  showModal() {
+    this.open = true;
+  }
+  close() {
+    this.open = false;
+    this.dispatch('close');
+  }
+  focus() {
+    if (this.ownerDocument) this.ownerDocument.activeElement = this;
+  }
+  descendants() {
+    return this.children.flatMap(node => [node, ...node.descendants()]);
+  }
+}
+
 function makePage(page, options = {}) {
   const html = options.html || readFileSync(new URL(`../${page}`, import.meta.url), 'utf8');
   const markup = html.match(/<form\b[^>]*class="editorial-form"[^>]*>[\s\S]*?<\/form>/u)?.[0];
@@ -56,7 +105,12 @@ function makePage(page, options = {}) {
     Object.defineProperty(input, 'validity', { get: () => ({ customError: !!input.customError }) });
     elements[name] = input;
   }
-  const button = { disabled: false, textContent: 'Оставить заявку' };
+  const button = {
+    disabled: false,
+    textContent: 'Оставить заявку',
+    isConnected: true,
+    focus() { doc.activeElement = this; }
+  };
   const status = { textContent: '' };
   const form = {
     elements,
@@ -78,12 +132,37 @@ function makePage(page, options = {}) {
     set href(value) { href = value; navigations.push(value); },
   } };
   const apiTag = html.match(/<meta\b[^>]*name="remgaz-content-api"[^>]*>/u)?.[0];
-  const context = createContext({
-    document: {
-      baseURI,
-      querySelector: () => apiTag ? { content: attribute(apiTag, 'content') } : null,
-      querySelectorAll: () => [form]
+
+  const doc = {
+    baseURI,
+    head: new DOMNode('head'),
+    body: new DOMNode('body'),
+    activeElement: null,
+    createElement(tag) {
+      const node = new DOMNode(tag);
+      node.ownerDocument = doc;
+      if (tag === 'dialog' && options.dialogSupported === false) {
+        delete node.showModal;
+      }
+      return node;
     },
+    querySelector(selector) {
+      if (selector === 'meta[name="remgaz-content-api"]') {
+        return apiTag ? { content: attribute(apiTag, 'content') } : null;
+      }
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === 'form.editorial-form') return [form];
+      return [];
+    }
+  };
+  doc.head.ownerDocument = doc;
+  doc.body.ownerDocument = doc;
+  doc.body.style.overflow = '';
+
+  const context = createContext({
+    document: doc,
     window, URL, crypto: webcrypto,
     fetch: async (url, init) => {
       requests.push({ url: String(url), init });
@@ -100,7 +179,12 @@ function makePage(page, options = {}) {
   function submit() {
     if (form.reportValidity()) return directSubmit();
   }
-  return { elements, form, context, window, navigations, requests, button, status, directSubmit, submit };
+  return {
+    elements, form, context, window, navigations, requests, button, status, directSubmit, submit,
+    document: doc,
+    get dialog() { return doc.body.children.find(node => node.tag === 'dialog'); },
+    find(predicate) { return doc.body.descendants().find(predicate); }
+  };
 }
 
 for (const page of pages) {
@@ -134,6 +218,7 @@ for (const page of pages) {
     assert.ok(view.elements.phone.customError);
     assert.equal(view.requests.length, 0);
     view.elements.phone.input('79212345678');
+    assert.equal(view.elements.phone.customError, '');
     await view.submit();
     assert.equal(view.requests.length, 1);
   });
@@ -141,7 +226,7 @@ for (const page of pages) {
   test(`${page}: whitespace-only name blocks submission and correction clears the error`, async () => {
     const view = makePage(page);
     const { name, phone, location } = view.elements;
-    name.value = ' \t ';
+    name.value = ' 	 ';
     phone.value = '+7 (921) 234-56-78';
     location.value = 'Санкт-Петербург';
     await view.submit();
@@ -219,16 +304,25 @@ for (const page of pages) {
     assert.match(location.customError, /200/u);
     assert.equal(view.requests.length, 0);
     location.input('СПб');
+    await view.directSubmit();
+    assert.equal(view.requests.length, 1);
+  });
+
+  test(`${page}: spaces and dashes inside phone value validate correctly`, async () => {
+    const view = makePage(page);
+    view.elements.name.value = 'Анна';
+    view.elements.phone.value = '+7 (921) 234-56-78';
+    view.elements.location.value = 'СПб';
     await view.submit();
     assert.equal(view.requests.length, 1);
   });
 
   test(`${page}: sends every field directly to the API without opening email`, async () => {
     const view = makePage(page);
-    view.elements.name.value = ' Анна & Борис? ';
-    view.elements.phone.value = ' +7 (921) 234-56-78 ';
-    view.elements.object.value = ' Дом & газ\nСУГ ';
-    view.elements.location.value = ' СПб? A&B ';
+    view.elements.name.value = '  Анна & Борис?  ';
+    view.elements.phone.value = '  +7 (921) 234-56-78  ';
+    view.elements.object.value = '  Дом & газ\nСУГ  ';
+    view.elements.location.value = '  СПб? A&B  ';
     await view.submit();
     assert.equal(view.requests.length, 1);
     const { url, init } = view.requests[0];
@@ -267,8 +361,10 @@ for (const page of pages) {
     const pending = view.submit();
     assert.equal(view.button.disabled, true);
     assert.match(view.status.textContent, /Отправляем/u);
-    await view.directSubmit();
+    const second = view.submit();
+    await second;
     assert.equal(view.requests.length, 1);
+    assert.doesNotMatch(view.status.textContent, /^Заявка принята/u);
     complete({ ok: true, json: async () => ({ ok: true, delivery: 'sent' }) });
     await pending;
     assert.equal(view.button.disabled, false);
@@ -319,6 +415,50 @@ for (const page of pages) {
       assert.equal(view.elements.location.value, 'СПб');
       assert.equal(view.button.disabled, false);
       assert.equal(view.navigations.length, 0);
+      assert.equal(view.dialog, undefined, 'Dialog must not open on failed request');
+    }
+  });
+
+  test(`${page}: successful delivery (sent or queued) opens modal with exact texts and single "Окей" button`, async () => {
+    for (const delivery of ['sent', 'queued']) {
+      const view = makePage(page, {
+        fetch: async () => ({ ok: true, json: async () => ({ ok: true, delivery }) })
+      });
+      view.elements.name.value = 'Анна';
+      view.elements.phone.value = '79212345678';
+      view.elements.location.value = 'СПб';
+      await view.submit();
+
+      const dialog = view.dialog;
+      assert.ok(dialog, 'dialog created on success');
+      assert.equal(dialog.open, true, 'dialog is open');
+      assert.equal(dialog.getAttribute('aria-labelledby'), 'rg-lead-success-title');
+      assert.equal(dialog.getAttribute('aria-describedby'), 'rg-lead-success-desc');
+      assert.equal(view.document.body.style.overflow, 'hidden');
+
+      const title = view.find(n => n.id === 'rg-lead-success-title');
+      assert.equal(title?.textContent, 'Ваша заявка отправлена');
+
+      const desc = view.find(n => n.id === 'rg-lead-success-desc');
+      assert.equal(desc?.textContent, 'Мы свяжемся с вами в ближайшее время.');
+
+      const okBtn = view.find(n => n.className === 'rg-lead-modal__ok');
+      assert.ok(okBtn, 'ok button exists');
+      assert.equal(okBtn.textContent, 'Окей');
+      assert.equal(view.document.activeElement, okBtn, 'ok button receives initial focus');
+
+      // Closing modal restores body overflow, returns focus to submit button
+      dialog.close();
+      assert.equal(dialog.open, false);
+      assert.equal(view.document.body.style.overflow, '');
+      assert.equal(view.document.activeElement, view.button, 'focus returns to submit button');
+      assert.equal(view.button.disabled, false, 'submit button remains enabled after close');
+
+      // Reopening doesn't duplicate dialog DOM
+      await view.submit();
+      const dialogs = view.document.body.children.filter(n => n.tag === 'dialog');
+      assert.equal(dialogs.length, 1, 'dialog is reused, not duplicated');
+      assert.equal(dialog.open, true);
     }
   });
 }
@@ -327,7 +467,7 @@ test('gas.html: a whitespace-only required delivery address blocks even direct s
   const view = makePage('gas.html');
   view.elements.name.value = 'Анна';
   view.elements.phone.value = '79212345678';
-  view.elements.location.value = ' \t ';
+  view.elements.location.value = ' 	 ';
   await view.directSubmit();
   assert.ok(view.elements.location.customError);
   assert.equal(view.requests.length, 0);

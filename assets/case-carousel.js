@@ -14,17 +14,10 @@
     if (!track) return null;
     container.dataset.carouselActive = 'true';
 
-    const prevBtn = container.querySelector('.case-carousel-prev');
-    const nextBtn = container.querySelector('.case-carousel-next');
-    const toggleBtn = container.querySelector('.case-carousel-toggle');
-    const toggleText = toggleBtn?.querySelector('.case-carousel-toggle-text');
-    const status = container.querySelector('.case-carousel-status');
-
-    let isManualPaused = false;
     let timer = null;
     let isInternalScrolling = false;
     let internalScrollTimeout = null;
-    const intervalMs = 5000;
+    const intervalMs = 7000;
 
     const mediaQuery = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
     function isReducedMotion() {
@@ -88,17 +81,14 @@
       return typeof document !== 'undefined' ? document.visibilityState !== 'hidden' : true;
     }
 
-    let isHovered = false;
-    let isFocused = false;
     let isInteracting = false;
     let interactTimeout = null;
 
     function shouldAutoPlay() {
-      if (isManualPaused) return false;
       if (isReducedMotion()) return false;
       if (!isPageVisible()) return false;
       if (!isIntersecting) return false;
-      if (isHovered || isFocused || isInteracting) return false;
+      if (isInteracting) return false;
       return maxScroll() > 10;
     }
 
@@ -113,70 +103,6 @@
         }, intervalMs);
       }
     }
-
-    function pause() {
-      isManualPaused = true;
-      if (toggleBtn) {
-        toggleBtn.setAttribute('aria-pressed', 'true');
-        toggleBtn.setAttribute('aria-label', 'Возобновить автопрокрутку портфолио');
-        if (toggleText) toggleText.textContent = 'Возобновить';
-      }
-      if (status) status.textContent = 'Автопрокрутка приостановлена';
-      updateTimer();
-    }
-
-    function play() {
-      isManualPaused = false;
-      if (toggleBtn) {
-        toggleBtn.setAttribute('aria-pressed', 'false');
-        toggleBtn.setAttribute('aria-label', 'Приостановить автопрокрутку портфолио');
-        if (toggleText) toggleText.textContent = 'Пауза';
-      }
-      if (status) status.textContent = 'Автопрокрутка включена';
-      updateTimer();
-    }
-
-    if (toggleBtn) {
-      toggleBtn.addEventListener('click', () => {
-        if (isManualPaused) {
-          play();
-        } else {
-          pause();
-        }
-      });
-    }
-
-    if (prevBtn) {
-      prevBtn.addEventListener('click', () => {
-        scrollByStep(-1);
-      });
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        scrollByStep(1);
-      });
-    }
-
-    container.addEventListener('pointerenter', () => {
-      isHovered = true;
-      updateTimer();
-    });
-
-    container.addEventListener('pointerleave', () => {
-      isHovered = false;
-      updateTimer();
-    });
-
-    container.addEventListener('focusin', () => {
-      isFocused = true;
-      updateTimer();
-    });
-
-    container.addEventListener('focusout', () => {
-      isFocused = false;
-      updateTimer();
-    });
 
     function markUserInteraction() {
       if (isInternalScrolling) return;
@@ -211,10 +137,6 @@
     updateTimer();
 
     const api = {
-      play,
-      pause,
-      next: () => scrollByStep(1),
-      prev: () => scrollByStep(-1),
       update: updateTimer,
       destroy: () => {
         clearInterval(timer);
