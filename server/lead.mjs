@@ -126,7 +126,19 @@ export function createLeadService(config) {
       );
       CREATE TABLE IF NOT EXISTS lead_recipient (
         id INTEGER PRIMARY KEY CHECK (id=1), chat_id TEXT NOT NULL
-      );`);
+      );
+      CREATE TABLE IF NOT EXISTS lead_recipients (
+        chat_id TEXT PRIMARY KEY, created_at INTEGER NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS lead_deliveries (
+        lead_id INTEGER NOT NULL, chat_id TEXT NOT NULL,
+        state TEXT NOT NULL CHECK (state IN ('queued','sending','sent','rejected','uncertain')),
+        created_at INTEGER NOT NULL,
+        PRIMARY KEY (lead_id, chat_id)
+      );
+      CREATE INDEX IF NOT EXISTS lead_deliveries_state ON lead_deliveries(state);
+      INSERT OR IGNORE INTO lead_recipients(chat_id, created_at)
+        SELECT chat_id, 0 FROM lead_recipient WHERE id=1;`);
   } catch (error) {
     db.close();
     throw error;
@@ -163,6 +175,17 @@ export function createLeadService(config) {
     delivered: db.prepare("UPDATE leads SET delivery=? WHERE id=? AND delivery='sending'"),
     recipient: db.prepare('SELECT chat_id FROM lead_recipient WHERE id=1'),
     bind: db.prepare('INSERT INTO lead_recipient(id,chat_id) VALUES (1,?) ON CONFLICT(id) DO NOTHING'),
+    insertRecipient: db.prepare("INSERT OR IGNORE INTO lead_recipients(chat_id,created_at) VALUES (?,?)"),
+    recipients: db.prepare("SELECT chat_id FROM lead_recipients ORDER BY created_at"),
+    insertDelivery: db.prepare("INSERT OR IGNORE INTO lead_deliveries(lead_id,chat_id,state,created_at) VALUES (?,?,'queued',?)"),
+    enqueueForRecipient: db.prepare(`INSERT OR IGNORE INTO lead_deliveries(lead_id,chat_id,state,created_at)
+      SELECT id, ?, 'queued', ? FROM leads WHERE delivery='queued'`),
+    queuedDeliveries: db.prepare("SELECT lead_id,chat_id FROM lead_deliveries WHERE state='queued' ORDER BY created_at,lead_id"),
+    queuedDeliveriesForLead: db.prepare("SELECT chat_id FROM lead_deliveries WHERE lead_id=? AND state='queued'"),
+    claimDelivery: db.prepare("UPDATE lead_deliveries SET state='sending' WHERE lead_id=? AND chat_id=? AND state='queued'"),
+    finishDelivery: db.prepare("UPDATE lead_deliveries SET state=? WHERE lead_id=? AND chat_id=? AND state='sending'"),
+    deliveriesForLead: db.prepare("SELECT state FROM lead_deliveries WHERE lead_id=?"),
+    updateLeadDelivery: db.prepare("UPDATE leads SET delivery=?,recipient=? WHERE id=?"),
     cleanKeys: db.prepare("DELETE FROM request_keys WHERE created_at<=?"),
     cleanReservations: db.prepare(`DELETE FROM reservations WHERE created_at<=? AND NOT EXISTS
       (SELECT 1 FROM request_keys WHERE reservation_id=reservations.id)`),
@@ -270,27 +293,83 @@ export function createLeadService(config) {
     }
   }
 
+  function getRecipients() {
+    if (telegramChatId) return [telegramChatId];
+    return q.recipients.all().map(r => r.chat_id);
+  }
+
   function recipient() {
-    return telegramChatId || q.recipient.get()?.chat_id;
+    return getRecipients()[0];
+  }
+
+  function updateAggregated(leadId) {
+    const states = q.deliveriesForLead.all(leadId).map(d => d.state);
+    let agg = 'queued';
+    let resState = 'pending';
+    if (states.length === 0) {
+      agg = 'queued';
+      resState = 'pending';
+    } else if (states.some(s => s === 'sent')) {
+      agg = 'sent';
+      resState = 'confirmed';
+    } else if (states.every(s => s === 'sending')) {
+      agg = 'sending';
+      resState = 'pending';
+    } else if (states.some(s => s === 'queued' || s === 'sending')) {
+      agg = 'queued';
+      resState = 'pending';
+    } else if (states.every(s => s === 'rejected')) {
+      agg = 'rejected';
+      resState = 'rejected';
+    } else {
+      agg = 'uncertain';
+      resState = 'uncertain';
+    }
+    const recs = getRecipients().join(',');
+    q.updateLeadDelivery.run(agg, recs || null, leadId);
+    q.finish.run(resState, leadId);
+  }
+
+  async function deliverTo(leadId, chatId) {
+    if (q.claimDelivery.run(leadId, chatId).changes !== 1) return;
+    transaction(() => { updateAggregated(leadId); });
+    const outcome = await deliver(q.lead.get(leadId), chatId);
+    const state = outcome === 'confirmed' ? 'sent' : outcome;
+    transaction(() => {
+      q.finishDelivery.run(state, leadId, chatId);
+      updateAggregated(leadId);
+    });
   }
 
   async function deliverSaved(id) {
-    const chatId = recipient();
-    if (!chatId || q.claim.run(String(chatId), id).changes !== 1) return;
-    const outcome = await deliver(q.lead.get(id), chatId);
-    // The durable claim stays non-retryable if this commit fails or the process stops.
+    const recs = getRecipients();
+    if (recs.length === 0) return;
     transaction(() => {
-      q.delivered.run(outcome === 'confirmed' ? 'sent' : outcome, id);
-      q.finish.run(outcome, id);
+      for (const chatId of recs) {
+        q.insertDelivery.run(id, chatId, clock());
+      }
     });
+    const targets = q.queuedDeliveriesForLead.all(id).map(r => r.chat_id);
+    await Promise.all(targets.map(chatId => deliverTo(id, chatId)));
   }
 
   let flushing;
   function flushQueued() {
-    if (!recipient()) return Promise.resolve();
+    const recs = getRecipients();
+    if (recs.length === 0) return Promise.resolve();
     if (!flushing) {
       flushing = (async () => {
-        for (const { id } of q.queued.all()) await deliverSaved(id);
+        for (const { id } of q.queued.all()) {
+          transaction(() => {
+            for (const chatId of recs) {
+              q.insertDelivery.run(id, chatId, clock());
+            }
+          });
+        }
+        const queued = q.queuedDeliveries.all();
+        for (const { lead_id, chat_id } of queued) {
+          await deliverTo(lead_id, chat_id);
+        }
       })().finally(() => { flushing = null; });
     }
     return flushing;
@@ -300,7 +379,14 @@ export function createLeadService(config) {
     const botId = telegramBotToken.split(':', 1)[0];
     if (!user || !Number.isSafeInteger(user.id) || user.id <= 0 ||
         (user.is_bot !== undefined && user.is_bot !== false) || String(user.id) === botId) return;
-    if (!telegramChatId) transaction(() => q.bind.run(String(user.id)));
+    const chatId = String(user.id);
+    if (!telegramChatId) {
+      transaction(() => {
+        q.insertRecipient.run(chatId, clock());
+        q.bind.run(chatId);
+        q.enqueueForRecipient.run(chatId, clock());
+      });
+    }
     await flushQueued();
   }
 

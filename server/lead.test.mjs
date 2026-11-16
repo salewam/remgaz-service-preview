@@ -648,3 +648,73 @@ test("one IP cannot exhaust Turnstile verification for another and verified keye
   assert.equal(app.calls.filter(({ url }) => url.includes("siteverify")).length, 11);
   assert.equal(app.calls.filter(({ url }) => url.startsWith("https://api.telegram.org/")).length, 1);
 });
+
+test("leads deliver to all authenticated operators when multiple operators have bound", async (t) => {
+  const app = await fixture(t, { telegramChatId: undefined });
+  await app.bindOperator({ id: 1001, is_bot: false });
+  await app.bindOperator({ id: 2002, is_bot: false });
+  await app.bindOperator({ id: 3003, is_bot: false });
+  const response = await app.submit({ data: lead("Рассылка всем") });
+  assert.equal(response.status, 200);
+  assert.deepEqual(response.body, { ok: true, delivery: "sent" });
+  assert.equal(app.calls.length, 3);
+  const chats = app.calls.map(c => JSON.parse(c.options.body).chat_id).sort();
+  assert.deepEqual(chats, ["1001", "2002", "3003"]);
+  assert.equal(app.listLeads()[0].delivery, "sent");
+});
+
+test("delivery to operator A succeeds even if operator B returns 4xx rejection", async (t) => {
+  const app = await fixture(t, { telegramChatId: undefined });
+  await app.bindOperator({ id: 1001, is_bot: false });
+  await app.bindOperator({ id: 2002, is_bot: false });
+  app.setDelivery((_, options) => {
+    const body = JSON.parse(options.body);
+    if (body.chat_id === "2002") return new Response('{"ok":false,"description":"Forbidden: bot was blocked by the user"}', { status: 403 });
+    return success();
+  });
+  const response = await app.submit({ data: lead("Один заблокирован") });
+  assert.equal(response.status, 200);
+  assert.deepEqual(response.body, { ok: true, delivery: "sent" });
+  assert.equal(app.calls.length, 2);
+  assert.equal(app.listLeads()[0].delivery, "sent");
+});
+
+test("queued leads waiting without recipients are sent to the newly bound operator", async (t) => {
+  const app = await fixture(t, { telegramChatId: undefined });
+  const response = await app.submit({ data: lead("Ожидающая заявка") });
+  assert.equal(response.status, 200);
+  assert.deepEqual(response.body, { ok: true, delivery: "queued" });
+  assert.equal(app.calls.length, 0);
+  await app.bindOperator({ id: 5555, is_bot: false });
+  assert.equal(app.calls.length, 1);
+  assert.equal(JSON.parse(app.calls[0].options.body).chat_id, "5555");
+  assert.equal(app.listLeads()[0].delivery, "sent");
+});
+
+test("legacy lead_recipient table is transparently migrated to lead_recipients", async (t) => {
+  const dir = await mkdtemp(join(tmpdir(), "remgaz-legacy-"));
+  const dbPath = join(dir, "lead.sqlite");
+  t.after(async () => { await rm(dir, { recursive: true, force: true }); });
+  const legacyDb = new DatabaseSync(dbPath);
+  legacyDb.exec(`
+    CREATE TABLE lead_recipient (id INTEGER PRIMARY KEY CHECK (id=1), chat_id TEXT NOT NULL);
+    INSERT INTO lead_recipient (id, chat_id) VALUES (1, '99999');
+  `);
+  legacyDb.close();
+  const calls = [];
+  const service = createLeadService({
+    origin, dbPath, ipHashSecret: secret,
+    telegramBotToken: "local-test-token", telegramChatId: undefined,
+    fetch: (url, options) => { calls.push({ url, options }); return success(); },
+  });
+  t.after(() => { service.close(); });
+  const request = new Request(`${origin}/api/lead`, {
+    method: "POST", headers: { Origin: origin, "Content-Type": "application/json" },
+    body: JSON.stringify(lead("Миграция")),
+  });
+  const response = await service.handle(request, "203.0.113.1");
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { ok: true, delivery: "sent" });
+  assert.equal(calls.length, 1);
+  assert.equal(JSON.parse(calls[0].options.body).chat_id, "99999");
+});

@@ -232,8 +232,9 @@ test('without a configured chat HTTP persists leads, binds only authenticated op
   const second = await fetch(`${base}/api/lead`, { method: 'POST', headers: { ...publicHeaders, 'Idempotency-Key': 'http-second' },
     body: JSON.stringify({ ...data, name: 'После входа' }) });
   assert.deepEqual(await second.json(), { ok: true, delivery: 'sent' });
-  assert.equal(deliveries.length, 2);
-  assert.equal(String(deliveries[1].chat_id), '987654321', 'The first operator cannot be replaced by another login');
+  assert.equal(deliveries.length, 3);
+  const secondDeliveries = deliveries.slice(1);
+  assert.deepEqual(secondDeliveries.map(d => String(d.chat_id)).sort(), ['111222333', '987654321']);
   const listed = await (await fetch(`${base}/api/admin/leads`, { headers })).json();
   assert.deepEqual(listed.leads.map(row => row.name), ['После входа', data.name]);
 
