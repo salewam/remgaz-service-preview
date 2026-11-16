@@ -158,3 +158,103 @@ test('decoded cache stays bounded rather than retaining an entire catalogue', as
   images.at(-1).finish();
   assert.notEqual(await reload, images[0]);
 });
+
+
+test('delivery photos remain browsable without a descriptive side panel', async () => {
+  const html = readFileSync(new URL('../gas.html', import.meta.url), 'utf8');
+  const gallery = html.match(/<figure class="hero-photo">([\s\S]*?)<\/figure>/u)?.[1];
+  assert.ok(gallery, 'delivery photo gallery exists');
+  assert.doesNotMatch(gallery, /<a\b/u, 'the gallery has no descriptive application panel');
+  const galleryScript = [...html.matchAll(/<script>([\s\S]*?)<\/script>/gu)]
+    .map(([, source]) => source).find(source => source.includes('gasHeroImg'));
+  assert.ok(galleryScript);
+  const attribute = (tag, name) => tag.match(new RegExp('\\b' + name + '="([^"]*)"', 'u'))?.[1];
+  const element = () => {
+    const attributes = new Map();
+    const listeners = new Map();
+    return {
+      children: [], textContent: '',
+      append(child) { this.children.push(child); },
+      getAttribute(name) { return attributes.get(name); },
+      setAttribute(name, value) { attributes.set(name, value); },
+      removeAttribute(name) { attributes.delete(name); },
+      addEventListener(type, listener) { listeners.set(type, listener); },
+      click() { listeners.get('click')(); },
+    };
+  };
+  const frame = element();
+  const picture = element();
+  const caption = element();
+  const number = element();
+  const menu = element();
+  menu.querySelectorAll = () => [];
+  const thumbs = [...gallery.matchAll(/<button\b[^>]*>(<img\b[^>]*>)<\/button>/gu)]
+    .map(([, imageTag]) => {
+      const button = element();
+      const image = {
+        src: attribute(imageTag, 'src'), complete: true,
+        naturalWidth: Number(attribute(imageTag, 'width')),
+        naturalHeight: Number(attribute(imageTag, 'height')),
+      };
+      button.querySelector = () => image;
+      return button;
+    });
+  assert.equal(thumbs.length, 3);
+  const photos = new Map(thumbs.map(button => {
+    const image = button.querySelector('img');
+    const src = image.src.replace('-thumb.webp', '.webp');
+    return [src, { ...image, src }];
+  }));
+  const sources = [...photos.keys()];
+  const warmed = [];
+  const timers = new Map();
+  const document = {
+    baseURI: 'https://remgaz.test/gas.html',
+    getElementById(id) { return { gasHeroImg: picture, gasPhotoCount: caption, gasPhotoNumber: number }[id] || null; },
+    querySelector(selector) { return selector === '.hero-photo-frame' ? frame : menu; },
+    querySelectorAll() { return thumbs; },
+    createElement: element,
+  };
+  const loader = {
+    source(src) { assert.ok(photos.has(src), 'a full photo address is retained'); return src; },
+    load: async src => photos.get(src),
+    display(image, src) { image.src = src; },
+    prefetch(sources) { warmed.push(...sources); },
+  };
+  runInContext(galleryScript, createContext({
+    document, window: { RemgazPhotos: loader }, URL,
+    IntersectionObserver: class {
+      constructor(callback) { this.callback = callback; }
+      observe() { this.callback([{ isIntersecting: true }]); }
+    },
+    setTimeout(callback) { const id = Symbol(); timers.set(id, callback); return id; },
+    clearTimeout(id) { timers.delete(id); },
+  }));
+  await Promise.resolve();
+  const previous = frame.children.find(node => node.getAttribute('aria-label') === 'Предыдущее фото доставки');
+  const next = frame.children.find(node => node.getAttribute('aria-label') === 'Следующее фото доставки');
+  const status = frame.children.find(node => node.getAttribute('role') === 'status');
+  assert.ok(previous && next, 'both photo arrows remain');
+  const selected = index => {
+    assert.equal(picture.src, sources[index]);
+    assert.equal(caption.textContent, 'Фото ' + (index + 1) + ' из 3 · Доставка сжиженного газа');
+    assert.equal(number.textContent, '0' + (index + 1) + ' / 03');
+    thumbs.forEach((button, current) => assert.equal(button.getAttribute('aria-current') === 'true', current === index));
+    assert.equal(status.hidden, true);
+    assert.equal(timers.size, 0);
+  };
+  for (const index of [1, 2, 0]) {
+    next.click();
+    await Promise.resolve();
+    selected(index);
+  }
+  previous.click();
+  await Promise.resolve();
+  selected(2);
+  for (const [index, button] of thumbs.entries()) {
+    button.click();
+    await Promise.resolve();
+    selected(index);
+  }
+  assert.ok(warmed.length > 0, 'neighbor photos are still preloaded');
+});

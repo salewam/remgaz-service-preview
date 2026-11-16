@@ -53,16 +53,8 @@ h1 { min-width: 0; max-width: min(600px, 100%); margin: 0 0 24px; color: var(--b
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; min-width: 0; max-width: 100%; }
 .hero-note { margin: 23px 0 0; color: var(--muted); font-size: 13px; }
 .hero-photo { display: flex; flex-direction: column; justify-content: center; min-width: 0; margin: 0; padding: 20px; background: var(--blue-subtle); }
-.hero-photo-frame { position: relative; width: 100%; min-width: 0; aspect-ratio: 4 / 3; overflow: hidden; background: var(--blue-deep); }
-.hero-photo-frame img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; background: var(--blue-deep); }
-.hero-photo-frame.is-portrait img { width: 52%; }
-.hero-photo-aside { display: none; flex-direction: column; justify-content: flex-start; min-width: 0; padding: 36px 28px; border-left: 1px solid var(--blue-primary); color: var(--white); overflow-y: auto; }
-.is-portrait .hero-photo-aside { position: absolute; inset: 0 0 0 52%; display: flex; }
-.hero-photo-aside > * { flex-shrink: 0; }
-.hero-photo-index { margin: 0; color: var(--blue-line); font: 700 13px/1.4 var(--font-mono); }
-.hero-photo-aside p:not(.hero-photo-index) { max-width: 220px; margin: 20px 0 0; font-size: 22px; line-height: 1.25; font-weight: 700; }
-.hero-photo-aside a { align-self: flex-start; margin-top: auto; padding-top: 12px; color: var(--white); font-size: 13px; font-weight: 700; text-underline-offset: 5px; }
-.hero-photo-aside a:focus-visible { outline-color: var(--white); }
+.hero-photo-frame { position: relative; width: 100%; min-width: 0; aspect-ratio: 4 / 3; overflow: hidden; background: var(--white); }
+.hero-photo-frame img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
 .hero-photo figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; padding-top: 12px; color: var(--ink-soft); font-size: 12px; }
 .hero-photo figcaption span:first-child { flex: 1 1 180px; min-width: 0; }
 .hero-photo-status { position: absolute; bottom: 12px; left: 12px; z-index: 2; max-width: calc(100% - 24px); padding: 8px 12px; background: var(--blue-deep); color: var(--white); font-size: 12px; font-weight: 600; pointer-events: none; }
@@ -143,8 +135,6 @@ h2 { margin: 0 0 20px; color: var(--blue-deep); font-size: 38px; line-height: 1.
   .contact-phone { font-size: 22px; }
   .hero-lead { font-size: 15px; }
   .hero-photo { padding: 14px 16px 18px; }
-  .hero-photo-aside { padding: 28px 22px; }
-  .hero-photo-aside p:not(.hero-photo-index) { font-size: 20px; }
   .section { padding: 56px 16px; }
   .price-layout, .contact-layout { gap: 24px; }
   .price-heading h2 { font-size: 3.5rem; }
@@ -164,11 +154,6 @@ h2 { margin: 0 0 20px; color: var(--blue-deep); font-size: 38px; line-height: 1.
   .hero-actions { width: 100%; }
   .hero-actions a { flex: 1 1 100%; }
   .hero-note { margin-top: 17px; }
-  .hero-photo-frame.is-portrait img { width: 53%; }
-  .is-portrait .hero-photo-aside { left: 53%; }
-  .hero-photo-aside { padding: 18px 12px; }
-  .hero-photo-aside p:not(.hero-photo-index) { font-size: 17px; }
-  .hero-photo-aside a { font-size: 12px; }
   .hero-photo figcaption { gap: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
@@ -195,7 +180,7 @@ h2 { margin: 0 0 20px; color: var(--blue-deep); font-size: 38px; line-height: 1.
         <p class="hero-note">Санкт-Петербург и Северо-Западный федеральный округ</p>
       </div>
       <figure class="hero-photo">
-        <div class="hero-photo-frame"><picture><source media="(min-width: 1101px)" srcset="assets/gas-delivery-truck-view.webp"><source media="(min-width: 601px)" srcset="assets/gas-delivery-truck-tablet.webp"><img id="gasHeroImg" src="assets/gas-delivery-truck-mobile.webp" alt="Фотография доставки сжиженного газа, кадр 1 из 3" width="960" height="720" fetchpriority="high" decoding="async"></picture><div class="hero-photo-aside"><p class="hero-photo-index" id="gasPhotoAsideIndex" aria-hidden="true">ФОТО / 01</p><p>Кадры доставки сжиженного газа</p><a href="#contact">Оставить заявку</a></div></div>
+        <div class="hero-photo-frame"><picture><source media="(min-width: 1101px)" srcset="assets/gas-delivery-truck-view.webp"><source media="(min-width: 601px)" srcset="assets/gas-delivery-truck-tablet.webp"><img id="gasHeroImg" src="assets/gas-delivery-truck-mobile.webp" alt="Фотография доставки сжиженного газа, кадр 1 из 3" width="960" height="720" fetchpriority="high" decoding="async"></picture></div>
         <figcaption><span id="gasPhotoCount" aria-live="polite">Фото 1 из 3 · Доставка сжиженного газа</span><span id="gasPhotoNumber">01 / 03</span></figcaption>
         <div class="hero-photo-thumbs" role="group" aria-label="Выбрать фотографию доставки"><button type="button" aria-label="Показать фото 1 из 3" aria-current="true" data-photo="0"><img src="assets/gas-delivery-truck-thumb.webp" alt="" width="192" height="144"></button><button type="button" aria-label="Показать фото 2 из 3" data-photo="1"><img src="assets/gas-delivery-02-thumb.webp" alt="" width="144" height="192"></button><button type="button" aria-label="Показать фото 3 из 3" data-photo="2"><img src="assets/gas-delivery-03-thumb.webp" alt="" width="93" height="192"></button></div>
       </figure>
@@ -230,15 +215,14 @@ h2 { margin: 0 0 20px; color: var(--blue-deep); font-size: 38px; line-height: 1.
 <script>
 (() => {
   const photos = [
-    ['assets/gas-delivery-truck.webp', 1440, 1080],
-    ['assets/gas-delivery-02.webp', 780, 1040],
-    ['assets/gas-delivery-03.webp', 762, 1568]
+    'assets/gas-delivery-truck.webp',
+    'assets/gas-delivery-02.webp',
+    'assets/gas-delivery-03.webp'
   ];
   const frame = document.querySelector('.hero-photo-frame');
   const picture = document.getElementById('gasHeroImg');
   const caption = document.getElementById('gasPhotoCount');
   const number = document.getElementById('gasPhotoNumber');
-  const asideIndex = document.getElementById('gasPhotoAsideIndex');
   const thumbs = document.querySelectorAll('.hero-photo-thumbs button');
   const loader = window.RemgazPhotos;
   const status = document.createElement('span');
@@ -258,11 +242,8 @@ h2 { margin: 0 0 20px; color: var(--blue-deep); font-size: 38px; line-height: 1.
   }
 
   function updateSelection(index) {
-    const [, width, height] = photos[index];
-    frame.classList.toggle('is-portrait', height > width);
     caption.textContent = `Фото ${index + 1} из ${photos.length} · Доставка сжиженного газа`;
     number.textContent = `0${index + 1} / 0${photos.length}`;
-    asideIndex.textContent = `ФОТО / 0${index + 1}`;
     thumbs.forEach((button, i) => {
       if (i === index) button.setAttribute('aria-current', 'true');
       else button.removeAttribute('aria-current');
@@ -272,8 +253,8 @@ h2 { margin: 0 0 20px; color: var(--blue-deep); font-size: 38px; line-height: 1.
   function warmNeighbors(index) {
     if (!near) return;
     loader.prefetch([...new Set([
-      loader.source(photos[(index + 1) % photos.length][0]),
-      loader.source(photos[(index - 1 + photos.length) % photos.length][0])
+      loader.source(photos[(index + 1) % photos.length]),
+      loader.source(photos[(index - 1 + photos.length) % photos.length])
     ])]);
   }
 
@@ -314,7 +295,7 @@ h2 { margin: 0 0 20px; color: var(--blue-deep); font-size: 38px; line-height: 1.
       warmNeighbors(selected);
     };
     timeout = setTimeout(fail, 20000);
-    loader.load(loader.source(photos[nextIndex][0]), 'high').then(loaded => {
+    loader.load(loader.source(photos[nextIndex]), 'high').then(loaded => {
       if (request !== requestId) return;
       settled = true;
       clearTimeout(timeout);
@@ -343,7 +324,7 @@ h2 { margin: 0 0 20px; color: var(--blue-deep); font-size: 38px; line-height: 1.
     if (!near) return;
     const index = selected;
     const request = requestId;
-    const source = loader.source(photos[index][0]);
+    const source = loader.source(photos[index]);
     if (picture.currentSrc !== new URL(source, document.baseURI).href) {
       loader.load(source, 'high').then(loaded => {
         if (request !== requestId || displayed !== index || !near) return;
