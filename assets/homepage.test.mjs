@@ -47,7 +47,7 @@ function assertActive(page, selectedId) {
     const active = tab.id === selectedId;
     assert.equal(tab.getAttribute('aria-selected'), String(active), tab.id);
     assert.equal(tab.tabIndex, active ? 0 : -1, tab.id);
-    assert.equal(tab.classes.has('service-card-featured'), active, tab.id);
+    assert.equal(tab.classes.has('service-card-featured'), tab.id === 'service-tab-04', `${tab.id}: only gas delivery stays highlighted`);
     assert.equal(page.panels.get(tab.getAttribute('aria-controls')).hidden, !active, tab.id);
   }
 }
@@ -60,7 +60,7 @@ test('gas delivery is highlighted with its panel visible before and after initia
   assertActive(page, 'service-tab-04');
 });
 
-test('clicks and keyboard navigation keep exactly one highlighted service and visible panel', () => {
+test('gas delivery stays highlighted while clicks and keyboard navigation switch panels', () => {
   const page = servicePage();
   page.start();
   for (const tab of page.tabs) {

@@ -6,14 +6,12 @@
 
   const tabs = Array.from(services.querySelectorAll('.service-grid .service-tab[role="tab"]'));
   const panels = tabs.map(tab => document.getElementById(tab.getAttribute('aria-controls')));
-  const cards = tabs.map(tab => tab.closest('.service-card'));
 
   function select(index) {
     tabs.forEach((tab, position) => {
       const active = position === index;
       tab.setAttribute('aria-selected', String(active));
       tab.tabIndex = active ? 0 : -1;
-      cards[position].classList.toggle('service-card-featured', active);
       panels[position].hidden = !active;
     });
   }

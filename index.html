@@ -817,7 +817,7 @@ body {
 .service-tab { display: inline; max-width: 100%; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; overflow-wrap: anywhere; cursor: pointer; }
 .service-tab::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: 8px; }
 .service-tab:focus-visible::after { outline: 2px solid var(--flame-orange); outline-offset: 3px; }
-.service-card:hover .service-tab { text-decoration: underline; text-underline-offset: 3px; }
+.service-card:hover .service-tab, .service-tab[aria-selected="true"] { text-decoration: underline; text-underline-offset: 3px; }
 .service-card p { color: var(--muted); font-size: 13px; line-height: 1.55; }
 .service-card-featured p { color: #B4CCE6; }
 .service-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; padding-top: 20px; }
