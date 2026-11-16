@@ -38,7 +38,9 @@
           <h2 id="editor-heading">Редактирование проекта</h2>
           <label>Название проекта<input name="title" maxlength="200" autocomplete="off"></label>
           <label>Город или место<input name="loc" maxlength="240" autocomplete="off"></label>
-          <label>Короткое описание<textarea name="desc" rows="3" maxlength="2000"></textarea></label>
+          <label>Задача<textarea name="task" rows="4" maxlength="8000"></textarea><span class="field-hint">Что требовалось обеспечить на объекте.</span></label>
+          <label>Описание выполненных работ<textarea name="work" rows="6" maxlength="12000"></textarea><span class="field-hint">Что сделали и какое оборудование установили. На сайте — раздел «Решение».</span></label>
+          <label>Основные цифры и характеристики<textarea name="facts" rows="5" placeholder="Мощность котельной — 180 кВт&#10;Объём резервуаров — 20 м³" aria-describedby="facts-hint"></textarea><span id="facts-hint" class="field-hint">Укажите главные параметры: мощность, объём, площадь, резерв. Одна строка: «Мощность котельной — 180 кВт». На сайт выводятся все строки в указанном порядке; числа автоматически не выбираются.</span></label>
           <fieldset class="photo-fieldset" id="photo-fieldset">
             <legend>Фотографии</legend>
             <p class="field-hint">Можно выбрать сразу несколько. Обложка используется в карточке проекта.</p>
@@ -47,11 +49,9 @@
             <div id="photo-list" class="photo-list"></div>
           </fieldset>
           <details class="extra-fields">
-            <summary>Задача, выполненные работы и другие поля</summary>
-            <label>Задача<textarea name="task" rows="4" maxlength="8000"></textarea></label>
-            <label>Что сделали<textarea name="work" rows="6" maxlength="12000"></textarea></label>
+            <summary>Дополнительные подписи (необязательно)</summary>
+          <label>Короткое описание<textarea name="desc" rows="3" maxlength="2000"></textarea></label>
             <label>Короткие теги<textarea name="tags" rows="3"></textarea><span class="field-hint">Один тег на строке.</span></label>
-            <label>Характеристики<textarea name="facts" rows="4"></textarea><span class="field-hint">Одна на строке: название — значение.</span></label>
             <label>Короткое название в навигации<input name="navTitle" maxlength="200"></label>
             <label>Описание карточки на главной<textarea name="cardDesc" rows="3" maxlength="2000"></textarea></label>
             <label>Подпись в списке объектов<input name="categorySummary" maxlength="240"></label>

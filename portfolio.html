@@ -81,7 +81,8 @@ h2 { color:var(--blue-deep); font-size:36px; line-height:1.15; margin-bottom:var
 .project-copy { grid-area:copy; padding:var(--space-3) var(--space-4) var(--space-4); min-width:0; overflow-wrap:anywhere; }
 .project-location { color:var(--blue-primary); font:600 12px/1.5 var(--font-mono); margin-bottom:var(--space-2); }
 .project-head h3 { color:var(--blue-deep); font-size:26px; line-height:1.25; }
-.project-copy > p { color:var(--ink-soft); font-size:15px; line-height:1.65; margin-bottom:var(--space-2); }
+.project-copy > p { color:var(--ink-soft); font-size:15px; line-height:1.65; margin-bottom:var(--space-2); white-space:pre-line; }
+.project-copy > [hidden] { display:none; }
 .project-facts { border-top:1px solid var(--line-light); margin-top:var(--space-3); padding-top:var(--space-2); display:grid; gap:var(--space-2); }
 .project-facts div { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr)); gap:6px var(--space-2); min-width:0; }
 .project-facts dt,.project-facts dd { min-width:0; overflow-wrap:anywhere; }

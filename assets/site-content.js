@@ -173,12 +173,17 @@
     paragraphs[0].textContent = project.desc;
     paragraphs[1].replaceChildren(element('strong', '', 'Задача:'), document.createTextNode(` ${project.task}`));
     paragraphs[2].replaceChildren(element('strong', '', 'Решение:'), document.createTextNode(` ${project.work}`));
+    paragraphs[0].hidden = !project.desc.trim();
+    paragraphs[1].hidden = !project.task.trim();
+    paragraphs[2].hidden = !project.work.trim();
     const facts = project.facts.map(fact => {
       const row = element('div');
       row.append(element('dt', '', fact.label), element('dd', '', fact.value));
       return row;
     });
-    article.querySelector('.project-facts').replaceChildren(...facts);
+    const factList = article.querySelector('.project-facts');
+    factList.replaceChildren(...facts);
+    factList.hidden = facts.length === 0;
     updateStage(article.querySelector('.gallery-stage'), project);
     const thumbs = article.querySelector('.gallery-thumbs');
     thumbs.setAttribute('aria-label', `Фотографии: ${project.title}`);
