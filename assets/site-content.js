@@ -92,7 +92,7 @@
     document.querySelectorAll('[data-gas-price]').forEach(node => {
       if (node.dataset.gasPrice === 'number') {
         const unit = node.querySelector('span');
-        node.replaceChildren(document.createTextNode(`${price} `), unit);
+        node.replaceChildren(document.createTextNode(`от ${price} `), unit);
       } else node.textContent = `${price} ₽/л`;
     });
   }
