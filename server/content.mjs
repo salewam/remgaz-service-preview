@@ -238,7 +238,7 @@ function webpSize(bytes) {
   return image;
 }
 
-export function createContentService(config, { seedPath = new URL('../content/site.json', import.meta.url) } = {}) {
+export function createContentService(config, { seedPath = new URL('../content/site.json', import.meta.url), leadService } = {}) {
   const { origin, telegramBotToken, contentDbPath, contentMediaDir } = config;
   let configuredOrigin;
   try { configuredOrigin = new URL(origin); } catch { throw new Error('Invalid content service configuration'); }
@@ -370,8 +370,9 @@ export function createContentService(config, { seedPath = new URL('../content/si
     const authorization = request.headers.get('authorization') || '';
     const match = /^tma (.+)$/i.exec(authorization);
     if (!match) throw new TelegramAuthError();
-    verifyTelegramInitData(match[1], telegramBotToken);
+    const user = verifyTelegramInitData(match[1], telegramBotToken);
     if (write && request.headers.get('origin') !== origin) throw new ContentError(403, 'Изменения разрешены только из приложения на нашем сайте.');
+    return user;
   }
 
   function change(expectedRevision, update) {
@@ -413,7 +414,7 @@ export function createContentService(config, { seedPath = new URL('../content/si
         return new Response(bytes, { headers: { ...headers, 'Content-Length': String(stored.bytes) } });
       }
       const projectMatch = /^\/api\/admin\/projects\/([a-z0-9]+(?:-[a-z0-9]+)*)$/.exec(path);
-      const expectedMethod = path === '/api/content' || path === '/api/admin/content' ? 'GET'
+      const expectedMethod = path === '/api/content' || path === '/api/admin/content' || path === '/api/admin/leads' ? 'GET'
         : path === '/api/admin/price' || projectMatch ? 'PUT'
           : path === '/api/admin/media' ? 'POST' : null;
       if (!expectedMethod) return json({ ok: false, error: 'Не найдено.' }, 404);
@@ -423,8 +424,15 @@ export function createContentService(config, { seedPath = new URL('../content/si
         document.projects = document.projects.filter(project => project.published);
         return json(document, 200, { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-cache' });
       }
-      authenticate(request, method !== 'GET');
-      if (path === '/api/admin/content') return json(JSON.parse(q.document.get().document));
+      const user = authenticate(request, method !== 'GET');
+      if (path === '/api/admin/content' || path === '/api/admin/leads') {
+        if (leadService) void leadService.bindOperator(user).catch(() => {});
+        if (path === '/api/admin/leads') {
+          if (!leadService) return json({ ok: false, error: 'Приём заявок не настроен.' }, 503);
+          return json({ leads: leadService.listLeads() });
+        }
+        return json(JSON.parse(q.document.get().document));
+      }
       if (path === '/api/admin/media') {
         if ((request.headers.get('content-type') || '').toLowerCase() !== 'image/webp') throw new ContentError(415, 'Загружайте фотографии в формате WebP.');
         const bytes = await readLimitedBody(request, MAX_MEDIA);

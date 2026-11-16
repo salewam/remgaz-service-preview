@@ -120,15 +120,70 @@
     }
   }
 
+  let leadsLoading = false;
+  async function loadLeads() {
+    if (leadsLoading) return;
+    leadsLoading = true;
+    const indicator = byId('leads-status');
+    const button = byId('reload-leads');
+    button.disabled = true;
+    indicator.textContent = 'Загружаем заявки…';
+    try {
+      const data = await request('/api/admin/leads');
+      if (!Array.isArray(data?.leads)) throw new Error('Сервер вернул неполный список заявок.');
+      const list = byId('lead-list');
+      list.replaceChildren();
+      const labels = {
+        sent: 'Уведомление отправлено в Telegram',
+        queued: 'Заявка сохранена, уведомление ожидает отправки',
+        rejected: 'Заявка сохранена, Telegram отклонил уведомление',
+        uncertain: 'Заявка сохранена, доставка уведомления не подтверждена. Повторно не отправляем, чтобы не создавать дубли.'
+      };
+      for (const lead of data.leads) {
+        const card = document.createElement('article');
+        card.className = 'lead-card';
+        const title = document.createElement('h3');
+        title.textContent = lead.name;
+        const date = document.createElement('p');
+        date.className = 'lead-meta';
+        date.textContent = new Date(lead.createdAt).toLocaleString('ru-RU');
+        const phone = document.createElement('a');
+        phone.href = `tel:${lead.phone.replace(/[^+\d]/g, '')}`;
+        phone.textContent = lead.phone;
+        card.append(title, date, phone);
+        for (const [label, value] of [['Объект', lead.object], ['Место', lead.location]]) {
+          if (!value) continue;
+          const detail = document.createElement('p');
+          detail.textContent = `${label}: ${value}`;
+          card.append(detail);
+        }
+        const delivery = document.createElement('p');
+        delivery.className = ['rejected', 'uncertain'].includes(lead.delivery) ? 'lead-warning' : 'lead-meta';
+        delivery.textContent = labels[lead.delivery] || labels.uncertain;
+        card.append(delivery);
+        list.append(card);
+      }
+      indicator.textContent = data.leads.length ? `Заявок: ${data.leads.length}. Новые — сверху.` : 'Пока нет заявок.';
+    } catch (error) {
+      indicator.textContent = error.message;
+    } finally {
+      leadsLoading = false;
+      button.disabled = state.busy;
+    }
+  }
+
   function switchTab(tab) {
     state.tab = tab;
     byId('portfolio-section').hidden = tab !== 'portfolio';
     byId('price-section').hidden = tab !== 'price';
+    byId('leads-section').hidden = tab !== 'leads';
     byId('portfolio-tab').setAttribute('aria-pressed', String(tab === 'portfolio'));
     byId('price-tab').setAttribute('aria-pressed', String(tab === 'price'));
+    byId('leads-tab').setAttribute('aria-pressed', String(tab === 'leads'));
     if (tab === 'portfolio' && state.draft) telegram?.BackButton?.show?.();
     else telegram?.BackButton?.hide?.();
     status('');
+    if (tab === 'leads') void loadLeads();
   }
 
   function mayLeaveDraft() {
@@ -266,6 +321,8 @@
 
   byId('portfolio-tab').addEventListener('click', () => switchTab('portfolio'));
   byId('price-tab').addEventListener('click', () => switchTab('price'));
+  byId('leads-tab').addEventListener('click', () => switchTab('leads'));
+  byId('reload-leads').addEventListener('click', loadLeads);
   byId('back-to-list').addEventListener('click', backToList);
   telegram?.BackButton?.onClick?.(backToList);
   projectForm.addEventListener('input', event => { if (event.target.type !== 'file') markDirty(); });
@@ -353,6 +410,7 @@
       acceptDocument(await request('/api/admin/content'));
       byId('access-panel').hidden = true;
       byId('workspace').hidden = false;
+      void loadLeads();
     } catch (error) {
       byId('access-title').textContent = 'Не удалось открыть управление';
       byId('access-text').textContent = error.message;

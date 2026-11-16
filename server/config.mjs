@@ -9,14 +9,17 @@ export function loadConfig(env = process.env) {
     if (!value || !value.trim()) throw new Error(`Missing required environment variable: ${name}`);
     return value.trim();
   };
-  const rawOrigin = required('PUBLIC_ORIGIN');
-  let origin;
-  try {
-    const parsed = new URL(rawOrigin);
-    if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password ||
-      parsed.pathname !== '/' || parsed.search || parsed.hash || parsed.origin !== rawOrigin) throw new Error();
-    origin = parsed.origin;
-  } catch { throw new Error('PUBLIC_ORIGIN must be a bare http(s) origin'); }
+  const parseOrigin = (name, value) => {
+    try {
+      const parsed = new URL(value);
+      if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password ||
+        parsed.pathname !== '/' || parsed.search || parsed.hash || parsed.origin !== value) throw new Error();
+      return parsed.origin;
+    } catch { throw new Error(`${name} must be a bare http(s) origin`); }
+  };
+  const origin = parseOrigin('PUBLIC_ORIGIN', required('PUBLIC_ORIGIN'));
+  const leadAllowedOrigins = [...new Set([origin, ...(env.LEAD_ALLOWED_ORIGINS?.trim()
+    ? env.LEAD_ALLOWED_ORIGINS.split(',').map(value => parseOrigin('LEAD_ALLOWED_ORIGINS', value.trim())) : [])])];
 
   const telegramBotToken = required('TELEGRAM_BOT_TOKEN');
   const telegramChatId = env.TELEGRAM_CHAT_ID?.trim() || undefined;
@@ -53,7 +56,7 @@ export function loadConfig(env = process.env) {
     throw new Error('CONTENT_MEDIA_DIR must be a separate directory');
   }
   return {
-    origin, telegramBotToken, telegramChatId, ipHashSecret, dbPath,
+    origin, leadAllowedOrigins, telegramBotToken, telegramChatId, ipHashSecret, dbPath,
     host, port: Number(rawPort), trustProxy: trustProxy === 'true', turnstileSecret,
     contentDbPath, contentMediaDir
   };

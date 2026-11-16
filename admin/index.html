@@ -24,6 +24,7 @@
       <nav class="section-tabs" aria-label="Управление содержимым">
         <button type="button" id="portfolio-tab" aria-pressed="true" aria-controls="portfolio-section">Портфолио</button>
         <button type="button" id="price-tab" aria-pressed="false" aria-controls="price-section">Цена газа</button>
+        <button type="button" id="leads-tab" aria-pressed="false" aria-controls="leads-section">Заявки</button>
       </nav>
       <p id="status" class="status" role="status" aria-live="polite" hidden></p>
       <section id="portfolio-section" aria-labelledby="portfolio-heading">
@@ -69,6 +70,13 @@
           <p class="field-hint">Одна цена для главной страницы и раздела доставки газа.</p>
           <button class="primary wide" type="submit" id="save-price">Сохранить цену</button>
         </form>
+      </section>
+      <section id="leads-section" aria-labelledby="leads-heading" hidden>
+        <h2 id="leads-heading">Заявки с сайта</h2>
+        <p class="section-description">Все принятые заявки сохраняются здесь. Уведомления получает первый оператор, открывший приложение, если получатель не задан на сервере.</p>
+        <button type="button" id="reload-leads" class="quiet wide">Обновить заявки</button>
+        <p id="leads-status" class="field-hint" role="status" aria-live="polite"></p>
+        <div id="lead-list" class="lead-list"></div>
       </section>
     </div>
   </main>

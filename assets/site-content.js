@@ -121,20 +121,56 @@
     updateText(document, '.intro-content > p', 'Проекты временно недоступны. Обновите страницу или свяжитесь с нами.');
   }
 
+  function createCaseBox(project) {
+    const card = element('article', 'case-box');
+    card.dataset.projectId = project.id;
+    const wrap = element('div', 'case-img-wrap');
+    const link = element('a');
+    link.dataset.lightbox = '';
+    const img = element('img');
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.width = 800;
+    img.height = 600;
+    link.append(img);
+    wrap.append(link);
+    const body = element('div', 'case-body');
+    const kicker = element('div', 'case-kicker');
+    const h3 = element('h3');
+    const titleLink = element('a');
+    h3.append(titleLink);
+    const desc = element('p');
+    const params = element('div', 'case-params');
+    body.append(kicker, h3, desc, params);
+    card.append(wrap, body);
+    return card;
+  }
+
   function renderCards(projects) {
-    document.querySelectorAll('.case-box[data-project-id]').forEach(card => {
-      const project = projects.find(item => item.id === card.dataset.projectId);
-      if (!project) {
-        card.remove();
-        return;
-      }
+    const container = document.querySelector('.case-carousel-track') || document.querySelector('.case-triad');
+    if (!container) return;
+    const existing = new Map(Array.from(container.querySelectorAll('.case-box[data-project-id]'), card => [card.dataset.projectId, card]));
+    const publishedProjects = projects.filter(item => item?.published !== false);
+    const initialOrder = ['park-hotel', 'spa', 'production'];
+    const sorted = [
+      ...initialOrder.map(id => publishedProjects.find(p => p.id === id)).filter(Boolean),
+      ...publishedProjects.filter(p => !initialOrder.includes(p.id))
+    ];
+    const cards = sorted.map(project => {
+      const card = existing.get(project.id) || createCaseBox(project);
       updateText(card, '.case-kicker', project.loc);
       updateText(card, '.case-body h3 a', project.title);
-      card.querySelector('.case-body h3 a').href = `portfolio.html#${project.id}`;
-      updateText(card, '.case-body > p', project.cardDesc || project.desc);
-      updateText(card, '.case-params', project.facts.map(fact => `${fact.label} — ${fact.value}`).join(' · '));
-      updateStage(card.querySelector('.case-img-wrap > a'), project);
+      const titleLink = card.querySelector('.case-body h3 a');
+      if (titleLink) titleLink.href = `portfolio.html#${project.id}`;
+      updateText(card, '.case-body > p', project.cardDesc || project.desc || project.work || '');
+      updateText(card, '.case-params', (project.facts || []).map(fact => `${fact.label} — ${fact.value}`).join(' · '));
+      const link = card.querySelector('.case-img-wrap > a');
+      if (link) updateStage(link, project);
+      return card;
     });
+    container.replaceChildren(...cards);
+    const carouselSection = typeof container.closest === 'function' ? container.closest('.case-carousel-section') : null;
+    window.RemgazCaseCarousel?.init(carouselSection || container);
   }
 
   function createProject(project, index) {

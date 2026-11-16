@@ -36,6 +36,16 @@ test('lead recipient is optional and provided values are preserved after trimmin
   }
 });
 
+test('additional lead origins are explicit, canonical and include the API site', () => {
+  assert.deepEqual(loadConfig(valid).leadAllowedOrigins, [valid.PUBLIC_ORIGIN]);
+  assert.deepEqual(loadConfig({ ...valid, LEAD_ALLOWED_ORIGINS: ' https://salewam.github.io, https://salewam.github.io ' }).leadAllowedOrigins,
+    [valid.PUBLIC_ORIGIN, 'https://salewam.github.io']);
+  for (const value of ['*', 'null', 'https://salewam.github.io/', 'https://salewam.github.io/project',
+    'https://name:password@example.test', 'https://example.test?x=1', 'https://example.test,']) {
+    assert.throws(() => loadConfig({ ...valid, LEAD_ALLOWED_ORIGINS: value }), /LEAD_ALLOWED_ORIGINS/);
+  }
+});
+
 test('database stays outside dist but may use a sibling directory', () => {
   const dist = fileURLToPath(new URL('../dist/', import.meta.url));
   const nested = fileURLToPath(new URL('../dist/leads.sqlite', import.meta.url));

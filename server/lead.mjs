@@ -84,20 +84,22 @@ function withDeadline(work) {
 
 export function createLeadService(config) {
   const {
-    origin, dbPath, ipHashSecret, telegramBotToken, telegramChatId, turnstileSecret,
+    origin, leadAllowedOrigins = [origin], dbPath, ipHashSecret, telegramBotToken, telegramChatId, turnstileSecret,
     fetch: requestFetch = globalThis.fetch, now: clock = Date.now,
   } = config;
-  if (!origin || !dbPath || !ipHashSecret || !telegramBotToken || !telegramChatId ||
+  if (!origin || !dbPath || !ipHashSecret || !telegramBotToken ||
       Buffer.byteLength(ipHashSecret) < 32 || !/^https?:\/\/[^/]+$/.test(origin)) {
     throw new Error("Invalid lead service configuration");
   }
   const hostname = new URL(origin).hostname;
+  const allowedOrigins = new Set([origin, ...leadAllowedOrigins]);
   mkdirSync(dirname(dbPath), { recursive: true, mode: 0o700 });
   const db = new DatabaseSync(dbPath);
   try {
     chmodSync(dbPath, 0o600);
     db.exec(`PRAGMA busy_timeout=1000;
       PRAGMA journal_mode=WAL;
+      PRAGMA synchronous=FULL;
       CREATE TABLE IF NOT EXISTS reservations (
         id INTEGER PRIMARY KEY, ip_hash TEXT NOT NULL, content_hash TEXT NOT NULL,
         created_at INTEGER NOT NULL, state TEXT NOT NULL CHECK (state IN ('pending','confirmed','rejected','uncertain'))
@@ -115,7 +117,16 @@ export function createLeadService(config) {
         id INTEGER PRIMARY KEY, ip_hash TEXT NOT NULL, created_at INTEGER NOT NULL
       );
       CREATE INDEX IF NOT EXISTS turnstile_attempts_time ON turnstile_attempts(created_at);
-      CREATE INDEX IF NOT EXISTS turnstile_attempts_ip_time ON turnstile_attempts(ip_hash,created_at);`);
+      CREATE INDEX IF NOT EXISTS turnstile_attempts_ip_time ON turnstile_attempts(ip_hash,created_at);
+      CREATE TABLE IF NOT EXISTS leads (
+        id INTEGER PRIMARY KEY, created_at INTEGER NOT NULL,
+        name TEXT NOT NULL, phone TEXT NOT NULL, object TEXT NOT NULL, location TEXT NOT NULL,
+        delivery TEXT NOT NULL CHECK (delivery IN ('queued','sending','sent','rejected','uncertain')),
+        recipient TEXT
+      );
+      CREATE TABLE IF NOT EXISTS lead_recipient (
+        id INTEGER PRIMARY KEY CHECK (id=1), chat_id TEXT NOT NULL
+      );`);
   } catch (error) {
     db.close();
     throw error;
@@ -123,22 +134,35 @@ export function createLeadService(config) {
   const hash = (value) => createHmac("sha256", ipHashSecret).update(value).digest("hex");
   const q = {
     key: db.prepare("SELECT content_hash,reservation_id FROM request_keys WHERE key_hash=? AND created_at>?"),
-    reservation: db.prepare("SELECT id,state,created_at FROM reservations WHERE id=?"),
-    duplicate: db.prepare(`SELECT id,state,created_at FROM reservations WHERE content_hash=? AND
-      ((state='confirmed' AND created_at>?) OR (state IN ('pending','uncertain') AND created_at>?))
-      ORDER BY created_at DESC,id DESC LIMIT 1`),
-    ipCount: db.prepare("SELECT COUNT(*) AS count FROM reservations WHERE ip_hash=? AND created_at>? AND state!='rejected'"),
-    lastIp: db.prepare("SELECT MAX(created_at) AS latest FROM reservations WHERE ip_hash=? AND created_at>? AND state!='rejected'"),
+    reservation: db.prepare(`SELECT r.id,r.state,r.created_at,l.delivery FROM reservations r
+      LEFT JOIN leads l ON l.id=r.id WHERE r.id=?`),
+    duplicate: db.prepare(`SELECT r.id,r.state,r.created_at,l.delivery FROM reservations r
+      LEFT JOIN leads l ON l.id=r.id WHERE content_hash=? AND
+      ((state='confirmed' AND r.created_at>?) OR (state IN ('pending','rejected','uncertain') AND r.created_at>?))
+      ORDER BY r.created_at DESC,r.id DESC LIMIT 1`),
+    ipCount: db.prepare("SELECT COUNT(*) AS count FROM reservations WHERE ip_hash=? AND created_at>?"),
+    lastIp: db.prepare("SELECT MAX(created_at) AS latest FROM reservations WHERE ip_hash=? AND created_at>?"),
     globalCount: db.prepare("SELECT COUNT(*) AS count FROM reservations WHERE created_at>?"),
     keyBurst: db.prepare("SELECT COUNT(*) AS count FROM request_keys WHERE created_at>?"),
     turnstileCount: db.prepare("SELECT COUNT(*) AS count FROM turnstile_attempts WHERE created_at>?"),
     turnstileIpCount: db.prepare("SELECT COUNT(*) AS count FROM turnstile_attempts WHERE ip_hash=? AND created_at>?"),
     cleanTurnstile: db.prepare("DELETE FROM turnstile_attempts WHERE created_at<=?"),
     insertTurnstile: db.prepare("INSERT INTO turnstile_attempts(ip_hash,created_at) VALUES (?,?)"),
-    insert: db.prepare("INSERT INTO reservations(ip_hash,content_hash,created_at,state) VALUES (?,?,?,'pending')"),
+    insert: db.prepare(`INSERT INTO reservations(id,ip_hash,content_hash,created_at,state)
+      SELECT MAX(COALESCE((SELECT MAX(id) FROM reservations),0),
+        COALESCE((SELECT MAX(id) FROM leads),0))+1,?,?,?,'pending'`),
     setKey: db.prepare(`INSERT INTO request_keys(key_hash,content_hash,reservation_id,created_at) VALUES (?,?,?,?)
       ON CONFLICT(key_hash) DO UPDATE SET reservation_id=excluded.reservation_id,created_at=excluded.created_at`),
-    finish: db.prepare("UPDATE reservations SET state=? WHERE id=? AND state='pending'"),
+    finish: db.prepare("UPDATE reservations SET state=? WHERE id=?"),
+    insertLead: db.prepare(`INSERT INTO leads(id,created_at,name,phone,object,location,delivery)
+      VALUES (?,?,?,?,?,?,'queued')`),
+    lead: db.prepare('SELECT * FROM leads WHERE id=?'),
+    list: db.prepare('SELECT * FROM leads ORDER BY created_at DESC,id DESC'),
+    queued: db.prepare("SELECT id FROM leads WHERE delivery='queued' ORDER BY created_at,id"),
+    claim: db.prepare("UPDATE leads SET delivery='sending',recipient=? WHERE id=? AND delivery='queued'"),
+    delivered: db.prepare("UPDATE leads SET delivery=? WHERE id=? AND delivery='sending'"),
+    recipient: db.prepare('SELECT chat_id FROM lead_recipient WHERE id=1'),
+    bind: db.prepare('INSERT INTO lead_recipient(id,chat_id) VALUES (1,?) ON CONFLICT(id) DO NOTHING'),
     cleanKeys: db.prepare("DELETE FROM request_keys WHERE created_at<=?"),
     cleanReservations: db.prepare(`DELETE FROM reservations WHERE created_at<=? AND NOT EXISTS
       (SELECT 1 FROM request_keys WHERE reservation_id=reservations.id)`),
@@ -166,14 +190,14 @@ export function createLeadService(config) {
     });
   }
 
-  function reserve(ipHash, contentHash, keyHash, time) {
+  function reserve(ipHash, contentHash, keyHash, time, lead) {
     return transaction(() => {
       q.cleanKeys.run(time - DAY);
       q.cleanReservations.run(time - DAY);
       const keyed = keyHash ? q.key.get(keyHash, time - DAY) : null;
       if (keyed && keyed.content_hash !== contentHash) return { status: 409, error: "Ключ уже использован для другой заявки" };
       const prior = keyed && q.reservation.get(keyed.reservation_id);
-      if (prior && prior.state !== "rejected") return existing(prior, time);
+      if (prior) return existing(prior, time);
       const duplicate = q.duplicate.get(contentHash, time - DEDUP, time - DAY);
       if (duplicate) {
         if (keyHash && !keyed && q.keyBurst.get(time - MINUTE).count >= 30) {
@@ -191,17 +215,19 @@ export function createLeadService(config) {
         return { status: 429, error: "Слишком много заявок. Повторите позже" };
       }
       const id = Number(q.insert.run(ipHash, contentHash, time).lastInsertRowid);
+      q.insertLead.run(id, time, lead.name, lead.phone, lead.object, lead.location);
       if (keyHash) q.setKey.run(keyHash, contentHash, id, time);
       return { id };
     });
   }
 
   function existing(record, time) {
-    if (record.state === "confirmed") return { status: 200 };
-    if (record.state === "pending" && record.created_at > time - DEADLINE) {
-      return { status: 409, error: "Заявка уже обрабатывается" };
+    // Historical reservations without saved fields cannot confirm durable acceptance.
+    if (!record.delivery) {
+      if (record.state === 'confirmed') return { status: 409, error: 'Заявка уже была отправлена. При необходимости позвоните нам.' };
+      return { status: 409, error: 'Статус прежней отправки неизвестен. Пожалуйста, позвоните нам.' };
     }
-    return { status: 502, error: "Статус отправки неизвестен" };
+    return { status: 200, delivery: record.delivery === 'sent' ? 'sent' : 'queued' };
   }
 
   async function verifyTurnstile(token) {
@@ -221,7 +247,7 @@ export function createLeadService(config) {
     }
   }
 
-  async function deliver(lead) {
+  async function deliver(lead, recipient) {
     const text = [
       "Новая заявка с сайта РемГаз",
       `Имя: ${lead.name}`,
@@ -233,7 +259,7 @@ export function createLeadService(config) {
       return await withDeadline(async (signal) => {
         const telegram = await requestFetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: telegramChatId, text }), signal,
+          body: JSON.stringify({ chat_id: recipient, text }), signal,
         });
         if (!telegram.ok) return telegram.status >= 400 && telegram.status < 500 ? "rejected" : "uncertain";
         const result = await telegram.json();
@@ -244,10 +270,53 @@ export function createLeadService(config) {
     }
   }
 
+  function recipient() {
+    return telegramChatId || q.recipient.get()?.chat_id;
+  }
+
+  async function deliverSaved(id) {
+    const chatId = recipient();
+    if (!chatId || q.claim.run(String(chatId), id).changes !== 1) return;
+    const outcome = await deliver(q.lead.get(id), chatId);
+    // The durable claim stays non-retryable if this commit fails or the process stops.
+    transaction(() => {
+      q.delivered.run(outcome === 'confirmed' ? 'sent' : outcome, id);
+      q.finish.run(outcome, id);
+    });
+  }
+
+  let flushing;
+  function flushQueued() {
+    if (!recipient()) return Promise.resolve();
+    if (!flushing) {
+      flushing = (async () => {
+        for (const { id } of q.queued.all()) await deliverSaved(id);
+      })().finally(() => { flushing = null; });
+    }
+    return flushing;
+  }
+
+  async function bindOperator(user) {
+    const botId = telegramBotToken.split(':', 1)[0];
+    if (!user || !Number.isSafeInteger(user.id) || user.id <= 0 ||
+        (user.is_bot !== undefined && user.is_bot !== false) || String(user.id) === botId) return;
+    if (!telegramChatId) transaction(() => q.bind.run(String(user.id)));
+    await flushQueued();
+  }
+
+  function listLeads() {
+    return q.list.all().map(lead => ({
+      id: lead.id, createdAt: new Date(lead.created_at).toISOString(),
+      name: lead.name, phone: lead.phone, object: lead.object, location: lead.location,
+      delivery: lead.delivery === 'sending' ? 'uncertain' : lead.delivery,
+    }));
+  }
+
   async function handle(request, clientIp) {
+    const origin = request.headers.get("Origin");
     const url = new URL(request.url);
     if (url.pathname !== "/api/lead") return response({ ok: false, error: "Не найдено" }, 404, origin, false);
-    if (request.headers.get("Origin") !== origin) {
+    if (!allowedOrigins.has(origin)) {
       return response({ ok: false, error: "Недопустимый источник" }, 403, origin, false);
     }
     if (request.method === "OPTIONS") {
@@ -303,12 +372,12 @@ export function createLeadService(config) {
           previous = { status: 409, error: "Ключ уже использован для другой заявки" };
         } else if (keyed) {
           const reservation = q.reservation.get(keyed.reservation_id);
-          if (reservation && reservation.state !== "rejected") previous = existing(reservation, clock());
+          if (reservation) previous = existing(reservation, clock());
         }
       } catch {
         return response({ ok: false, error: "Сервис временно недоступен" }, 503, origin);
       }
-      if (previous) return response(previous.status === 200 ? { ok: true } : { ok: false, error: previous.error },
+      if (previous) return response(previous.status === 200 ? { ok: true, delivery: previous.delivery } : { ok: false, error: previous.error },
         previous.status, origin);
     }
     if (turnstileSecret) {
@@ -328,24 +397,21 @@ export function createLeadService(config) {
     }
     let reservation;
     try {
-      reservation = reserve(ipHash, contentHash, keyHash, clock());
+      reservation = reserve(ipHash, contentHash, keyHash, clock(), { name, phone, object, location });
     } catch {
       return response({ ok: false, error: "Сервис временно недоступен" }, 503, origin);
     }
     if (!reservation.id) {
-      return response(reservation.status === 200 ? { ok: true } : { ok: false, error: reservation.error },
+      return response(reservation.status === 200 ? { ok: true, delivery: reservation.delivery } : { ok: false, error: reservation.error },
         reservation.status, origin);
     }
-    const outcome = await deliver({ name, phone, object, location });
-    try {
-      transaction(() => q.finish.run(outcome, reservation.id));
-    } catch {
-      return response({ ok: false, error: "Сервис временно недоступен" }, 503, origin);
-    }
-    return outcome === "confirmed"
-      ? response({ ok: true }, 200, origin)
-      : response({ ok: false, error: "Не удалось отправить заявку" }, 502, origin);
+    try { await deliverSaved(reservation.id); }
+    catch { /* The saved lead remains visible; an uncertain claim is never retried. */ }
+    return response({ ok: true, delivery: q.lead.get(reservation.id).delivery === 'sent' ? 'sent' : 'queued' }, 200, origin);
   }
 
-  return { handle, close: () => db.close() };
+  let closed = false;
+  // Resume only unclaimed durable work; interrupted sending rows remain non-retryable.
+  queueMicrotask(() => { if (!closed) void flushQueued().catch(() => {}); });
+  return { handle, bindOperator, listLeads, close() { if (!closed) { db.close(); closed = true; } } };
 }

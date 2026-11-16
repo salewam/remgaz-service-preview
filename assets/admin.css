@@ -70,6 +70,13 @@ input[type="file"]::file-selector-button { min-height: 40px; margin-right: 10px;
 .switch-label input { flex: none; width: 22px; height: 22px; accent-color: var(--admin-button); }
 .save-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; margin-top: 24px; padding: 16px 0 max(16px, env(safe-area-inset-bottom)); border-top: 1px solid var(--admin-line); background: var(--admin-bg); }
 .price-form { max-width: 420px; margin-top: 24px; }
+.lead-list { display: grid; gap: 14px; margin-top: 18px; }
+.lead-card { min-width: 0; padding: 16px; border: 1px solid var(--admin-line); border-radius: 6px; }
+.lead-card h3 { margin: 0 0 6px; font-size: 16px; }
+.lead-card p { margin: 7px 0; white-space: pre-wrap; }
+.lead-card a { display: inline-block; min-height: 44px; padding-block: 10px; color: var(--admin-link); }
+.lead-meta { color: var(--admin-muted); font-size: 12px; }
+.lead-warning { color: var(--admin-error); font-size: 12px; }
 @media (max-width: 420px) {
   .admin-shell { padding-inline: 16px; }
   .admin-header { align-items: flex-start; }

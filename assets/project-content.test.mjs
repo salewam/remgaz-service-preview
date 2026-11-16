@@ -143,3 +143,42 @@ test('portfolio hides empty labels and reveals filled sections with unchanged fa
   await render();
   assert.equal(facts.hidden, true, 'numbers are not extracted from work text automatically');
 });
+
+test('homepage case feed renders all published projects, excludes unpublished, and falls back to work when desc is empty', async () => {
+  const track = new Element('div');
+  track.className = 'case-triad case-carousel-track';
+  const document = {
+    baseURI: 'https://example.test/', currentScript: { src: 'https://example.test/assets/site-content.js' },
+    createElement: tag => new Element(tag), createTextNode,
+    querySelector: selector => (selector.includes('case-triad') || selector.includes('case-carousel-track')) ? track : null,
+    querySelectorAll: () => [],
+  };
+  const window = {
+    RemgazPhotos: { source: (src, mode) => src, display(image, src) { image.src = src; } },
+    RemgazCaseCarousel: { init() {} }
+  };
+  const publishedProject1 = { ...structuredClone(example), id: 'p1', title: 'Проект 1', published: true, cardDesc: 'Карточка 1' };
+  const publishedProject2 = { ...structuredClone(example), id: 'p2', title: 'Проект 2', published: true, cardDesc: '', desc: '', work: 'Выполненные работы 2' };
+  const unpublishedProject = { ...structuredClone(example), id: 'p3', title: 'Черновик', published: false };
+  
+  runInNewContext(contentScript, {
+    document, window, URL, AbortController, setTimeout, clearTimeout,
+    location: { origin: 'https://example.test' },
+    fetch: async () => ({
+      ok: true,
+      json: async () => ({
+        revision: 1,
+        gasPriceRub: 50,
+        projects: [publishedProject1, unpublishedProject, publishedProject2]
+      })
+    }),
+  });
+  await window.RemgazContent.ready;
+
+  assert.equal(track.children.length, 2, 'unpublished project is excluded');
+  assert.equal(track.children[0].dataset.projectId, 'p1');
+  assert.equal(track.children[1].dataset.projectId, 'p2');
+  assert.equal(track.children[0].querySelector('.case-body > p').textContent, 'Карточка 1');
+  assert.equal(track.children[1].querySelector('.case-body > p').textContent, 'Выполненные работы 2', 'fallback to work when cardDesc and desc are empty');
+  assert.equal(track.children[0].querySelector('.case-body h3 a').getAttribute('href') || track.children[0].querySelector('.case-body h3 a').href, 'portfolio.html#p1');
+});

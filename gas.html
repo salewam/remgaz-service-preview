@@ -195,14 +195,15 @@ h2 { margin: 0 0 20px; color: var(--blue-deep); font-size: 38px; line-height: 1.
     <section class="section contact-section" id="contact" aria-labelledby="contact-title">
       <div class="contact-layout">
         <div class="contact-copy"><p class="section-kicker">Запрос на доставку</p><h2 id="contact-title">Сообщите адрес и нужный объём газа</h2><p>Оставьте контактные данные для расчёта. Если объём пока неизвестен, опишите объект — детали можно уточнить при разговоре.</p><a class="contact-phone" href="tel:+78123855353">8 (812) 385-53-53</a><span class="contact-small">Можно сразу позвонить и обсудить доставку.</span><a class="contact-home" href="index.html">Вернуться на главную ↗</a></div>
-        <form class="editorial-form" action="mailto:info@remgaz.com" method="post" enctype="text/plain" data-email-subject="Запрос по доставке СУГ" onsubmit="prepareEmail(event)">
+        <form class="editorial-form" action="/api/lead" method="post" onsubmit="submitLead(event)">
           <p class="form-title">Запросить расчёт доставки СУГ</p>
-          <p class="form-intro">Заполните поля: откроется письмо, которое нужно будет отправить в почтовой программе.</p>
+          <p class="form-intro">Отправьте заявку — свяжемся с вами для расчёта доставки.</p>
           <div class="form-row-line"><label for="gas-name">Ваше имя</label><input class="form-transparent-input" id="gas-name" name="name" type="text" autocomplete="name" placeholder="Как к вам обращаться" maxlength="100" required></div>
           <div class="form-row-line"><label for="gas-phone">Телефон для связи</label><input class="form-transparent-input" id="gas-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+7 (___) ___-__-__" maxlength="40" required pattern="(?=(?:\D*\d){10,15}\D*$)(?!\D*(\d)(?:\D*\1)+\D*$)\s*(?:\+?\d+(?:[ \-]?\(\d{1,5}\))?|\(\d{1,5}\))(?:[ \-]?\d+)*\s*" title="Введите номер телефона: 10–15 цифр, допустимы +, пробелы, скобки и дефисы."></div>
           <div class="form-row-line"><label for="gas-object">Объект и объём СУГ</label><input class="form-transparent-input" id="gas-object" name="object" type="text" placeholder="Тип объекта и примерный объём, если известен" maxlength="200"></div>
           <div class="form-row-line"><label for="gas-location">Адрес доставки и подъезд</label><input class="form-transparent-input" id="gas-location" name="location" type="text" autocomplete="street-address" placeholder="Населённый пункт, адрес, условия подъезда" maxlength="200" required></div>
           <button type="submit" class="btn-primary submit-btn-line">Оставить заявку</button>
+          <p class="form-fallback" data-form-status role="status" aria-live="polite"></p>
           <p class="form-fallback">Закажите доставку газа — позвоните нам: <a href="tel:+78123855353">8 (812) 385-53-53</a>.</p>
         </form>
       </div>

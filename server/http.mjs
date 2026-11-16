@@ -79,17 +79,17 @@ function webRequest(req, url) {
 }
 
 async function writeResponse(res, response) {
-  res.writeHead(response.status, {
-    ...security, 'Cache-Control': 'no-store', ...Object.fromEntries(response.headers),
-    ...(response.status === 413 ? { Connection: 'close' } : {})
-  });
+  const headers = new Headers({ ...security, 'Cache-Control': 'no-store' });
+  for (const [name, value] of response.headers) headers.set(name, value);
+  if (response.status === 413) headers.set('Connection', 'close');
+  res.writeHead(response.status, Object.fromEntries(headers));
   if (response.body) await pipeline(Readable.fromWeb(response.body), res);
   else res.end();
 }
 
-export function createHttpServer(config, service = config.telegramChatId ? createLeadService(config) : null, distRoot = root) {
+export function createHttpServer(config, service = createLeadService(config), distRoot = root) {
   let contentService;
-  try { contentService = config.contentDbPath ? createContentService(config) : null; }
+  try { contentService = config.contentDbPath ? createContentService(config, { leadService: service }) : null; }
   catch (error) { service?.close(); throw error; }
   const server = createServer({ maxHeaderSize: 16 * 1024 }, async (req, res) => {
     try {

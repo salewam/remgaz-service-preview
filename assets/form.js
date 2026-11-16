@@ -1,4 +1,5 @@
 const phoneError = 'Введите номер телефона: 10–15 цифр, допустимы +, пробелы, скобки и дефисы.';
+const leadRequests = new WeakMap();
 
 function validatePhone(phoneInput) {
   const phone = phoneInput.value.trim();
@@ -10,9 +11,11 @@ function validatePhone(phoneInput) {
   return validPhone;
 }
 
-function prepareEmail(event) {
+async function submitLead(event) {
   event.preventDefault();
   const form = event.currentTarget;
+  const button = form.querySelector('button[type="submit"]');
+  if (button.disabled) return;
   const nameInput = form.elements.name;
   const phoneInput = form.elements.phone;
   const name = nameInput.value.trim();
@@ -27,15 +30,38 @@ function prepareEmail(event) {
   validatePhone(phoneInput);
   if (!form.reportValidity()) return;
 
-  const value = key => form.elements[key]?.value.trim() || '';
-  const body = [
-    `Имя: ${name}`,
-    `Телефон: ${phone}`,
-    `Тип объекта и параметры: ${value('object') || 'не указано'}`,
-    `Локация: ${value('location') || 'не указана'}`
-  ].join('\n');
-  const subject = form.dataset.emailSubject || 'Запрос по объекту';
-  window.location.href = `mailto:info@remgaz.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const status = form.querySelector('[data-form-status]');
+  const label = button.textContent;
+  const body = JSON.stringify({
+    name, phone,
+    object: form.elements.object?.value.trim() || '',
+    location: form.elements.location?.value.trim() || ''
+  });
+  let submission = leadRequests.get(form);
+  if (!submission || submission.body !== body) {
+    submission = { body, key: crypto.randomUUID() };
+    leadRequests.set(form, submission);
+  }
+  button.disabled = true;
+  button.textContent = 'Отправляем…';
+  status.textContent = 'Отправляем заявку…';
+  try {
+    const apiURL = new URL(document.querySelector('meta[name="remgaz-content-api"]')?.content || '/api/content', document.baseURI);
+    const response = await fetch(new URL('/api/lead', apiURL), {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': submission.key }, body
+    });
+    const result = await response.json();
+    if (!response.ok || result?.ok !== true || !['sent', 'queued'].includes(result.delivery)) {
+      status.textContent = result?.error || 'Не удалось отправить заявку. Повторите попытку или позвоните нам.';
+      return;
+    }
+    status.textContent = 'Заявка принята и сохранена. Мы свяжемся с вами по указанному телефону.';
+  } catch {
+    status.textContent = 'Не удалось подтвердить отправку. Данные остались в форме. Повторите попытку или позвоните нам.';
+  } finally {
+    button.disabled = false;
+    button.textContent = label;
+  }
 }
 
 document.querySelectorAll('form.editorial-form').forEach(form => {
