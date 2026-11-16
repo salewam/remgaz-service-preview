@@ -31,7 +31,6 @@ test('homepage hero distinguishes engineering and gas requests with the right de
     .map(([, href, text]) => ({ href, text }));
   assert.deepEqual(links, [
     { href: '#contact', text: 'Связаться с инженером' },
-    { href: '#objects', text: 'Выбрать объект' },
     { href: 'gas.html#contact', text: 'Заказать газ' },
   ]);
 });
